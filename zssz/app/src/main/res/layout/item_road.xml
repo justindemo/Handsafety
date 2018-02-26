@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:padding="6dp">
+
+    <ImageView
+        android:id="@+id/iv_swipe_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerVertical="true"
+        android:scaleType="fitXY" />
+
+
+    <TextView
+        android:id="@+id/tv_problem_reporter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/iv_swipe_icon"
+        android:ellipsize="end"
+        android:text="@string/allreporter"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_problem_reporter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_problem_reporter_title"
+        android:ellipsize="end"
+        android:text="张王丽"
+        android:textSize="16sp" />
+
+
+    <TextView
+        android:id="@+id/tv_problem_loca_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_problem_reporter_title"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/iv_swipe_icon"
+        android:ellipsize="end"
+        android:text="@string/problemlocation"
+        android:textSize="16sp" />
+
+
+    <FrameLayout
+        android:id="@+id/tv_problem_loca1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_problem_reporter_title"
+        android:layout_toRightOf="@+id/tv_problem_loca_title">
+
+        <TextView
+            android:id="@+id/tv_problem_audio"
+            android:layout_width="100dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/selector_tv_audio"
+            android:drawableRight="@mipmap/play"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:id="@+id/tv_problem_loca"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:text="位述置描述"
+            android:textSize="16sp" />
+
+
+    </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/tv_problem_reportertime_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_problem_loca1"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/iv_swipe_icon"
+        android:ellipsize="end"
+        android:text="@string/reportertime"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_problem_reportertime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_problem_loca1"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/tv_problem_reportertime_title"
+        android:ellipsize="end"
+        android:text="2017/3/2 15:02"
+        android:textSize="16sp" />
+
+
+</RelativeLayout>

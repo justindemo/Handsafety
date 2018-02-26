@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.xytsz.xytaj.ui.NoScrollViewpager
+            android:id="@+id/homeactivity_vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:id="@+id/rl_notonline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/btn_refresh"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="@string/home_notnetwork"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/selector_btn_refresh"
+                android:text="@string/home_refresh"
+                android:textColor="@color/miantitle"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/home_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateDrawable="@drawable/progress_loading" />
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/cc_dark_fade" />
+
+    <!--底部按钮-->
+    <RadioGroup
+        android:id="@+id/homeactivity_rg_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <!-- checked : 是否选中RadioButton true:选中,false:不选中
+             button : 设置单选按钮的样式,@null : 不使用样式
+             drawableTop : 在文本的顶部设置图片
+        -->
+        <RadioButton
+            android:id="@+id/homeactivity_rbtn_more"
+            style="@style/HomeActivityRadioButtonStyle"
+            android:drawableTop="@drawable/selector_supervise"
+            android:text="@string/bottom_thrid" />
+
+        <RadioButton
+            android:id="@+id/homeactivity_rbtn_home"
+            style="@style/HomeActivityRadioButtonStyle"
+            android:drawableTop="@drawable/selector_home"
+            android:text="@string/bottom_first" />
+
+
+        <RadioButton
+            android:id="@+id/homeactivity_rbtn_me"
+            style="@style/HomeActivityRadioButtonStyle"
+            android:drawableTop="@drawable/selector_me"
+            android:text="@string/bottom_fifth" />
+
+    </RadioGroup>
+</LinearLayout>

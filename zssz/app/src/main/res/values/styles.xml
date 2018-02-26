@@ -1,0 +1,99 @@
+<resources xmlns:android="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <!--actionbar 的颜色-->
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <!--时间格 的颜色-->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionBarSize">40dp</item>
+
+    </style>
+
+    <style name="ThemeSplash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:screenOrientation">portrait</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+    <!--<style name="ButtonStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:colorButtonNormal">@color/white</item>
+        <item name="android:colorControlHighlight">@color/graybackground</item>
+    </style>-->
+
+
+
+    <!-- Navigation Header -->
+    <style name="NavPage">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+        <!-- <item name="android:background">@drawable/nav_page</item> -->
+        <item name="android:background">@color/navpage</item>
+    </style>
+
+
+    <style name="HomeActivityRadioButtonStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:button">@null</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@drawable/selector_homeactivity_rbtn_text_color</item>
+    </style>
+
+    <style name="MyDialog" parent="Base.AlertDialog.AppCompat.Light">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@mipmap/none</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="NativeDialog" parent="@style/MyDialog"></style>
+
+    <style name="text_nomal_orage">
+        <item name="android:textColor">@color/cc_orage</item>
+        <item name="android:textSize">@dimen/text_nomal</item>
+    </style>
+
+    <style name="text_nomal_darklight">
+        <item name="android:textColor">@color/cc_text_darklight</item>
+        <item name="android:textSize">@dimen/text_nomal</item>
+    </style>
+
+    <style name="text_nomal_blank">
+        <item name="android:textColor">@color/cc_text_blank</item>
+        <item name="android:textSize">@dimen/text_nomal</item>
+    </style>
+
+    <style name="spinner_style" parent="Base.Widget.AppCompat.Spinner">
+        <item name="android:divider">#aa000000</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
+    <style name="TabLayoutTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ThemeHome" parent="Theme.AppCompat.Light.NoActionBar">
+         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+         <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="ThemeMain" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+
+</resources>

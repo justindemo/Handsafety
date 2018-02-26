@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:padding="6dp"
+    >
+
+    <TextView
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="6dp"
+        android:text="道路"
+        android:textSize="20sp"
+        android:id="@+id/tv_road_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_un_read_msg_count"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:text="1"
+        android:textSize="12sp"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:background="@drawable/tv_shape"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"/>
+</RelativeLayout>

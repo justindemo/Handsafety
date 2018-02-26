@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="6dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_marginTop="3dp"
+        android:textSize="18sp"
+        android:text="北京市大兴区"
+        android:id="@+id/member"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_marginTop="3dp"
+        android:text="条"
+        android:id="@+id/right"
+        android:textSize="18sp"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:text="800"
+        android:textSize="23sp"
+        android:id="@+id/tv_table_number"
+        android:layout_toLeftOf="@id/right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

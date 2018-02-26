@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:padding="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_send_photo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rl_send_road_detail"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            >
+            <TextView
+                android:id="@+id/tv_sendroad_vname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/allreporter"
+                android:textSize="16sp"
+                />
+            <TextView
+                android:id="@+id/tv_sendroad_Vname"
+                android:layout_toRightOf="@+id/tv_sendroad_vname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="一级病害"
+                android:textSize="16sp" />
+
+
+            <TextView
+                android:layout_below="@+id/tv_sendroad_Vname"
+                android:id="@+id/tv_sendroad_Pname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/problemlocation"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:id="@+id/tv_send_Pname1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_sendroad_Vname"
+                android:layout_toRightOf="@+id/tv_sendroad_Pname">
+
+                <TextView
+                    android:id="@+id/tv_send_audio"
+                    android:layout_width="120dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/selector_tv_audio"
+                    android:drawableRight="@mipmap/play"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_send_Pname"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="nihao "
+                    android:textSize="16sp" />
+
+            </FrameLayout>
+
+
+            <TextView
+                android:id="@+id/tv_send_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_send_Pname1"
+                android:layout_marginTop="6dp"
+                android:layout_toRightOf="@+id/tv_sendroad_date"
+                android:text="2017年3月8日11:09"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_sendroad_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_send_Pname1"
+                android:layout_marginTop="6dp"
+                android:text="@string/reportertime"
+                android:textSize="16sp" />
+        </RelativeLayout>
+
+        <CheckBox
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/sendroad_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_sendroad_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal">
+
+        <com.xytsz.xytaj.ui.TimeChoiceButton
+            android:id="@+id/bt_send_choice"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:background="@drawable/shape_sendroad_tv"
+            android:text="@string/send_request_time" />
+
+        <TextView
+            android:id="@+id/bt_send_send"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/shape_sendroad_tv"
+            android:gravity="center"
+            android:text="@string/send_send"
+            android:textColor="@color/white" />
+
+
+        <TextView
+            android:id="@+id/bt_send_back"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_sendroad_back"
+            android:gravity="center"
+            android:text="@string/send_fail"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/graybackground">
+
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:padding="6dp"
+        android:background="@color/cc_white"
+        android:focusableInTouchMode="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_centerVertical="true"
+            android:text="@string/information_name"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:layout_alignParentRight="true"
+            android:textSize="18sp"
+            android:id="@+id/my_name"
+            android:gravity="right"
+            android:hint="@string/hint_name"
+            android:padding="6dp"
+            android:background="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_marginTop="1dp"
+        android:padding="6dp"
+        android:background="@color/cc_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_centerVertical="true"
+            android:text="@string/information_phone"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:layout_alignParentRight="true"
+            android:focusableInTouchMode="false"
+            android:focusable="false"
+            android:textSize="18sp"
+            android:id="@+id/my_telephone"
+            android:padding="6dp"
+            android:background="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+
+
+    <RelativeLayout
+        android:layout_marginTop="1dp"
+        android:background="@color/cc_white"
+        android:padding="6dp"
+        android:id="@+id/my_ll_activite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:text="@string/information_department"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:layout_alignParentRight="true"
+            android:focusableInTouchMode="false"
+            android:focusable="false"
+            android:textSize="18sp"
+            android:id="@+id/my_department"
+            android:padding="6dp"
+            android:background="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/mine_modification_psd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/selector_btn_exit"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/information_modification"
+        android:textColor="@color/cc_white"
+        android:textSize="20sp" />
+
+
+
+    <Button
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        android:id="@+id/mine_compelet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/selector_btn_exit"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/information_save"
+        android:textColor="@color/cc_white"
+        android:textSize="20sp" />
+
+
+
+</LinearLayout>

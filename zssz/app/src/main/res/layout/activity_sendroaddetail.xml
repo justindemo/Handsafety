@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="6dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/allreporter"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_reporter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="nihao"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/report_dealgrade"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_facility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="sscc"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/report_department"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_facility_person"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="sscc"
+            android:textSize="18sp" />
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/report_dealcategory"
+                android:textColor="@color/cc_text_blank"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_send_detail_facility_team"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="sscc"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/report_roadname"
+                android:textColor="@color/cc_text_blank"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_send_detail_facility_loca"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="sscc"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/detail_problem"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_facility_problem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_uncheck_information"
+            android:gravity="start|center_vertical"
+            android:text=""
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reportertime"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_reportetime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2017年3月2日16:45:06"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@string/report_locaiton"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <FrameLayout
+            android:id="@+id/tv_send_detail_address1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_send_problem_audio"
+                android:layout_width="120dp"
+                android:layout_height="28dp"
+                android:background="@drawable/selector_tv_audio"
+                android:drawableRight="@mipmap/play"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:visibility="gone"  />
+
+            <TextView
+                android:id="@+id/tv_send_detail_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:text="@string/locationdes"
+                android:textSize="18sp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/report_problemdes"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_send_detail_diseasedes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="miaoshu"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/reportimg"
+        android:textColor="@color/cc_text_blank"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:id="@+id/ll_iv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_uncheck_information"
+        android:orientation="horizontal"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/iv_send_detail_photo1"
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/iv_send_detail_photo2"
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            android:layout_marginLeft="8dp"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/iv_send_detail_photo3"
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            android:layout_marginLeft="8dp"
+            android:scaleType="fitXY" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_video"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+       >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/report_problemdes"
+            android:textColor="@color/cc_text_blank"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/iv_play_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:src="@mipmap/iv_video" />
+    </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_leader_advice"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="6dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_advice"
+                android:textColor="@color/cc_text_blank"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/tv_send_detail_advice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:hint="请填写审批意见"
+                android:background="@drawable/shape_uncheck_information"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:id="@+id/ll_send_mine_advice"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="6dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通知意见："
+                android:textColor="@color/cc_text_blank"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_send_detail_leader_advice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:background="@drawable/shape_uncheck_information"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:layout_alignParentBottom="true"
+        android:id="@+id/ll_road_idea"
+        android:padding="6dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/tv_send_pass"
+            android:padding="3dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/shape_sendroad_tv"
+            android:text="@string/review_tv_pass"
+            android:textColor="@color/cc_white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/tv_send_back"
+            android:padding="3dp"
+            android:layout_width="0dp"
+            android:layout_marginLeft="6dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/shape_sendroad_back"
+            android:text="@string/review_tv_fail"
+            android:textColor="@color/cc_white"
+            android:textSize="18sp" />
+    </LinearLayout>
+</RelativeLayout>

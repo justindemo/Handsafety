@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.xytsz.xytaj">
+
+
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <!-- 这个权限用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 这个权限用于访问GPS定位-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 获取运营商信息，用于支持提供运营商信息相关的接口-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- 用于读取手机当前的状态-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 访问网络，网络定位需要上网-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- SD卡读取权限，用户写入离线定位数据-->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!--允许应用读取低级别的系统日志文件 -->
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!--调用相机-->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+
+    <!-- 来电消音 -->
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <!-- 手机震动权限 -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    <uses-permission android:name="android.permission.ACCES_MOCK_LOCATION" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--蓝牙所需权限-->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <application
+        android:name="com.xytsz.xytaj.MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="0PghQKDfVOhgy4EKGIqDyF09wObRAiSm" />
+
+        <meta-data
+            android:name="BaiduMobAd_CELL_LOCATION"
+            android:value="true" />
+        <meta-data
+            android:name="BaiduMobAd_GPS_LOCATION"
+            android:value="true" />
+        <meta-data
+            android:name="BaiduMobAd_WIFI_LOCATION"
+            android:value="true" />
+
+
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="1f6cfb66a86e3" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="218b52ee592eb212d631b7e13e7f1547" />
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.SplashAcitvity"
+            android:theme="@style/ThemeSplash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.MainActivity"
+            android:theme="@style/ThemeMain" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeHome" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.ReportActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="com.xytsz.xytaj.activity.RoadActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MemberLocationActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.DealActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.UnCheckActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="com.xytsz.xytaj.activity.CheckRoadActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.PostRoadActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SendRoadActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"/>
+        <activity android:name="com.xytsz.xytaj.activity.FloodActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.AppraiseActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.MakerProblemActivty"
+            android:screenOrientation="portrait" />
+        <activity android:name="com.xytsz.xytaj.activity.DiseaseDetailActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.PhotoShowActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name="com.xytsz.xytaj.activity.CheckDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyReporteActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyDealedActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyReviewedActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyReporteDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyDealedDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SendRoadDetailActivity" />
+
+        <activity android:name="com.xytsz.xytaj.activity.RoadNumberActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.BridgeNumberActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.RoadMapActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MyInformationActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ReportPhotoShowActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MemberMapActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ForUsActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ModificationActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MySendDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MySendActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MarkPositionActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.InputNumberActivity" />
+
+        <activity
+            android:name="com.google.zxing.activity.CaptureActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+
+        <activity android:name="com.xytsz.xytaj.activity.FacilityManageActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.RecordVideoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name="com.xytsz.xytaj.activity.PlayVideoActivity" />
+
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.SearchRoadActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.GuideActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.BigPictureActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.SendBigPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name="com.xytsz.xytaj.activity.PostBigPhotoActivity" />
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.CheckPostBigPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.CheckReportBigPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name="com.xytsz.xytaj.activity.ProcessDetailActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.MarkerReportPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <activity
+            android:name="com.xytsz.xytaj.activity.PrePhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.PostPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.IngPhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
+        <!-- alipay sdk begin -->
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
+        <!-- alipay sdk end -->
+
+
+        <!--配置shareSDk 需要的activity-->
+
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+
+            <intent-filter>
+                <data android:scheme="tencent100371282" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- 调用新浪原生SDK，需要注册的回调activity -->
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!--集成line客户端登录授权，需要添如下格式的过滤器-->
+            <intent-filter>
+                <data android:scheme="line.1477692153" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+
+
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote">
+
+        </service>
+
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+
+    </application>
+
+</manifest>
