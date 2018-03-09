@@ -366,8 +366,8 @@ public class MeFragment extends BaseFragment {
     }
 
     private String path;
-    private String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/myIcon/";
-    private final String pathString = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/myIcon/myicon.jpg";
+    private String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/myIcon/";
+    private final String pathString = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/myIcon/myicon.jpg";
 
     public String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载

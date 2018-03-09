@@ -11,7 +11,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dalong.marqueeview.MarqueeView;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.FacilityManageActivity;
-import com.xytsz.xytaj.activity.FloodActivity;
+import com.xytsz.xytaj.activity.PersonSignActivity;
 import com.xytsz.xytaj.activity.MemberLocationActivity;
 import com.xytsz.xytaj.adapter.SuperviseAdapter;
 import com.xytsz.xytaj.base.BaseFragment;
@@ -64,7 +64,7 @@ public class  SuperviseFragment extends BaseFragment  {
         titles.add("设备问题");
         titles.add("车辆管理");
         titles.add("设施管理");
-        titles.add("早会签到");
+        titles.add("人员签到");
      
 
         mActionbartext.setText(R.string.supervise);
@@ -102,7 +102,7 @@ public class  SuperviseFragment extends BaseFragment  {
                         //showDialog();
                         break;
                     case SIGN:
-                        IntentUtil.startActivity(getContext(), FloodActivity.class);
+                        IntentUtil.startActivity(getContext(), PersonSignActivity.class);
                         //防汛
                         break;
                 }
@@ -156,5 +156,10 @@ public class  SuperviseFragment extends BaseFragment  {
         mheadMarquee.startScroll();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mheadMarquee.stopScroll();
+    }
 }
 

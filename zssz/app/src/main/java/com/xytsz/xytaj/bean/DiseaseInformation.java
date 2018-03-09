@@ -7,7 +7,9 @@ package com.xytsz.xytaj.bean;
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * 任务单号          TaskNumber  区分任务的标示
@@ -74,6 +76,42 @@ public class DiseaseInformation implements KvmSerializable {
     public String audioName;
     public String videoName;
     public String audioTime;
+    public String selectPerson;
+    private List<CheckItem> checkItems  = new ArrayList<>();
+
+    public List<CheckItem> getCheckItems() {
+        return checkItems;
+    }
+
+    public void setCheckItems(List<CheckItem> checkItems) {
+        this.checkItems = checkItems;
+    }
+
+    public static class CheckItem{
+        public CheckItem(boolean isCheck,int position){
+            this.isCheck = isCheck;
+            this.position = position;
+        }
+        public boolean isCheck() {
+            return isCheck;
+        }
+
+        public void setCheck(boolean check) {
+            isCheck = check;
+        }
+
+        private boolean isCheck;
+        private int position;
+
+        public int getPosition() {
+            return position;
+        }
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
+    }
+
 
     @Override
     public Object getProperty(int i) {

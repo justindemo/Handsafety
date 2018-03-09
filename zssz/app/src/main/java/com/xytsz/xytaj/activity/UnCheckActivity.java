@@ -511,7 +511,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private DiseaseInformation diseaseInformation;
-    private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/UncheckImage/";//图片的存储目录
+    private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/UncheckImage/";//图片的存储目录
 
     public String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
@@ -525,7 +525,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
             FileOutputStream outputStream = null;
             try {
                 outputStream = new FileOutputStream(path);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);//把图片数据写入文件
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
                 photo2Base64(path);
             } catch (FileNotFoundException e) {
 
@@ -974,9 +974,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
             switch (requestCode) {
                 case 9001:
                     bitmap = getBitmap(ivPredealIcon1, fileUri.getPath());
+                    ivPredealIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivPredealIcon1.setImageBitmap(bitmap);
                     ivPredealIcon1.setClickable(false);
                     encode = photo2Base64(path);
                     fileNames.add(fileName);
@@ -986,9 +986,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 case 9002:
                     bitmap = getBitmap(ivPredealIcon2, fileUri.getPath());
+                    ivPredealIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivPredealIcon2.setImageBitmap(bitmap);
                     ivPredealIcon2.setClickable(false);
                     encode = photo2Base64(path);
                     fileNames.add(fileName);
@@ -998,9 +998,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 case 9003:
                     bitmap = getBitmap(ivPredealIcon3, fileUri.getPath());
+                    ivPredealIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivPredealIcon3.setImageBitmap(bitmap);
                     ivPredealIcon3.setClickable(false);
                     encode = photo2Base64(path);
                     fileNames.add(fileName);
@@ -1010,9 +1010,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 case 9004:
                     bitmap = getBitmap(ivDealingIcon1, fileUri.getPath());
+                    ivDealingIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealingIcon1.setImageBitmap(bitmap);
                     ivDealingIcon1.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamess.add(fileName);
@@ -1023,9 +1023,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 case 9005:
 
                     bitmap = getBitmap(ivDealingIcon2, fileUri.getPath());
+                    ivDealingIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealingIcon2.setImageBitmap(bitmap);
                     ivDealingIcon2.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamess.add(fileName);
@@ -1037,9 +1037,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     //bitmap = (Bitmap) data.getExtras().get("data");
 
                     bitmap = getBitmap(ivDealingIcon3, fileUri.getPath());
+                    ivDealingIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealingIcon3.setImageBitmap(bitmap);
                     ivDealingIcon3.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamess.add(fileName);
@@ -1050,9 +1050,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 case 9007:
                     //bitmap = (Bitmap) data.getExtras().get("data");
                     bitmap = getBitmap(ivDealedIcon1, fileUri.getPath());
+                    ivDealedIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealedIcon1.setImageBitmap(bitmap);
                     ivDealedIcon1.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamesss.add(fileName);
@@ -1063,9 +1063,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 case 9008:
                     //bitmap = (Bitmap) data.getExtras().get("data");
                     bitmap = getBitmap(ivDealedIcon2, fileUri.getPath());
+                    ivDealedIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealedIcon2.setImageBitmap(bitmap);
                     ivDealedIcon2.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamesss.add(fileName);
@@ -1077,9 +1077,9 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     //bitmap = (Bitmap) data.getExtras().get("data");
 
                     bitmap = getBitmap(ivDealedIcon3, fileUri.getPath());
+                    ivDealedIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    ivDealedIcon3.setImageBitmap(bitmap);
                     ivDealedIcon3.setClickable(false);
                     encode = photo2Base64(path);
                     fileNamesss.add(fileName);

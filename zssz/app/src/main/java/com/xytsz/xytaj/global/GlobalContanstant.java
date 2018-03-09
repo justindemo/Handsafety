@@ -1,5 +1,7 @@
 package com.xytsz.xytaj.global;
 
+import android.os.Message;
+
 /**
  * Created by admin on 2017/1/3.
  *
@@ -76,4 +78,10 @@ public class GlobalContanstant {
     public static final int MYSENDSUCCESS = 50002;
     public static final int PERSONLISTSUCCESS = 50003;
     public static final int PERSONLISTFAIL = 50004;
+    public static final int PERSONSIGNSUCCESS= 7000;
+    public static final int PERSONSIGNFAIL= 7001;
+    public static final int MORNINGFAIL =8001;
+    public static final int MORNINGSUCCESS =8000;
+    public static final int MORNINGIMGFAIL = 9001;
+
 }

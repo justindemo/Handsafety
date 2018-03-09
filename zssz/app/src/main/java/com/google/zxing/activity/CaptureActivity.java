@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -150,26 +152,65 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 
     /**
      * 灯开关
-     * @param lightStatus
+     * @param lightStatus 开关
+     *
      */
     private void lightSwitch(final boolean lightStatus) {
         if (lightStatus) { // 关闭手电筒
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 try {
-                    manager.setTorchMode("0", false);
+                    //获取当前手机所有摄像头设备ID
+                    String[] ids  = manager.getCameraIdList();
+                    for (String id : ids) {
+                        CameraCharacteristics c = manager.getCameraCharacteristics(id);
+                        //查询该摄像头组件是否包含闪光灯
+                        Boolean flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+                        *//*
+                        * 获取相机面对的方向
+                        * CameraCharacteristics.LENS_FACING_FRONT 前置摄像头
+                        * CameraCharacteristics.LENS_FACING_BACK 后只摄像头
+                        * CameraCharacteristics.LENS_FACING_EXTERNAL 外部的摄像头
+                        *//*
+                        Integer lensFacing = c.get(CameraCharacteristics.LENS_FACING);
+                        if (flashAvailable != null && flashAvailable
+                                && lensFacing != null && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                            //打开或关闭手电筒
+                            manager.setTorchMode(id, false);
+                        }
+                    }
+
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } else {
+            } else {*/
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                 m_Camera.setParameters(parameters);
-            }
+
         } else { // 打开手电筒
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                try {
-                    manager.setTorchMode("0", true);
-                } catch (Exception e) {
-                }
-            } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                try {
+//                    //获取当前手机所有摄像头设备ID
+//                    String[] ids  = manager.getCameraIdList();
+//                    for (String id : ids) {
+//                        CameraCharacteristics c = manager.getCameraCharacteristics(id);
+//                        //查询该摄像头组件是否包含闪光灯
+//                        Boolean flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+//                        /*
+//                        * 获取相机面对的方向
+//                        * CameraCharacteristics.LENS_FACING_FRONT 前置摄像头
+//                        * CameraCharacteristics.LENS_FACING_BACK 后只摄像头
+//                        * CameraCharacteristics.LENS_FACING_EXTERNAL 外部的摄像头
+//                        */
+//                        Integer lensFacing = c.get(CameraCharacteristics.LENS_FACING);
+//                        if (flashAvailable != null && flashAvailable
+//                                && lensFacing != null && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+//                            //打开或关闭手电筒
+//                            manager.setTorchMode(id, true);
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                }
+//            } else {
                 final PackageManager pm = getPackageManager();
                 final FeatureInfo[] features = pm.getSystemAvailableFeatures();
                 for (final FeatureInfo f : features) {
@@ -180,7 +221,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
                         m_Camera.startPreview();
                     }
                 }
-            }
+
         }
     }
 

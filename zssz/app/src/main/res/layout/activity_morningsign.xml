@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ll_sign"
+        android:visibility="invisible"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:padding="6dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/sign_team"
+                android:textSize="16sp"
+                android:textColor="@color/cc_text_blank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_sign_team"
+                android:text="仓储队"
+                android:textSize="16sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:padding="6dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/sign_person"
+                android:textSize="16sp"
+                android:textColor="@color/cc_text_blank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textColorHint="@color/cc_supervise"
+                android:textColor="@color/cc_text_blank"
+                android:hint="@string/personsign_tip"
+                android:id="@+id/tv_sign_person"
+                android:background="@drawable/shape_uncheck_information"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text=""
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="6dp"
+            android:background="@color/graybackground"/>
+
+        <LinearLayout
+            android:padding="6dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/sign_picture"
+                android:textSize="16sp"
+                android:textColor="@color/cc_text_blank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/iv_sign_picture"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="6dp"
+                android:background="@mipmap/iv_add"
+                android:scaleType="fitXY" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="6dp"
+            android:background="@color/graybackground"/>
+
+        <LinearLayout
+            android:padding="6dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/sign_strand"
+                android:textSize="16sp"
+                android:textColor="@color/cc_text_blank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:padding="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="220dp">
+                <ListView
+                    android:id="@+id/strand_lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </ListView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/report_sign"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="6dp"
+        android:layout_gravity="bottom"
+        android:background="@mipmap/report_update"
+        android:text="@string/report_commit"
+        android:textColor="@color/white"
+        android:textSize="19sp" />
+
+
+    <LinearLayout
+        android:visibility="visible"
+        android:id="@+id/morning_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_modification_pb"
+        android:gravity="center"
+        >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_loading" />
+    </LinearLayout>
+
+
+
+</FrameLayout>

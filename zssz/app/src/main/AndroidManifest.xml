@@ -122,7 +122,8 @@
         <activity android:name="com.xytsz.xytaj.activity.PostRoadActivity" />
         <activity android:name="com.xytsz.xytaj.activity.SendRoadActivity"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
-        <activity android:name="com.xytsz.xytaj.activity.FloodActivity" />
+        <activity android:name=".activity.PersonSignActivity" />
+        <activity android:name=".activity.MoringSignActivity" />
         <activity android:name="com.xytsz.xytaj.activity.AppraiseActivity" />
         <activity
             android:name="com.xytsz.xytaj.activity.MakerProblemActivty"
@@ -270,6 +271,16 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.xytsz.xytaj.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
 
     </application>

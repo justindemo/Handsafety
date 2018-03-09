@@ -168,4 +168,7 @@ public class NetUrl {
     public static final String getAllSendByPersonID = "GetAllIssuedByPersonID";
     public static final String getReportDataMethodname = "GetCheckTermByDeviceId";
     public static final String getReport_SOAP_ACTION = "http://AJ.org/GetCheckTermByDeviceId";
+    public static final String getSignpersonMethodname ="";
+    public static final String MoringSignmethod ="";
+    public static final String TrainSignmethod ="";
 }

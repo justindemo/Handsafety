@@ -98,12 +98,12 @@ public class ReportActivity extends AppCompatActivity {
 
     private Button mbtReport;
     //图片的存储位置
-    private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/Image/";//图片的存储目录
-    private static final String audioPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/Audio/";
+    private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";//图片的存储目录
+    private static final String audioPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Audio/";
     private DiseaseInformation diseaseInformation;
     private String reportResult;
     private String isphotoSuccess1;
-    private String path;
+    private  String path;
     private List<String> fileNames = new ArrayList<>();
     private List<String> imageBase64Strings = new ArrayList<>();
     private String taskNumber;
@@ -887,9 +887,8 @@ public class ReportActivity extends AppCompatActivity {
                     if (facilityProblem.equals("正常")) {
                         diseaseInformation.problemTag = 1;
                         diseaseInformation.problem = "";
+                        diseaseInformation.problemID = "1,1,1,1";
                     } else {
-
-
                         String p[] = facilityProblem.split(",");
                         StringBuilder sb = new StringBuilder();
                         StringBuilder sb1 = new StringBuilder();
@@ -916,15 +915,13 @@ public class ReportActivity extends AppCompatActivity {
                     //保存到服务器  弹吐司
                     if (mEtlocation != null) {
                         diseaseInformation.locationDesc = mEtlocation.getText().toString();
-
                         if (diseaseInformation.locationDesc.isEmpty() && audioNamepath == null) {
-
                             ToastUtil.shortToast(getApplicationContext(), reportLocation);
                             mprogressbar.setVisibility(View.GONE);
+                            return;
                         }
 
                     }
-
 
                     mprogressbar.setVisibility(View.VISIBLE);
                     diseaseInformation.uploadTime = getCurrentTime();
@@ -1021,9 +1018,7 @@ public class ReportActivity extends AppCompatActivity {
 
                                         try {
 
-
                                             String remoteInfo = getRemoteInfo(diseaseInformation);
-
                                             Message message = Message.obtain();
                                             message.obj = remoteInfo;
                                             message.what = GlobalContanstant.REPORTESUCCESS;
@@ -1171,7 +1166,7 @@ public class ReportActivity extends AppCompatActivity {
     /**
      * 给拍的照片命名
      */
-    public String createPhotoName() {
+    public  String createPhotoName() {
         //以系统的当前时间给图片命名
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
@@ -1190,7 +1185,7 @@ public class ReportActivity extends AppCompatActivity {
         // 照片全路径
         String fileName = "";
         // 文件夹路径
-        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/Image/mymy/";
+        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
         //String pathUrl = "/sdcard/Zssz/Image/mymy/";
         //String pathUrl = Environment.getExternalStorageDirectory().getPath()+"/Zssz/Image/mymy/";
         String imageName = "imageTest" + i + ".jpg";
@@ -1204,7 +1199,7 @@ public class ReportActivity extends AppCompatActivity {
     /**
      * 保存到本地
      */
-    public String saveToSDCard(Bitmap bitmap) {
+    public  String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -1217,7 +1212,7 @@ public class ReportActivity extends AppCompatActivity {
             try {
                 outputStream = new FileOutputStream(path);
 
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);//把图片数据写入文件
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -1230,7 +1225,7 @@ public class ReportActivity extends AppCompatActivity {
                 }
             }
         } else {
-            ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
+            ToastUtil.shortToast(getApplicationContext(),"SD卡不存在");
         }
 
         return photoName;
@@ -1266,9 +1261,9 @@ public class ReportActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 if (requestCode == 1) {
                     bitmap = getBitmap(mIvphoto1, fileUri.getPath());
+                    mIvphoto1.setImageBitmap(bitmap);
                     String fileName1 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    mIvphoto1.setImageBitmap(bitmap);
                     mIvphoto1.setClickable(false);
                     String encode1 = photo2Base64(path);
                     fileNames.add(fileName1);
@@ -1276,9 +1271,9 @@ public class ReportActivity extends AppCompatActivity {
                 } else if (requestCode == 2) {
 
                     bitmap = getBitmap(mIvphoto2, fileUri.getPath());
+                    mIvphoto2.setImageBitmap(bitmap);
                     String fileName2 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    mIvphoto2.setImageBitmap(bitmap);
                     mIvphoto2.setClickable(false);
                     String encode2 = photo2Base64(path);
                     fileNames.add(fileName2);
@@ -1286,9 +1281,9 @@ public class ReportActivity extends AppCompatActivity {
 
                 } else if (requestCode == 3) {
                     bitmap = getBitmap(mIvphoto3, fileUri.getPath());
+                    mIvphoto3.setImageBitmap(bitmap);
                     String fileName3 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    mIvphoto3.setImageBitmap(bitmap);
                     mIvphoto3.setClickable(false);
                     String encode3 = photo2Base64(path);
                     fileNames.add(fileName3);
@@ -1314,9 +1309,9 @@ public class ReportActivity extends AppCompatActivity {
                 ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
                 return;
             }
+            mIvphoto1.setImageBitmap(bitmap);
             String fileName4 = saveToSDCard(bitmap);
             //将选择的图片设置到控件上
-            mIvphoto1.setImageBitmap(bitmap);
             mIvphoto1.setClickable(false);
 
             String encode4 = photo2Base64(path);
@@ -1342,9 +1337,9 @@ public class ReportActivity extends AppCompatActivity {
                 ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
                 return;
             }
+            mIvphoto2.setImageBitmap(bitmap);
             String fileName5 = saveToSDCard(bitmap);
             //将选择的图片设置到控件上
-            mIvphoto2.setImageBitmap(bitmap);
             mIvphoto2.setClickable(false);
 
             String encode5 = photo2Base64(path);
@@ -1367,9 +1362,9 @@ public class ReportActivity extends AppCompatActivity {
                 ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
                 return;
             }
+            mIvphoto3.setImageBitmap(bitmap);
             String fileName6 = saveToSDCard(bitmap);
             //将选择的图片设置到控件上
-            mIvphoto3.setImageBitmap(bitmap);
             mIvphoto3.setClickable(false);
 
             String encode6 = photo2Base64(path);
@@ -1380,7 +1375,7 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
-    private Bitmap getBitmap(ImageView imageView, String path) {
+    protected static Bitmap getBitmap(ImageView imageView, String path) {
         Bitmap bitmap;
         int width = imageView.getWidth();
 
@@ -1412,7 +1407,7 @@ public class ReportActivity extends AppCompatActivity {
         return rotateBitmap;
     }
 
-    private int getBitmapDegree(String path) {
+    private static int getBitmapDegree(String path) {
         int degree = 0;
         try {
             //从指定路径读取图片，获取exif信息
@@ -1442,7 +1437,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
 
-    private Bitmap rotateBitmap(Bitmap bm, float orientationDegree) {
+    private static Bitmap rotateBitmap(Bitmap bm, float orientationDegree) {
         Matrix m = new Matrix();
         m.setRotate(orientationDegree, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
 
@@ -1460,7 +1455,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private Bitmap largeBitmap = null;
 
-    private String photo2Base64(String path) {
+    public static String photo2Base64(String path) {
 
         try {
             FileInputStream fis = new FileInputStream(path);
@@ -1561,7 +1556,7 @@ public class ReportActivity extends AppCompatActivity {
                                 diseaseInformation = null;
 
                                 mprogressbar.setVisibility(View.GONE);
-                                finish();
+                                goHome();
                             }
                         } else {
                             ToastUtil.shortToast(getApplicationContext(), uperror);
@@ -1621,6 +1616,14 @@ public class ReportActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void goHome() {
+        Intent intent = new Intent(ReportActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("backHome", GlobalContanstant.BACKHOME);
+        startActivity(intent);
+        finish();
+    }
 
 
     private PendingIntent getContentIntent() {

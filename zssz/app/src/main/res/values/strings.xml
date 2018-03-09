@@ -26,7 +26,10 @@
     <string name="report_tv_record">重录</string>
     <string name="app_tip">提示</string>
     <string name="report_tip">请选择问题项</string>
+    <string name="personsign_tip">请选择人员</string>
     <string name="play_video">视频播放</string>
+    <string name="morningsign">早会签到</string>
+    <string name="trainsign">早会签到</string>
 
 
 
@@ -187,9 +190,14 @@
     <string name="audio_fail">音频上传失败</string>
     <string name="disrecord">请先录音</string>
     <string name="reportmore">请重录</string>
-    <string name="reportlocation">请填写位置描述</string>
+    <string name="reportlocation">请填写具体描述</string>
 
     <string name="add_video">添加视频</string>
+    <string name="sign_team">签到团队：</string>
+    <string name="sign_person">签到人员：</string>
+    <string name="sign_picture">人员照片：</string>
+    <string name="sign_strand">检查标准：</string>
+    <string name="sign_up">提交</string>
 
 
 
@@ -267,6 +275,7 @@
     <string name="personloca">人员定位</string>
     <string name="problemdeal">病害处置</string>
     <string name="facilitymanage">设施管理</string>
+    <string name="personsign">人员签到</string>
 
     <string name="table_nodata">数据未加载</string>
     <string name="table_top_title">掌上市政使用数据</string>

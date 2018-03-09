@@ -6,7 +6,6 @@ package com.xytsz.xytaj.bean;
  */
 public class Person {
 
-
     /**
      * id : 1
      * name : 王蒙蒙
