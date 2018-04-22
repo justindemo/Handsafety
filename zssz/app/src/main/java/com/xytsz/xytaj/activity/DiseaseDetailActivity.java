@@ -41,8 +41,6 @@ import butterknife.OnClick;
  */
 public class DiseaseDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
-    @Bind(R.id.tv_detail_reporter)
-    TextView tvDetailReporter;
     @Bind(R.id.tv_detail_facility)
     TextView tvDetailFacility;
     @Bind(R.id.tv_detail_facility_person)
@@ -69,6 +67,8 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
     TextView tvDetailPlaner;
     @Bind(R.id.ll_road_idea)
     LinearLayout llRoadIdea;
+    @Bind(R.id.tv_detail_sendadvice)
+    TextView tvDetailSendadvice;
     private ImageView mivPhoto1;
     private ImageView mivPhoto2;
     private ImageView mivPhoto3;
@@ -140,7 +140,7 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
 
             audioUrl = (AudioUrl) getIntent().getSerializableExtra("audioUrl");
             position = getIntent().getIntExtra("position", -1);
-            tag = getIntent().getIntExtra("tag",-1);
+
 
         }
         setContentView(R.layout.activity_diseasedetail);
@@ -148,22 +148,6 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         initAcitionbar();
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initView();
-        //请求是否有视屏
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String videopath = SendRoadDetailActivity.getVideo(detail.getTaskNumber());
-//                    Message message = Message.obtain();
-//                    message.what = SUCCESS;
-//                    message.obj = videopath;
-//                    handler.sendMessage(message);
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//        }.start();
-
         initData();
     }
 
@@ -175,8 +159,6 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
 
         mtvProblemLoca = (TextView) findViewById(R.id.tv_detail_problem_loca);
         mtvProblemAudio = (TextView) findViewById(R.id.tv_detail_problem_audio);
-
-
         mllVideo = (LinearLayout) findViewById(R.id.ll_video);
         mivPlay = (ImageView) findViewById(R.id.iv_play_video);
 
@@ -184,15 +166,14 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
     }
 
 
-    private int id;
 
     private void initData() {
         //赋值
-        tvDetailReporter.setText(detail.getCheckPersonName());
         tvDetailFacility.setText(detail.getDeviceName());
-        tvDetailFacilityPerson.setText(detail.getAdministrator());
+        tvDetailFacilityPerson.setText(detail.getCheckPersonName());
         tvDetailFacilityTeam.setText(detail.getDeptName());
 
+        tvDetailSendadvice.setText(detail.getZZCSSHInfo());
         tvDetailFacilityLoca.setText(detail.getAddressInfo());
         StringBuilder stringBuilder = new StringBuilder();
         List<String> errorInfo = detail.getErrorInfo();
@@ -202,7 +183,6 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
         tvDetailFacilityProblem.setText(problem);
 
-
         tvDetailReportetime.setText(detail.getCheckTime());
         tvDetailRequestname.setText(detail.getRequirementsComplete_Person_Name());
         tvDetailRequesttime.setText(detail.getRequirementsCompleteTime());
@@ -210,15 +190,6 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         tvDetailPlaner.setText(detail.getZZCSPersonName());
 
         mtvProblemLoca.setText(detail.getRemarks());
-
-
-        switch (tag){
-            case 1:
-                llRoadIdea.setVisibility(View.VISIBLE);
-                break;
-
-        }
-
 
 
         if (imageUrls.size() != 0) {

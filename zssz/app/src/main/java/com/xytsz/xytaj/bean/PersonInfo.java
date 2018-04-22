@@ -11,28 +11,42 @@ public class PersonInfo implements Serializable {
 
 
     /**
-     * ID : 1
-     * userName : 王蒙蒙
+     * DeptName : 仓储队
+     * ID : 371
+     * userName : 向阳天
+     * Dept_id : 1
+     * Area_id : 1
      * sex : 男
-     * login_ID : wmm
+     * login_ID : xyt
      * password : 123456
-     * telephone : 0000000
-     * department_ID : 1
+     * telephone : 1111
+     * role_ID : 1
      * Dirty : true
      * Key :
      * SubEntities : []
      */
 
+    private String DeptName;
     private int ID;
     private String userName;
+    private int Dept_id;
+    private int Area_id;
     private String sex;
     private String login_ID;
     private String password;
     private String telephone;
-    private int department_ID;
+    private int role_ID;
     private boolean Dirty;
     private String Key;
     private List<?> SubEntities;
+
+    public String getDeptName() {
+        return DeptName;
+    }
+
+    public void setDeptName(String DeptName) {
+        this.DeptName = DeptName;
+    }
 
     public int getID() {
         return ID;
@@ -48,6 +62,22 @@ public class PersonInfo implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public int getDept_id() {
+        return Dept_id;
+    }
+
+    public void setDept_id(int Dept_id) {
+        this.Dept_id = Dept_id;
+    }
+
+    public int getArea_id() {
+        return Area_id;
+    }
+
+    public void setArea_id(int Area_id) {
+        this.Area_id = Area_id;
     }
 
     public String getSex() {
@@ -82,12 +112,12 @@ public class PersonInfo implements Serializable {
         this.telephone = telephone;
     }
 
-    public int getDepartment_ID() {
-        return department_ID;
+    public int getRole_ID() {
+        return role_ID;
     }
 
-    public void setDepartment_ID(int department_ID) {
-        this.department_ID = department_ID;
+    public void setRole_ID(int role_ID) {
+        this.role_ID = role_ID;
     }
 
     public boolean isDirty() {

@@ -1,9 +1,9 @@
 package com.xytsz.xytaj.activity;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
@@ -19,23 +18,27 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.text.format.Time;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.MoringCheckAdapter;
+import com.xytsz.xytaj.adapter.SearchAdapter;
+import com.xytsz.xytaj.adapter.SendRoadAdapter;
+import com.xytsz.xytaj.bean.CheckItem;
 import com.xytsz.xytaj.bean.DiseaseInformation;
 import com.xytsz.xytaj.bean.Person;
-import com.xytsz.xytaj.bean.ReportData;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.ui.SearchView;
 import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
@@ -64,7 +67,7 @@ import butterknife.OnClick;
  * Created by admin on 2018/3/2.
  * 早会签到
  */
-public class MoringSignActivity extends AppCompatActivity {
+public class MoringSignActivity extends AppCompatActivity implements SearchView.SearchViewListener {
 
     @Bind(R.id.tv_sign_team)
     TextView tvSignTeam;
@@ -88,6 +91,20 @@ public class MoringSignActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case GlobalContanstant.CHECKFAIL:
+                    reportSign.setVisibility(View.VISIBLE);
+                    morningProgressbar.setVisibility(View.GONE);
+                    ToastUtil.shortToast(getApplicationContext(),"上传失败");
+                    break;
+                case GlobalContanstant.CHECKPASS:
+                    String endsign  = (String) msg.obj;
+                    if (endsign.equals("true")){
+                        ToastUtil.shortToast(getApplicationContext(),"签到结束");
+                        finish();
+                    }
+
+                    break;
+
                 case GlobalContanstant.PERSONSIGNFAIL:
                     ToastUtil.shortToast(getApplicationContext(), "数据未获取");
                     morningProgressbar.setVisibility(View.GONE);
@@ -96,9 +113,15 @@ public class MoringSignActivity extends AppCompatActivity {
                     morningProgressbar.setVisibility(View.GONE);
                     llSign.setVisibility(View.VISIBLE);
                     reportSign.setVisibility(View.VISIBLE);
-                    String data = (String) msg.obj;
-                    persons = JsonUtil.jsonToBean(data, new TypeToken<List<Person>>() {
+                    Bundle bundle = msg.getData();
+                    String personJson = bundle.getString("person");
+                    String checkJson = bundle.getString("check");
+
+                    persons = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
                     }.getType());
+                    checkItemLists = JsonUtil.jsonToBean(checkJson, new TypeToken<List<CheckItem>>() {
+                    }.getType());
+
 
                     personlist = new String[persons.size()];
                     for (int i = 0; i < personlist.length; i++) {
@@ -107,19 +130,50 @@ public class MoringSignActivity extends AppCompatActivity {
 
                     checkItems.clear();
                     checkItems.add("正常");
-                    checkItems.add("未戴工号牌");
-                    checkItems.add("未穿工作服");
-                    checkItems.add("未穿袖章");
-                    checkItems.add("未穿拖鞋");
-                    checkItems.add("未戴口罩");
-
+                    if (checkItemLists != null) {
+                        for (int i = 0; i < checkItemLists.size(); i++) {
+                            checkItems.add(checkItemLists.get(i).getSignDicInfo());
+                        }
+                    }
                     moringCheckAdapter = new MoringCheckAdapter(checkItems);
                     strandLv.setAdapter(moringCheckAdapter);
                     moringCheckAdapter.setCheckItems(diseaseInformation);
                     moringCheckAdapter.notifyDataSetChanged();
 
                     break;
+
+                case GlobalContanstant.MORNINGSUCCESS:
+                    morningProgressbar.setVisibility(View.GONE);
+                    reportSign.setVisibility(View.VISIBLE);
+                    String result = (String) msg.obj;
+                    ToastUtil.shortToast(getApplicationContext(), result);
+                    path = null;
+                    tvSignPerson.setText("");
+
+                    ivSignPicture.setImageResource(R.mipmap.iv_add);
+
+                    //默认是0 就
+
+
+                    //退出又进来  count = totalcount;
+
+                    count = totalcount;
+                    ++count;
+                    if (count == personlist.length) {
+                        reportSign.setText("结束签到");
+                    }
+
+
+                    break;
+                case GlobalContanstant.MORNINGFAIL:
+                    reportSign.setVisibility(View.VISIBLE);
+                    morningProgressbar.setVisibility(View.GONE);
+                    ToastUtil.shortToast(getApplicationContext(), "上传失败");
+                    path = null;
+                    break;
             }
+
+
         }
     };
 
@@ -133,6 +187,13 @@ public class MoringSignActivity extends AppCompatActivity {
     private MoringCheckAdapter moringCheckAdapter;
     private Uri fileUri;
     private File file;
+    private String department;
+    private String problemTag;
+    private List<CheckItem> checkItemLists;
+    private int count;
+    private ListView lv;
+    private Dialog dialog;
+    private int totalcount;
 
 
     @Override
@@ -140,11 +201,14 @@ public class MoringSignActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             tag = getIntent().getStringExtra("tag");
+            signId = getIntent().getIntExtra("singnid", -1);
+            totalcount = getIntent().getIntExtra("count", -1);
         }
         setContentView(R.layout.activity_morningsign);
         ButterKnife.bind(this);
 
         personID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
+        department = SpUtils.getString(getApplicationContext(), GlobalContanstant.DEPARATMENT);
         switch (tag) {
             case "moringsign":
                 method = NetUrl.MoringSignmethod;
@@ -181,14 +245,21 @@ public class MoringSignActivity extends AppCompatActivity {
 
     private void initData() {
         reportSign.setVisibility(View.GONE);
+        tvSignTeam.setText(department);
         new Thread() {
             @Override
             public void run() {
                 try {
-                    String data = getData();
-                    if (data != null) {
+                    String personData = getData("person");
+                    String checkData = getData("check");
+
+
+                    if (personData != null && checkData != null) {
                         Message message = Message.obtain();
-                        message.obj = data;
+                        Bundle bundle = new Bundle();
+                        bundle.putString("person", personData);
+                        bundle.putString("check", checkData);
+                        message.setData(bundle);
                         message.what = GlobalContanstant.PERSONSIGNSUCCESS;
                         handler.sendMessage(message);
                     }
@@ -204,9 +275,23 @@ public class MoringSignActivity extends AppCompatActivity {
 
     }
 
-    private String getData() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getPersonList);
+
+    private String getData(String tag) throws Exception {
+        String method = null;
+
+        switch (tag) {
+            case "person":
+                method = NetUrl.getPersonList;
+                break;
+            case "check":
+                method = NetUrl.getSignCheck;
+
+                break;
+        }
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
+
         soapObject.addProperty("ID", personID);
+
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
         envelope.dotNet = true;
@@ -230,11 +315,11 @@ public class MoringSignActivity extends AppCompatActivity {
             switch (requestCode) {
 
                 case PermissionUtils.CODE_CAMERA:
-                    file = new File(getExternalCacheDir(),"personsign.jpg");
+                    file = new File(getExternalCacheDir(), "personsign.jpg");
                     try {
-                        if (file.exists()){
-                        file.delete();
-                    }
+                        if (file.exists()) {
+                            file.delete();
+                        }
                         file.createNewFile();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -242,9 +327,8 @@ public class MoringSignActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT >= 24) {
                         fileUri = FileProvider.getUriForFile(MoringSignActivity.this, Tag, file);
                     } else {
-                        fileUri =Uri.fromFile(file);
+                        fileUri = Uri.fromFile(file);
                     }
-
 
                     Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
                     intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -265,9 +349,9 @@ public class MoringSignActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case Take_Photo:
-                if (resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
 
                     Bitmap bitmap = null;
 //                    try {
@@ -277,16 +361,17 @@ public class MoringSignActivity extends AppCompatActivity {
 //                        e.printStackTrace();
 //                    }
 
-                    if (Build.VERSION.SDK_INT >= 24){
-                        bitmap = ReportActivity.getBitmap(ivSignPicture,file.getAbsolutePath());
-                    }else {
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        bitmap = ReportActivity.getBitmap(ivSignPicture, file.getAbsolutePath());
+                    } else {
 
                         bitmap = ReportActivity.getBitmap(ivSignPicture, fileUri.getPath());
                     }
                     ivSignPicture.setImageBitmap(bitmap);
-                    diseaseInformation.fileName =saveToSDCard(bitmap);
+                    diseaseInformation.fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
-                    diseaseInformation.encode= ReportActivity.photo2Base64(path);
+                    diseaseInformation.encode = ReportActivity.photo2Base64(path);
+
 
                 }
 
@@ -296,9 +381,9 @@ public class MoringSignActivity extends AppCompatActivity {
     }
 
 
-
-    private final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Zsaj/Image/";
+    private final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
     private String path;
+
     private String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
@@ -312,7 +397,7 @@ public class MoringSignActivity extends AppCompatActivity {
             try {
                 outputStream = new FileOutputStream(path);
 
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);//把图片数据写入文件
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -325,7 +410,7 @@ public class MoringSignActivity extends AppCompatActivity {
                 }
             }
         } else {
-            ToastUtil.shortToast(getApplicationContext(),"SD卡不存在");
+            ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
         }
 
         return photoName;
@@ -343,21 +428,36 @@ public class MoringSignActivity extends AppCompatActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_sign_person:
+                autoCompleteData = null;
+                autoCompleteAdapter = null;
+                resultAdapter = null;
+                resultData = null;
+                dialog = new AlertDialog.Builder(MoringSignActivity.this).create();
+                dialog.setCancelable(true);// 可以用“返回键”取消
+                dialog.setCanceledOnTouchOutside(true);//
+                dialog.show();
+                dialog.setContentView(R.layout.sendroad_choicecheckperson);
+                lv = (ListView) dialog.findViewById(R.id.lv_sendroad_list);
+                SearchView searchView = (SearchView) dialog.findViewById(R.id.search_layout);
+                searchView.setSearchViewListener(MoringSignActivity.this);
+                searchView.setAutoCompleteAdapter(autoCompleteAdapter);
+                initPersonData();
+                if (lv != null) {
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            //得到人名，显示
+                            tvSignPerson.setText(resultData.get(position));
+                            dialog.dismiss();
 
-                new AlertDialog.Builder(MoringSignActivity.this).setSingleChoiceItems(personlist, 0, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String name = personlist[which];
-                                tvSignPerson.setText(name);
-                                dialog.dismiss();
-                            }
                         }
-                ).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+
+                    });
+                }
+                dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+
+
                 break;
             case R.id.iv_sign_picture:
                 //添加照片
@@ -370,83 +470,68 @@ public class MoringSignActivity extends AppCompatActivity {
                 //没有图片不能上报
                 //没有选择检查项不能上报
                 //选择正常和不正常的同时的时候 不能上报。
-                String personName = tvSignPerson.getText().toString();
-                //获取人员ID
-                for (Person pe : persons) {
-                    if (TextUtils.equals(personName, pe.getName())) {
-                        selectPersonID = pe.getId();
-                    }
-                }
-                List<DiseaseInformation.CheckItem> checkItemList = moringCheckAdapter.getDiseaseInformation();
+                if (count != personlist.length) {
 
-                StringBuilder stringBuilder = new StringBuilder();
 
-                if (checkItemList.get(0).isCheck()) {
-                    problemtext = "1,1,1,1,1";
-                    for (int i = 1; i < checkItemList.size(); i++) {
-                        if (checkItemList.get(i).isCheck()) {
-                            ToastUtil.shortToast(getApplicationContext(), "检查项选择错误");
-                            return;
+                    String personName = tvSignPerson.getText().toString();
+                    //获取人员ID
+                    for (Person pe : persons) {
+                        if (TextUtils.equals(personName, pe.getName())) {
+                            selectPersonID = pe.getId();
                         }
                     }
+                    List<DiseaseInformation.CheckItem> checkItemList = moringCheckAdapter.getDiseaseInformation();
+
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    if (checkItemList.get(0).isCheck()) {
+                        for (int i = 1; i < checkItemList.size(); i++) {
+                            if (checkItemList.get(i).isCheck()) {
+                                ToastUtil.shortToast(getApplicationContext(), "检查项选择错误");
+                                return;
+                            }
+                        }
+
+                        problemTag = "正常";
+                    } else {
+                        problemTag = "不正常";
+                    }
+
+
+                    for (int i = 1; i < checkItemList.size(); i++) {
+
+                        int position = checkItemList.get(i).getPosition();
+                        stringBuilder.append(position).append(",");
+
+                    }
+                    problemtext = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+
+                    upData();
+                } else {
+                    closeSign();
                 }
-
-
-                for (int i = 1; i < checkItemList.size(); i++) {
-
-                    int position = checkItemList.get(i).getPosition();
-                    stringBuilder.append(position).append(",");
-
-                }
-                problemtext = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
-
-
-                upData();
-
                 break;
         }
     }
 
-    private void upData() {
-
-        String text = problemtext;
-        String string = diseaseInformation.selectPerson;
+    private void closeSign() {
+        morningProgressbar.setVisibility(View.VISIBLE);
+        reportSign.setVisibility(View.GONE);
         //提交服务器；
-        // TODO: 2018/3/2
         new Thread() {
             @Override
             public void run() {
                 try {
-                    //一张图片
-                    String imgresult = upImg2Service();
-                    if (imgresult != null) {
-                        if (imgresult.equals("true")) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.shortToast(getApplicationContext(), "图片上传成功");
-                                }
-                            });
-                            try {
-                                String result = up2Service();
-                                if (result != null) {
-                                    Message message = Message.obtain();
-                                    message.what = GlobalContanstant.MORNINGSUCCESS;
-                                    message.obj = result;
-                                    handler.sendMessage(message);
-                                }
-                            } catch (Exception e) {
-                                Message message = Message.obtain();
-                                message.what = GlobalContanstant.MORNINGFAIL;
-                                handler.sendMessage(message);
-                            }
-                        }
+                    String result = EndSign();
+                    if (result != null) {
+                        Message message = Message.obtain();
+                        message.what = GlobalContanstant.CHECKPASS;
+                        message.obj = result;
+                        handler.sendMessage(message);
                     }
-
-
                 } catch (Exception e) {
                     Message message = Message.obtain();
-                    message.what = GlobalContanstant.MORNINGIMGFAIL;
+                    message.what = GlobalContanstant.CHECKFAIL;
                     handler.sendMessage(message);
                 }
             }
@@ -454,37 +539,125 @@ public class MoringSignActivity extends AppCompatActivity {
 
     }
 
-    private String upImg2Service() throws Exception {
-
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.photomethodName);
-        //传递的参数
-        soapObject.addProperty("tag", diseaseInformation.taskNumber);
-        soapObject.addProperty("FileName", diseaseInformation.photoName);  //文件类型
-        soapObject.addProperty("ImgBase64String", diseaseInformation.encode);   //参数2  图片字符串
-        soapObject.addProperty("personid", selectPersonID);
-
-        //设置访问地址 和 超时时间
+    private String EndSign() throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.EndSignmethod);
+        soapObject.addProperty("SignID", signId);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
         envelope.setOutputSoapObject(soapObject);
+        envelope.dotNet = true;
+        envelope.bodyOut = soapObject;
 
 
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
-        //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+
+        httpTransportSE.call(null, envelope);
         SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String isphotoSuccess = object.getProperty(0).toString();
-        return isphotoSuccess;
+        String result = object.getProperty(0).toString();
+        return result;
     }
+
+    private void initPersonData() {
+
+        //从数据库获取数据
+        getDbData();
+        //初始化热搜版数据
+        //getHintData();
+        //初始化自动补全数据
+        getAutoCompleteData(null);
+        //初始化搜索结果数据
+        getResultData(null);
+    }
+
+
+    private void getDbData() {
+
+        dbData.clear();
+        for (int i = 0; i < personlist.length; i++) {
+            dbData.add(personlist[i]);
+        }
+
+    }
+
+    private void getAutoCompleteData(String text) {
+
+        if (autoCompleteData == null) {
+            //初始化
+            autoCompleteData = new ArrayList<>(hintSize);
+        } else {
+            // 根据text 获取auto data
+            autoCompleteData.clear();
+            for (int i = 0, count = 0; i < dbData.size()
+                    && count < hintSize; i++) {
+                if (dbData.get(i).contains(text.trim())) {
+                    autoCompleteData.add(dbData.get(i));
+                    count++;
+                }
+            }
+        }
+        if (autoCompleteAdapter == null) {
+            autoCompleteAdapter = new ArrayAdapter<>(MoringSignActivity.this, android.R.layout.simple_list_item_1, autoCompleteData);
+        } else {
+            autoCompleteAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void getResultData(String text) {
+
+        if (resultData == null) {
+            // 初始化
+            resultData = new ArrayList<>();
+        } else {
+            resultData.clear();
+            for (int i = 0; i < dbData.size(); i++) {
+                if (dbData.get(i).contains(text.trim())) {
+                    resultData.add(dbData.get(i));
+                }
+            }
+        }
+        if (resultAdapter == null) {
+            resultAdapter = new SearchAdapter(MoringSignActivity.this, resultData);
+        } else {
+            resultAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    private void upData() {
+        morningProgressbar.setVisibility(View.VISIBLE);
+        reportSign.setVisibility(View.GONE);
+        //提交服务器；
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    String result = up2Service();
+                    if (result != null) {
+                        Message message = Message.obtain();
+                        message.what = GlobalContanstant.MORNINGSUCCESS;
+                        message.obj = result;
+                        handler.sendMessage(message);
+                    }
+                } catch (Exception e) {
+                    Message message = Message.obtain();
+                    message.what = GlobalContanstant.MORNINGFAIL;
+                    handler.sendMessage(message);
+                }
+            }
+        }.start();
+
+    }
+
+    private int signId;
 
     private String up2Service() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
-        soapObject.addProperty("team", "");
-        soapObject.addProperty("leader", personID);
-        soapObject.addProperty("selectpersonId", selectPersonID);
-        soapObject.addProperty("error", problemtext);
+        soapObject.addProperty("SignID", signId);
+        soapObject.addProperty("AdminPersonId", personID);
+        soapObject.addProperty("SignPersonId", selectPersonID);
+        soapObject.addProperty("CheckInfo", problemTag);
+        soapObject.addProperty("Info", problemtext);
+        soapObject.addProperty("FileName", diseaseInformation.fileName);  //文件类型
+        soapObject.addProperty("ImgBase64String", diseaseInformation.encode);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.setOutputSoapObject(soapObject);
@@ -499,4 +672,58 @@ public class MoringSignActivity extends AppCompatActivity {
         String result = object.getProperty(0).toString();
         return result;
     }
+
+    @Override
+    public void onRefreshAutoComplete(String text) {
+        getAutoCompleteData(text);
+    }
+
+    @Override
+    public void onSearch(String text) {
+        //更新result数据
+        getResultData(text);
+        lv.setVisibility(View.VISIBLE);
+        //第一次获取结果 还未配置适配器
+        if (lv.getAdapter() == null) {
+            //获取搜索数据 设置适配器
+            lv.setAdapter(resultAdapter);
+        } else {
+            //更新搜索数据
+            resultAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onClear(SearchView.EditChangedListener editChangedListener) {
+        editChangedListener = null;
+    }
+
+
+    private ArrayAdapter<String> autoCompleteAdapter;
+    /**
+     * 搜索结果列表adapter
+     */
+    private SearchAdapter resultAdapter;
+    /**
+     * 搜索过程中自动补全数据
+     */
+    private List<String> autoCompleteData;
+
+    /**
+     * 搜索结果的数据
+     */
+    private List<String> resultData;
+
+    /**
+     * 默认提示框显示项的个数
+     */
+    private static int DEFAULT_HINT_SIZE = 9;
+
+    /**
+     * 提示框显示项的个数
+     */
+    private static int hintSize = DEFAULT_HINT_SIZE;
+
+    private List<String> dbData = new ArrayList<>();
+
 }

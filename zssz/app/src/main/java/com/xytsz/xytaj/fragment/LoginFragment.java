@@ -35,10 +35,11 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.microedition.khronos.opengles.GL;
+
 /**
  * Created by admin on 2017/9/5.
- *  登录界面
- *
+ * 登录界面
  */
 public class LoginFragment extends android.support.v4.app.Fragment {
 
@@ -59,6 +60,9 @@ public class LoginFragment extends android.support.v4.app.Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case GlobalContanstant.FAIL:
+                    ToastUtil.shortToast(getActivity(),error);
+                    break;
                 case PERSONDATA:
                     ToastUtil.shortToast(getActivity(), checknet);
                     break;
@@ -74,8 +78,8 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                         }
                         SpUtils.putStrListValue(getActivity(), GlobalContanstant.PERSONNAMELIST, personNameList);
                         SpUtils.putStrListValue(getActivity(), GlobalContanstant.PERSONIDLIST, personIDList);
-                    }else {
-                        ToastUtil.shortToast(getActivity(),neterror);
+                    } else {
+                        ToastUtil.shortToast(getActivity(), neterror);
                     }
                     break;
             }
@@ -93,14 +97,16 @@ public class LoginFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view =   View.inflate(getActivity(), R.layout.fragment_login,null);
-        login_id = (EditText)view.findViewById(R.id.login_id);
+        View view = View.inflate(getActivity(), R.layout.fragment_login, null);
+        login_id = (EditText) view.findViewById(R.id.login_id);
         passWord = (EditText) view.findViewById(R.id.passWord);
         login = (Button) view.findViewById(R.id.login);
 
         return view;
 
     }
+
+    private int personid;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -138,67 +144,76 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                         public void run() {
                             try {
                                 final String json = tologin(loginID, pWD);
-                                final String personJson = MyApplication.getAllPersonList();
                                 if (json != null) {
                                     if (!json.equals("[]")) {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (json.equals("false")) {
+                                        if (json.equals("false")) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
                                                     ToastUtil.shortToast(getContext(), error);
-                                                } else {
-                                                    final PersonInfo personInfo = JsonUtil.jsonToBean(json, PersonInfo.class);
-                                                    //保存到本地  ID  名字
-                                                    int personID = personInfo.getID();
-                                                    String userName = personInfo.getUserName();
-                                                    String phone = personInfo.getTelephone();
-                                                    int department_id = personInfo.getDepartment_ID();
+                                                }
+                                            });
+                                        } else {
+                                            final PersonInfo personInfo = JsonUtil.jsonToBean(json, PersonInfo.class);
+                                            //保存到本地  ID  名字
+                                            personid = personInfo.getID();
+                                            String userName = personInfo.getUserName();
+                                            String phone = personInfo.getTelephone();
+                                            String department = personInfo.getDeptName();
 
-//                                                    int role = personInfo.get;
-                                                    int role = 1;
-                                                    //sp 保存
-                                                    SpUtils.exit(getActivity().getApplicationContext());
+                                            int role = personInfo.getRole_ID();
 
+                                            String personJson = MyApplication.getAllPersonList(personid);
+                                            if (personJson != null) {
+                                                if (!personJson.equals("[]")){
+                                                    List<Person> memberList = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
+                                                    }.getType());
+                                                    Message message = Message.obtain();
+                                                    message.obj = memberList;
+                                                    message.what = ISMEMBER;
+                                                    handler.sendMessage(message);
+                                                }
+                                            }
 
-                                                    SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.LOGINID, loginID);
-                                                    SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.PASSWORD, pWD);
-                                                    //保存不是第一次进入
-                                                    SpUtils.saveBoolean(getActivity().getApplicationContext(), GlobalContanstant.ISFIRSTENTER, false);
-                                                    SpUtils.saveInt(getActivity().getApplicationContext(), GlobalContanstant.PERSONID, personID);
-                                                    SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.USERNAME, userName);
-                                                    SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.PHONE, phone);
-                                                    SpUtils.saveInt(getActivity().getApplicationContext(), GlobalContanstant.DEPARATMENT, department_id);
-                                                    SpUtils.saveInt(getActivity().getApplicationContext(), GlobalContanstant.ROLE, role);
-
-                                                    if (personJson != null) {
-
-                                                        List<Person> memberList = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
-                                                        }.getType());
-                                                        Message message = Message.obtain();
-                                                        message.obj = memberList;
-                                                        message.what = ISMEMBER;
-                                                        handler.sendMessage(message);
-                                                    }
+                                            //sp 保存
+                                            SpUtils.exit(getActivity().getApplicationContext());
 
 
-
+                                            SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.LOGINID, loginID);
+                                            SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.PASSWORD, pWD);
+                                            //保存不是第一次进入
+                                            SpUtils.saveBoolean(getActivity().getApplicationContext(), GlobalContanstant.ISFIRSTENTER, false);
+                                            SpUtils.saveInt(getActivity().getApplicationContext(), GlobalContanstant.PERSONID, personid);
+                                            SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.USERNAME, userName);
+                                            SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.PHONE, phone);
+                                            SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.DEPARATMENT, department);
+                                            SpUtils.saveInt(getActivity().getApplicationContext(), GlobalContanstant.ROLE, role);
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
                                                     ToastUtil.shortToast(getContext(), success);
 
-                                                    IntentUtil.startActivity(getActivity(),HomeActivity.class);
+                                                    IntentUtil.startActivity(getActivity(), HomeActivity.class);
                                                     getActivity().finish();
 
 
                                                 }
+                                                 });
                                             }
-                                        });
+
                                     } else {
                                         Message message = Message.obtain();
                                         message.what = PERSONDATA;
                                         handler.sendMessage(message);
                                     }
                                 }
-                            } catch (Exception e) {
 
+
+
+                            } catch (Exception e) {
+                                Message message = Message.obtain();
+                                message.what = GlobalContanstant.FAIL;
+                                handler.sendMessage(message);
 
                             }
 

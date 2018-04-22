@@ -376,7 +376,7 @@ public class MySendDetailActivity extends AppCompatActivity implements View.OnCl
                 dialog.setContentView(R.layout.mysend_replaceperson);
                 ListView lv = (ListView) dialog.findViewById(R.id.lv_replaceperson);
                 //获取人员的数据
-                //TODO:  需要修改传入人员的list
+
                 if (personListBeen != null && personListBeen.size() != 0) {
                     ReplacePersonAdapter replacePersonAdapter = new ReplacePersonAdapter(personListBeen);
                     lv.setAdapter(replacePersonAdapter);

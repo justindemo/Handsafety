@@ -15,7 +15,7 @@ import java.io.IOException;
 public class SoundUtil {
 
     static final private double EMA_FILTER = 0.6;
-    private String path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/Audio/";
+    private String path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Audio/";
     private MediaRecorder mRecorder = null;
     private double mEMA = 0.0;
     private MediaPlayer mediaPlayer;
@@ -167,9 +167,7 @@ public class SoundUtil {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(name);
                 mediaPlayer.prepare();
-
                 mediaPlayer.start();
-
 
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
@@ -179,11 +177,8 @@ public class SoundUtil {
                     }
                 });
 
-
                 return time;
             } catch (Exception e) {
-
-
                 onFinishListener.onError();
 
             }

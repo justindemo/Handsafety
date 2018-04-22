@@ -39,11 +39,15 @@ public class Review implements Serializable {
      * id : 0
      */
 
+    private int id;
+    private String DeviceNum;
+    private String DeciceCheckNum;
+    private String AddressInfo;
+    private String DeptName;
+    private int DeviceId;
     private int CheckInfo;
     private String CheckPersonName;
     private String CheckTime;
-    private String DeciceCheckNum;
-    private int DeviceId;
     private String Remarks;
     private int State;
     private String WXInfo;
@@ -61,12 +65,27 @@ public class Review implements Serializable {
     private String ZZTZInfo;
     private String ZZTZPersonName;
     private String ZZTZTime;
-    private int id;
-    private String AddressInfo;
     private String Administrator;
-    private String DeptName;
     private String DeviceName;
-    private String DeviceNum;
+    private String sendCheckPerson;
+
+    public int getSendCheckPersonId() {
+        return sendCheckPersonId;
+    }
+
+    public void setSendCheckPersonId(int sendCheckPersonId) {
+        this.sendCheckPersonId = sendCheckPersonId;
+    }
+
+    private int sendCheckPersonId;
+
+    public String getSendCheckPerson() {
+        return sendCheckPerson;
+    }
+
+    public void setSendCheckPerson(String sendCheckPerson) {
+        this.sendCheckPerson = sendCheckPerson;
+    }
 
     public String getAddressInfo() {
         return AddressInfo;
@@ -195,8 +214,6 @@ public class Review implements Serializable {
     public void setSendPerson(String sendPerson) {
         this.sendPerson = sendPerson;
     }
-
-
 
 
     public String getRequestTime() {

@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="#fff">
+
+    <TextView
+        android:id="@+id/tv_question"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="6dp"
+        android:text="read fragment" />
+
+    <RadioGroup
+        android:layout_margin="6dp"
+        android:id="@+id/read_radiogroup"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/read_rb_a"
+            style="@style/ReadFragmentRadioButtonStyle"
+            android:drawableLeft="@drawable/ic_action_favor_normal"
+            android:text="3年"
+           />
+        <RadioButton
+            android:id="@+id/read_rb_b"
+            style="@style/ReadFragmentRadioButtonStyle"
+            android:drawableLeft="@drawable/bg_topic_no"
+            android:text="3年"
+            />
+        <RadioButton
+            android:id="@+id/read_rb_c"
+            style="@style/ReadFragmentRadioButtonStyle"
+            android:drawableLeft="@drawable/bg_topic_no"
+            android:text="3年"
+             />
+        <RadioButton
+            android:id="@+id/read_rb_d"
+            style="@style/ReadFragmentRadioButtonStyle"
+            android:drawableLeft="@drawable/bg_topic_no"
+            android:text="3年"
+             />
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/ll_answer"
+        android:visibility="gone"
+        android:layout_margin="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="正确答案："
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textSize="16sp"
+            android:id="@+id/tv_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+</LinearLayout>

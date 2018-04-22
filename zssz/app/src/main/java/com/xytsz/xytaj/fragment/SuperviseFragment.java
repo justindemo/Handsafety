@@ -1,24 +1,40 @@
 package com.xytsz.xytaj.fragment;
 
 
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.dalong.marqueeview.MarqueeView;
+import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.R;
-import com.xytsz.xytaj.activity.FacilityManageActivity;
-import com.xytsz.xytaj.activity.PersonSignActivity;
-import com.xytsz.xytaj.activity.MemberLocationActivity;
+import com.xytsz.xytaj.activity.ContingencyPlanActivity;
+import com.xytsz.xytaj.activity.MoringSignActivity;
+import com.xytsz.xytaj.activity.MoringSignListActivity;
+import com.xytsz.xytaj.activity.PatrolListActivity;
+import com.xytsz.xytaj.activity.SystemManageActivity;
+import com.xytsz.xytaj.activity.TrainTestActivity;
+import com.xytsz.xytaj.adapter.PatrolListAdapter;
 import com.xytsz.xytaj.adapter.SuperviseAdapter;
+import com.xytsz.xytaj.adapter.SuperviseSecondAdapter;
 import com.xytsz.xytaj.base.BaseFragment;
+import com.xytsz.xytaj.bean.PatrolListBean;
 import com.xytsz.xytaj.global.GlobalContanstant;
+import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.IntentUtil;
+import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +46,18 @@ import java.util.List;
  */
 public class  SuperviseFragment extends BaseFragment  {
 
+    private static final int MYTASK = 1;
+    private static final int SYSTEMMANAGE = 2;
     private RecyclerView recycleView;
+    private RecyclerView recycleViewSecond;
     private int role;
-    private static final int PERSON = 6;
-    private static final int PROBLEM = 0;
-    private static final int FACILITY = 2;
-    private static final int SIGN = 3;
-    private static final int CAROIL = 1;
-    private MarqueeView mheadMarquee;
-    private int alluser;
+    private static final int SIGN = 0;
+
+
+
     private TextView mActionbartext;
+    private int personId;
+    private SuperviseAdapter adapter;
 
 
     @Override
@@ -47,119 +65,164 @@ public class  SuperviseFragment extends BaseFragment  {
 
         View view = View.inflate(getActivity(), R.layout.fragment_supervise, null);
         recycleView = (RecyclerView) view.findViewById(R.id.recycle_view);
+        recycleViewSecond = (RecyclerView) view.findViewById(R.id.recycle_second);
         mActionbartext = (TextView) view.findViewById(R.id.actionbar_text);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),3);
+        GridLayoutManager gridLayoutManager1 = new GridLayoutManager(getActivity(),3);
 
         recycleView.setLayoutManager(gridLayoutManager);
+        recycleViewSecond.setLayoutManager(gridLayoutManager1);
         return view;
     }
 
     private List<String>  titles = new ArrayList<>();
+    private List<String>  titles1 = new ArrayList<>();
+    private List<PatrolListBean> patrolListBeens;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case GlobalContanstant.PATROLLISTSUCCESS:
+                    String jsonData = (String) msg.obj;
+                    if (!jsonData.equals("[]")) {
+                        patrolListBeens = JsonUtil.jsonToBean(jsonData, new TypeToken<List<PatrolListBean>>() {
+                        }.getType());
+
+                        if (patrolListBeens != null) {
+                            if (patrolListBeens.size() != 0) {
+                                //展示
+                                number = patrolListBeens.size();
+                                adapter.notifyDataSetChanged();
+
+                            }
+
+                        }
+                    }
+                    break;
+                case GlobalContanstant.PATROLLISTFAIL:
+                    ToastUtil.shortToast(getContext(), "数据未加载");
+                    break;
+            }
+        }
+    };
+
+    private int number;
+
     @Override
     public void initData() {
-        String alltitle = getString(R.string.alltitle);
-        alluser = SpUtils.getInt(getContext(), GlobalContanstant.ALLUSERCOUNT);
+        titles1.clear();
+        titles1.add("培训考试");
+        titles1.add("应急预案");
         titles.clear();
-        titles.add("设备问题");
-        titles.add("车辆管理");
-        titles.add("设施管理");
-        titles.add("人员签到");
-     
+        titles.add("早会签到");
+        titles.add("我的任务");
+        titles.add("制度管理");
+        personId = SpUtils.getInt(getContext(), GlobalContanstant.PERSONID);
+        role = SpUtils.getInt(getContext(),GlobalContanstant.ROLE);
+        getData();
+
 
         mActionbartext.setText(R.string.supervise);
-        SuperviseAdapter adapter = new SuperviseAdapter(titles,role);
+        adapter = new SuperviseAdapter(titles,role,number);
         recycleView.setAdapter(adapter);
 
         adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 switch (position) {
-                    case PERSON:
-                        //定位
-                        if (role == 1) {
-                            IntentUtil.startActivity(getContext(), MemberLocationActivity.class);
-                        } else {
-                            ToastUtil.shortToast(getContext(), "您没有权限");
-                        }
-
-                        break;
-                    case PROBLEM:
-                        if (role == 1) {
-                            //IntentUtil.startActivity(getContext(), MakerProblemActivty.class);
-                        } else {
-                            ToastUtil.shortToast(getContext(), "您没有权限");
-                        }
-                        //IntentUtil.startActivity(parent.getContext(), MakerProblemActivty.class);
-
-                        break;
-                    case FACILITY:
-                        IntentUtil.startActivity(getContext(), FacilityManageActivity.class);
-                        //井盖
-                        break;
-                    case CAROIL:
-                        //公告
-                        //showDialog();
-                        break;
                     case SIGN:
-                        IntentUtil.startActivity(getContext(), PersonSignActivity.class);
-                        //防汛
+                        if (role !=1 ){
+                            IntentUtil.startActivity(SuperviseFragment.this.getActivity(),MoringSignListActivity.class);
+
+                        }else {
+                            ToastUtil.shortToast(getContext(),"您没有权限");
+                        }
+
+                        break;
+
+                    case MYTASK:
+                        //我的任务
+                        IntentUtil.startActivity(getContext(),PatrolListActivity.class);
+                        break;
+                    case SYSTEMMANAGE:
+                        IntentUtil.startActivity(getContext(),SystemManageActivity.class);
                         break;
                 }
             }
         });
 
 
-        View headview = inflateView(R.layout.supervise_header, recycleView);
+        SuperviseSecondAdapter secondAdapter = new SuperviseSecondAdapter(titles1,role);
+        recycleViewSecond.setAdapter(secondAdapter);
+        secondAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                switch (position) {
+                    case SIGN:
+                        //培训考试
+                        IntentUtil.startActivity(getContext(), TrainTestActivity.class);
 
-        mheadMarquee = (MarqueeView) headview.findViewById(R.id.tv_headmarquee);
-
-        mheadMarquee.setText(alltitle + alluser);
-        mheadMarquee.setFocusable(true);
-        mheadMarquee.requestFocus();
-        mheadMarquee.sepX = 2;
-        mheadMarquee.startScroll();
+                        break;
+                    case MYTASK:
+                        IntentUtil.startActivity(getContext(), ContingencyPlanActivity.class);
+                        break;
 
 
-        adapter.addHeaderView(headview);
-
-
+                }
+            }
+        });
 
     }
 
-    private View inflateView(int layoutId,RecyclerView rv) {
-        //升级版的适配器支持添加headerView
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        //参三为false 表示 条目视图打气进来之后不添加rv.
-        return inflater.inflate(layoutId,rv,false);
+    /**
+     * 获取显示的数据
+     */
+    private void getData() {
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    String jsonData = downData(personId);
+                    if (jsonData != null) {
+                        Message message = Message.obtain();
+                        message.what = GlobalContanstant.PATROLLISTSUCCESS;
+                        message.obj = jsonData;
+                        handler.sendMessage(message);
+                    }
+
+                } catch (Exception e) {
+                    Message message = Message.obtain();
+                    message.what = GlobalContanstant.PATROLLISTFAIL;
+                    handler.sendMessage(message);
+                }
+            }
+        }.start();
     }
 
+    private String downData(int personId) throws Exception {
 
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskByPersonID);
+        soapObject.addProperty("personId", personId);
 
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        role = SpUtils.getInt(getContext(), GlobalContanstant.ROLE);
-        mheadMarquee.startScroll();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mheadMarquee.stopScroll();
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(null, envelope);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        String result = object.getProperty(0).toString();
+        return result;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mheadMarquee.startScroll();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mheadMarquee.stopScroll();
+        getData();
     }
 }
 

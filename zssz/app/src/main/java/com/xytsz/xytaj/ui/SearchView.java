@@ -32,17 +32,11 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
      */
     private ImageView ivDelete;
 
-    /**
-     * 返回按钮
-     */
-    private Button btnBack;
 
     /**
      * 上下文对象
      */
     private Context mContext;
-
-
 
     /**
      * 自动补全adapter 只显示名字
@@ -73,14 +67,14 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     private void initViews() {
         etInput = (EditText) findViewById(R.id.search_et_input);
         ivDelete = (ImageView) findViewById(R.id.search_iv_delete);
-        btnBack = (Button) findViewById(R.id.search_btn_back);
-
 
         ivDelete.setOnClickListener(this);
-        btnBack.setOnClickListener(this);
 
-        etInput.addTextChangedListener(new EditChangedListener());
-        etInput.setOnClickListener(this);
+        EditChangedListener editChangedListener = new EditChangedListener();
+        etInput.addTextChangedListener(editChangedListener);
+        if (mListener != null){
+            mListener.onClear(editChangedListener);
+        }
 
     }
 
@@ -107,10 +101,9 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         this.mAutoCompleteAdapter = adapter;
     }
 
-    private class EditChangedListener implements TextWatcher {
+    public class EditChangedListener implements TextWatcher {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
         }
 
         @Override
@@ -138,15 +131,12 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.search_et_input:
-                break;
+
             case R.id.search_iv_delete:
                 etInput.setText("");
                 ivDelete.setVisibility(GONE);
                 break;
-            case R.id.search_btn_back:
-                ((Activity) mContext).finish();
-                break;
+
         }
     }
 
@@ -168,6 +158,8 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
          * @param text 传入输入框的文本
          */
         void onSearch(String text);
+
+        void onClear(EditChangedListener editText);
 
 //        /**
 //         * 提示列表项点击时回调方法 (提示/自动补全)

@@ -1,14 +1,20 @@
 package com.xytsz.xytaj.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,10 +24,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.bean.AudioUrl;
+import com.xytsz.xytaj.bean.DiseaseInformation;
 import com.xytsz.xytaj.bean.ImageUrl;
 import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SoundUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
@@ -31,8 +39,16 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -70,26 +86,36 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     TextView tvSendDetailFacilityPerson;
     @Bind(R.id.tv_send_detail_facility_problem)
     TextView tvSendDetailFacilityProblem;
-    @Bind(R.id.tv_send_detail_advice)
-    EditText tvSendDetailAdvice;
     @Bind(R.id.tv_send_pass)
     TextView tvSendPass;
-    @Bind(R.id.tv_send_back)
-    TextView tvSendBack;
-    @Bind(R.id.tv_send_detail_reporter)
-    TextView tvSendDetailReporter;
     @Bind(R.id.tv_send_detail_facility_loca)
     TextView tvSendDetailFacilityLoca;
     @Bind(R.id.tv_send_detail_facility_team)
     TextView tvSendDetailFacilityTeam;
-    @Bind(R.id.ll_leader_advice)
-    LinearLayout llLeaderAdvice;
-    @Bind(R.id.tv_send_detail_leader_advice)
-    TextView tvSendDetailLeaderAdvice;
+    @Bind(R.id.tv_send_detail_mine_advice)
+    EditText tvSendDetailMineAdvice;
     @Bind(R.id.ll_send_mine_advice)
     LinearLayout llSendMineAdvice;
     @Bind(R.id.ll_road_idea)
     LinearLayout llRoadIdea;
+    @Bind(R.id.iv_review_icon1)
+    ImageView ivReviewIcon1;
+    @Bind(R.id.iv_review_icon2)
+    ImageView ivReviewIcon2;
+    @Bind(R.id.iv_review_icon3)
+    ImageView ivReviewIcon3;
+    @Bind(R.id.ll_review_img)
+    LinearLayout llReviewImg;
+    @Bind(R.id.sendroad_progressbar)
+    LinearLayout sendroadProgressbar;
+    @Bind(R.id.space_view)
+    View spaceView;
+    @Bind(R.id.tv_check_pass)
+    TextView tvCheckPass;
+    @Bind(R.id.tv_check_back)
+    TextView tvCheckBack;
+    @Bind(R.id.ll_check_idea)
+    LinearLayout llCheckIdea;
 
     private Review detail;
     private List<ImageUrl> imageUrls;
@@ -103,6 +129,36 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case GlobalContanstant.IMAGEFAIL:
+                    sendroadProgressbar.setVisibility(View.GONE);
+                    if (tag == GlobalContanstant.REVIEW){
+                        llCheckIdea.setVisibility(View.VISIBLE);
+                    }else {
+                        llRoadIdea.setVisibility(View.VISIBLE);
+                    }
+                    ToastUtil.shortToast(getApplicationContext(), "图片上传失败");
+                    return;
+                case GlobalContanstant.REVIEWSTATEFAIL:
+                    sendroadProgressbar.setVisibility(View.GONE);
+                    if (tag == GlobalContanstant.REVIEW){
+                        llCheckIdea.setVisibility(View.VISIBLE);
+                    }else {
+                        llRoadIdea.setVisibility(View.VISIBLE);
+                    }
+                    ToastUtil.shortToast(getApplicationContext(), "数据上传失败");
+                    return;
+                case GlobalContanstant.REVIEWSTATESUCCESS:
+                    String resultstate = (String) msg.obj;
+                    if (resultstate.equals("true")) {
+                        ToastUtil.shortToast(getApplicationContext(), "数据上传成功");
+                        sendroadProgressbar.setVisibility(View.GONE);
+                        Intent intent = getIntent();
+                        intent.putExtra("position", position);
+                        setResult(302, intent);
+                        finish();
+                    }
+
+                    break;
                 case SUCCESS:
                     videopath = (String) msg.obj;
                     if (videopath.isEmpty() || videopath == null || videopath.equals("false")) {
@@ -116,7 +172,8 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     String result = (String) msg.obj;
                     if (result != null) {
                         if (result.equals("true")) {
-                            ToastUtil.shortToast(getApplicationContext(), "通知成功");
+                            sendroadProgressbar.setVisibility(View.GONE);
+                            ToastUtil.shortToast(getApplicationContext(), "提交成功");
                             Intent intent = getIntent();
                             intent.putExtra("position", position);
                             setResult(301, intent);
@@ -125,25 +182,57 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     }
                     break;
                 case GlobalContanstant.CHECKROADFAIL:
-                    String cancle = (String) msg.obj;
-                    if (cancle != null) {
-                        if (cancle.equals("true")) {
-                            ToastUtil.shortToast(getApplicationContext(), "未通过");
-                            Intent intent = getIntent();
-                            intent.putExtra("position", position);
-                            setResult(302, intent);
-                            finish();
-                        }
+                    sendroadProgressbar.setVisibility(View.GONE);
+                    if (tag == GlobalContanstant.REVIEW){
+                        llCheckIdea.setVisibility(View.VISIBLE);
+                    }else {
+                        llRoadIdea.setVisibility(View.VISIBLE);
                     }
+                    ToastUtil.shortToast(getApplicationContext(), "数据上传出错");
                     break;
             }
         }
     };
-    private String advice;
+
     private int position;
     private int tag;
-    private int state;
     private int personID;
+    private static final int Take_Photo = 100;
+    private static final String Tag = "com.xytsz.xytaj.fileprovider";
+    private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
+        @Override
+        public void onPermissionGranted(int requestCode) {
+            switch (requestCode) {
+                case PermissionUtils.CODE_CAMERA:
+                    file = new File(getExternalCacheDir(), "reviewimg.jpg");
+                    try {
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                    } else {
+                        fileUri = Uri.fromFile(file);
+                    }
+
+                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent1, Take_Photo);
+                    break;
+            }
+        }
+    };
+    private int role;
+    private File file;
+    private Uri fileUri;
+    private DiseaseInformation diseaseInformation;
+    private String isphotoSuccess1;
+    private String mineAdvice;
 
 
     @Override
@@ -162,47 +251,10 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         ButterKnife.bind(this);
 
         initAcitionbar();
-        //请求是否有视屏
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String videopath = getVideo(detail.getTaskNumber());
-//                    Message message = Message.obtain();
-//                    message.what = SUCCESS;
-//                    message.obj = videopath;
-//                    handler.sendMessage(message);
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//        }.start();
 
         initData();
     }
 
-    public static String getVideo(String taskNumber) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getVideoMethodName);
-        //传递的参数
-        soapObject.addProperty("TaskNumber", taskNumber);
-
-        Log.i("soapo", soapObject.toString());
-        //设置访问地址 和 超时时间
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
-        //链接后执行的回调
-        httpTranstation.call(null, envelope);
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String result = object.getProperty(0).toString();
-        return result;
-
-    }
 
     private void initAcitionbar() {
         ActionBar actionBar = getSupportActionBar();
@@ -222,18 +274,26 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
     private void initData() {
         personID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
+        role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
 
-        tvSendDetailReporter.setText(detail.getCheckPersonName());
+        diseaseInformation = new DiseaseInformation();
         tvSendDetailFacility.setText(detail.getDeviceName());
-        tvSendDetailFacilityPerson.setText(detail.getAdministrator());
+        tvSendDetailFacilityPerson.setText(detail.getCheckPersonName());
         tvSendDetailFacilityTeam.setText(detail.getDeptName());
         StringBuilder stringBuilder = new StringBuilder();
         List<String> errorInfo = detail.getErrorInfo();
-        for (String s : errorInfo) {
-            stringBuilder.append(s).append(";");
+
+
+        if (errorInfo == null || errorInfo.size() == 0) {
+            tvSendDetailFacilityProblem.setText("正常");
+        } else {
+            for (String s : errorInfo) {
+                stringBuilder.append(s).append(";");
+            }
+            String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+            tvSendDetailFacilityProblem.setText(problem);
         }
-        String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-        tvSendDetailFacilityProblem.setText(problem);
+
 
         tvSendDetailReportetime.setText(detail.getCheckTime());
         tvSendDetailAddress.setText(detail.getRemarks());
@@ -320,16 +380,26 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         }
 
         switch (tag) {
-            case 1:
-                state = GlobalContanstant.GETSEND;
-                llLeaderAdvice.setVisibility(View.VISIBLE);
+            //代表检查
+            case GlobalContanstant.REVIEW:
+
+                //检查图片可以看到
+                llReviewImg.setVisibility(View.VISIBLE);
                 llSendMineAdvice.setVisibility(View.GONE);
                 //然后显示对应的节点的上传的意见
                 break;
-            case 2:
-                state = GlobalContanstant.GETPOST;
+            //代表整改
+            case GlobalContanstant.NOTIFY:
+
+                spaceView.setVisibility(View.VISIBLE);
+                llRoadIdea.setVisibility(View.VISIBLE);
+                llCheckIdea.setVisibility(View.GONE);
+                break;
+            //代表 审批
+            case GlobalContanstant.SEND:
+                tvSendDetailMineAdvice.setText(detail.getZZCSInfo());
                 llRoadIdea.setVisibility(View.GONE);
-                tvSendDetailLeaderAdvice.setText(detail.getZZTZInfo());
+                llCheckIdea.setVisibility(View.GONE);
                 break;
         }
 
@@ -343,7 +413,8 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         startActivity(intent);
     }
 
-    @OnClick({R.id.iv_play_video, R.id.tv_send_pass, R.id.tv_send_back})
+    @OnClick({R.id.iv_play_video, R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
+            R.id.iv_review_icon3,R.id.tv_check_pass, R.id.tv_check_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -354,16 +425,355 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 break;
             case R.id.tv_send_pass:
                 //拿到意见
-                advice = tvSendDetailAdvice.getText().toString();
-                UpData(advice);
+                mineAdvice = tvSendDetailMineAdvice.getText().toString().trim();
+                switch (tag) {
+                    //代表检查
+                    case GlobalContanstant.REVIEW:
+                        //然后显示对应的节点的上传的意见
+                        break;
+                    //代表整改
+                    case GlobalContanstant.NOTIFY:
+                        sendroadProgressbar.setVisibility(View.VISIBLE);
+
+                        llRoadIdea.setVisibility(View.GONE);
+                        UpData(mineAdvice);
+                        break;
+                    //代表 审批
+                    case GlobalContanstant.SEND:
+
+                        break;
+                }
 
                 break;
-            case R.id.tv_send_back:
-                advice = tvSendDetailAdvice.getText().toString();
-                UpData(advice);
+
+            case R.id.tv_check_pass:
+                sendroadProgressbar.setVisibility(View.VISIBLE);
+                llRoadIdea.setVisibility(View.GONE);
+                llCheckIdea.setVisibility(View.GONE);
+                upImage(true);
+
+                break;
+            case R.id.tv_check_back:
+                sendroadProgressbar.setVisibility(View.VISIBLE);
+                llRoadIdea.setVisibility(View.GONE);
+                llCheckIdea.setVisibility(View.GONE);
+                upImage(false);
+
+                break;
+            
+            case R.id.iv_review_icon1:
+                if (firstbitmap != null) {
+                    return;
+                } else {
+                    PermissionUtils.requestPermission(SendRoadDetailActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
+                }
+                break;
+            case R.id.iv_review_icon2:
+
+                if (secondbitmap != null) {
+                    return;
+                } else {
+                    file = new File(getExternalCacheDir(), "reviewimg2.jpg");
+                    try {
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                    } else {
+                        fileUri = Uri.fromFile(file);
+                    }
+
+                    Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    intent2.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent2, 200);
+                }
+                break;
+            case R.id.iv_review_icon3:
+                if (thirdbitmap != null) {
+                    return;
+                } else {
+                    file = new File(getExternalCacheDir(), "reviewimg3.jpg");
+                    try {
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                    } else {
+                        fileUri = Uri.fromFile(file);
+                    }
+
+                    Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent3, 300);
+                }
                 break;
         }
     }
+
+    private  String result;
+    private void upImage(final boolean t) {
+
+        new Thread() {
+            @Override
+            public void run() {
+                for (int i = 0; i < fileNames.size(); i++) {
+                    diseaseInformation.photoName = fileNames.get(i);
+                    diseaseInformation.encode = imageBase64Strings.get(i);
+
+                    try {
+                        isphotoSuccess1 = connectWebService(diseaseInformation);
+
+                    } catch (Exception e) {
+                        Message message = Message.obtain();
+                        message.what = GlobalContanstant.IMAGEFAIL;
+                        handler.sendMessage(message);
+                    }
+
+                }
+
+                if (isphotoSuccess1 != null) {
+                    if (isphotoSuccess1.equals("true")) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastUtil.shortToast(getApplicationContext(), "图片上传成功");
+                            }
+                        });
+
+                        try {
+                            if (t){
+                                result = upState(detail.getId(), personID);
+                            }else {
+                                result = back(detail.getId(),personID);
+                            }
+
+                            Message message = Message.obtain();
+                            message.obj = result;
+                            message.what = GlobalContanstant.REVIEWSTATESUCCESS;
+                            handler.sendMessage(message);
+                        } catch (Exception e) {
+                            Message message = Message.obtain();
+                            message.what = GlobalContanstant.REVIEWSTATEFAIL;
+                            handler.sendMessage(message);
+                        }
+                    }
+
+
+                }
+
+            }
+
+
+        }.start();
+
+
+    }
+
+    private String back(int id, int personID) throws Exception{
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.REVIEWSTATEBACKMETHOD);
+        //传递的参数
+        soapObject.addProperty("id", id);
+        soapObject.addProperty("personId", personID);  //文件类型
+
+        //设置访问地址 和 超时时间
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+
+        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
+        //链接后执行的回调
+        httpTranstation.call(null, envelope);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+
+        String result = object.getProperty(0).toString();
+        return result;
+    }
+
+    private String upState(int id, int personID) throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.REVIEWSTATEMETHOD);
+        //传递的参数
+        soapObject.addProperty("id", id);
+        soapObject.addProperty("personId", personID);  //文件类型
+
+        //设置访问地址 和 超时时间
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+
+        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
+        //链接后执行的回调
+        httpTranstation.call(null, envelope);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+
+        String result = object.getProperty(0).toString();
+        return result;
+    }
+
+    private String connectWebService(DiseaseInformation diseaseInformation) throws Exception {
+
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.photomethodName);
+        //传递的参数
+        soapObject.addProperty("DeciceCheckNum", detail.getDeciceCheckNum());
+        soapObject.addProperty("FileName", diseaseInformation.photoName);  //文件类型
+        soapObject.addProperty("ImgBase64String", diseaseInformation.encode);   //参数2  图片字符串
+        ///
+        soapObject.addProperty("PhaseId", GlobalContanstant.REVIEWPICTURE);
+
+        //设置访问地址 和 超时时间
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+
+        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
+        //链接后执行的回调
+        httpTranstation.call(null, envelope);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+
+        String isphotoSuccess = object.getProperty(0).toString();
+        return isphotoSuccess;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private List<String> fileNames = new ArrayList<>();
+    private List<String> imageBase64Strings = new ArrayList<>();
+
+    private Bitmap secondbitmap;
+    private Bitmap firstbitmap;
+    private Bitmap thirdbitmap;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case Take_Photo:
+
+//                    try {
+//                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(fileUri));
+//
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, file.getAbsolutePath());
+                    } else {
+
+                        firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, fileUri.getPath());
+                    }
+                    ivReviewIcon1.setImageBitmap(firstbitmap);
+                    String fileName1 = saveToSDCard(firstbitmap);
+                    //将选择的图片设置到控件上
+                    String encode1 = ReportActivity.photo2Base64(path);
+                    ivReviewIcon1.setClickable(false);
+                    fileNames.add(fileName1);
+                    imageBase64Strings.add(encode1);
+                    break;
+
+                case 200:
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        secondbitmap = ReportActivity.getBitmap(ivReviewIcon2, file.getAbsolutePath());
+                    } else {
+                        secondbitmap = ReportActivity.getBitmap(ivReviewIcon2, fileUri.getPath());
+                    }
+                    ivReviewIcon2.setImageBitmap(secondbitmap);
+                    String fileName2 = saveToSDCard(secondbitmap);
+                    //将选择的图片设置到控件上
+                    ivReviewIcon2.setClickable(false);
+                    String encode2 = ReportActivity.photo2Base64(path);
+                    fileNames.add(fileName2);
+                    imageBase64Strings.add(encode2);
+                    break;
+                case 300:
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        thirdbitmap = ReportActivity.getBitmap(ivReviewIcon3, file.getAbsolutePath());
+                    } else {
+
+                        thirdbitmap = ReportActivity.getBitmap(ivReviewIcon3, fileUri.getPath());
+                    }
+                    ivReviewIcon3.setImageBitmap(thirdbitmap);
+                    String fileName3 = saveToSDCard(thirdbitmap);
+                    ivReviewIcon3.setClickable(false);
+                    //将选择的图片设置到控件上
+                    String encode3 = ReportActivity.photo2Base64(path);
+                    fileNames.add(fileName3);
+                    imageBase64Strings.add(encode3);
+
+                    break;
+            }
+
+
+        }
+
+    }
+
+    private final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
+    private String path;
+
+    private String saveToSDCard(Bitmap bitmap) {
+        //先要判断SD卡是否存在并且挂载
+        String photoName = createPhotoName();
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File file = new File(iconPath);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            path = iconPath + photoName;
+            FileOutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(path);
+
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
+        }
+
+        return photoName;
+
+    }
+
+    private String createPhotoName() {
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
+        String fileName = format.format(date) + ".jpg";
+        return fileName;
+
+    }
+
 
     private void UpData(final String advice) {
         new Thread() {
@@ -389,12 +799,11 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     //选择一个
     private String toNet(String advice) throws Exception {
         //发通知节点//哪个单子，状态，通知人是谁，意见是什么,时间是否需要。
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reviewmethodName);
-
-        soapObject.addProperty("DeciceCheckNum", detail.getDeciceCheckNum());
-        soapObject.addProperty("state", state);
-        soapObject.addProperty("personId", personID);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
+        soapObject.addProperty("id", detail.getId());
         soapObject.addProperty("opinion", advice);
+        soapObject.addProperty("personId", personID);
+        soapObject.addProperty("state", GlobalContanstant.NOTIFY);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
         envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
         envelope.dotNet = true;
@@ -410,4 +819,5 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     }
 
 
+    
 }

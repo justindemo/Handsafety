@@ -24,7 +24,7 @@
     <!-- 描边颜色 -->
     <color name="cc_cricle_red">#fdff7d7d</color>
 
-    <color name="navpage">#FFE1E8EB</color>
+    <color name="navpage">#b3afaf</color>
 
     <color name="cc_green">#a3e4b7</color>
     <color name="cc_home_scan">#1FB7FC</color>

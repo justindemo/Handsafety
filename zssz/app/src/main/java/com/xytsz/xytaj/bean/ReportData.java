@@ -29,6 +29,16 @@ public class ReportData implements Serializable{
     private int ID;
     private java.util.List<Problem> List;
 
+    public String getChargeperson2() {
+        return Chargeperson2;
+    }
+
+    public void setChargeperson2(String chargeperson2) {
+        Chargeperson2 = chargeperson2;
+    }
+
+    private String Chargeperson2;
+
     public String getAddressInfo() {
         return AddressInfo;
     }

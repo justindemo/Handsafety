@@ -83,7 +83,7 @@ public class PostRoadActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    String sendData = getDealData(GlobalContanstant.GETPOST, personID);
+                    String sendData = getDealData(NetUrl.getManagementList, personID);
 
                     if (sendData != null) {
 
@@ -138,8 +138,8 @@ public class PostRoadActivity extends AppCompatActivity {
     }
 
 
-    public static String getDealData(int phaseIndication, int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getManagementList);
+    public static String getDealData(String methodName, int personID) throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, methodName);
         soapObject.addProperty("personId", personID);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
         envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut

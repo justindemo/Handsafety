@@ -12,6 +12,9 @@
         android:orientation="vertical"
         android:padding="2dp">
 
+
+
+
         <TextView
             android:gravity="center"
             android:layout_width="match_parent"
@@ -66,6 +69,7 @@
 
 
     <Button
+        android:clickable="false"
         android:id="@+id/appraise_btn"
         android:layout_marginTop="6dp"
         android:layout_marginLeft="6dp"

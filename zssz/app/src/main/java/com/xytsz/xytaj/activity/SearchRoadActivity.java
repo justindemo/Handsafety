@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.xytsz.xytaj.R;
@@ -82,9 +83,9 @@ public class SearchRoadActivity extends AppCompatActivity implements SearchView.
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent() != null){
-            roads = getIntent().getStringArrayExtra("road");
+            roads = getIntent().getStringArrayExtra("person");
         }
-        setContentView(R.layout.activity_searchroad);
+        setContentView(R.layout.sendroad_choiceperson);
 
 
         initView();
@@ -203,6 +204,11 @@ public class SearchRoadActivity extends AppCompatActivity implements SearchView.
             resultAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    @Override
+    public void onClear(SearchView.EditChangedListener editChangedListener) {
+        editChangedListener = null;
     }
 
 }

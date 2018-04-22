@@ -137,7 +137,7 @@ public final class CameraManager {
       }
       configManager.setDesiredCameraParameters(camera);
 
-      //FIXME
+      //
  //     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
       //�Ƿ�ʹ��ǰ��
 //      if (prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false)) {
@@ -243,7 +243,7 @@ public final class CameraManager {
       }
 
       int leftOffset = (screenResolution.x - width) / 2;
-      int topOffset = (screenResolution.y - height) / 2;
+      int topOffset = (screenResolution.y - height) / 3;
       framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
 
     }

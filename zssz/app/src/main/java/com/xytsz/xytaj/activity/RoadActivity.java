@@ -55,7 +55,7 @@ public class RoadActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 switch (msg.what){
                     case NOONE:
-                        ToastUtil.shortToast(getApplicationContext(),"已审核完毕");
+                        ToastUtil.shortToast(getApplicationContext(),"已检查完毕");
                         mProgressBar.setVisibility(View.GONE);
                         break;
                     case GlobalContanstant.SENDFAIL:
@@ -73,6 +73,8 @@ public class RoadActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private RoadAdapter roadAdapter;
     private List<Review> reviews;
+    private String serviceData;
+    private int role;
 
 
     @Override
@@ -81,6 +83,7 @@ public class RoadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_road);
 
         initAcitionbar();
+        role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initView();
         initData();
@@ -101,8 +104,7 @@ public class RoadActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    String serviceData = getServiceData(GlobalContanstant.GETREVIEW);
-
+                    serviceData = getServiceData(NetUrl.reviewmethodName,personId);
                     if (serviceData != null) {
                         reviews = JsonUtil.jsonToBean(serviceData, new TypeToken<List<Review>>() {
                         }.getType());
@@ -136,9 +138,6 @@ public class RoadActivity extends AppCompatActivity {
                                     AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
                                     audioUrls.add(audioUrl);
                                 }
-
-
-
                             }
 
                             roadAdapter = new RoadAdapter(reviews, imageUrlLists, audioUrls);
@@ -152,7 +151,7 @@ public class RoadActivity extends AppCompatActivity {
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             Intent intent = new Intent(RoadActivity.this,SendRoadDetailActivity.class);
                                             intent.putExtra("position",position);
-                                            intent.putExtra("tag",1);
+                                            intent.putExtra("tag",GlobalContanstant.REVIEW);
                                             intent.putExtra("detail", reviews.get(position));
                                             intent.putExtra("audioUrl", audioUrls.get(position));
                                             intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position));
@@ -176,9 +175,9 @@ public class RoadActivity extends AppCompatActivity {
 
     }
 
-    public static String getServiceData(int phaseIndication)throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace,NetUrl.getTaskList);
-        soapObject.addProperty("state",phaseIndication);
+    public static String getServiceData(String methodname,  int personId)throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace,methodname);
+        soapObject.addProperty("personId",personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
         envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
@@ -233,11 +232,11 @@ public class RoadActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 300 ){
-            if (resultCode == 301 ||resultCode == 302){
+            if (resultCode == 302 ){
                 int backedPosition = data.getIntExtra("position", -1);
                 reviews.remove(backedPosition);
                 imageUrlLists.remove(backedPosition);
-                //audioUrls.remove(backedPosition);
+                audioUrls.remove(backedPosition);
                 roadAdapter.notifyDataSetChanged();
             }
         }

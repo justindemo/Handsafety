@@ -19,16 +19,16 @@ public class GlobalContanstant {
     public static final String PROBLEMDESC = "PROBLEMDESC";
     public static final String ISFIRSTENTER = "ISFIRSTENTER";
     /*
-    * 审核页面数据*/
+    * 检查页面数据*/
     public static final int GETREVIEW = 0;
     /*
-    * 下派页面数据*/
-    public static final int GETSEND = 1;
+    * 整改页面数据*/
+    public static final int GETNOTIFY = 1;
+    /*
+    * 审批数据*/
+    public static final int GETSEND = 2;
     /*
     * 处置数据*/
-    public static final int GETDEAL = 2;
-    /*
-    * 报验数据*/
     public static final int GETPOST = 3;
     /*
     * 验收的数据*/
@@ -42,6 +42,13 @@ public class GlobalContanstant {
     /**
      * 未被审核 */
     public static final int GETUNREVIEW = 5;
+    //检查
+    public static final int REVIEW = 1;
+    //整改
+    public static final int NOTIFY = 2;
+    //审批
+    public static final int SEND = 3;
+
 
 
     public static final String PERSONID = "PERSONID";
@@ -84,4 +91,10 @@ public class GlobalContanstant {
     public static final int MORNINGSUCCESS =8000;
     public static final int MORNINGIMGFAIL = 9001;
 
+    public static final int IMAGESUCCESS = 60001;
+    public static final int PATROLLISTFAIL = 201;
+    public static final int PATROLLISTSUCCESS = 200;
+    public static final int REVIEWPICTURE = 10;
+    public static final int REVIEWSTATESUCCESS = 300;
+    public static final int REVIEWSTATEFAIL = 301;
 }

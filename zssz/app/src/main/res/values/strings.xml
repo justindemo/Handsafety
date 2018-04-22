@@ -7,7 +7,7 @@
     <string name="logo_passWordName">请输入密码</string>
     <string name="report_dealgrade">检查设备：</string>
     <string name="report_dealcategory">设备负责队：</string>
-    <string name="report_department">设备负责人：</string>
+    <string name="report_department">设备排查人：</string>
     <string name="report_facategory">设备检查项：</string>
     <string name="report_faname">设备问题项：</string>
     <string name="detail_problem">设备问题：</string>
@@ -19,6 +19,7 @@
     <string name="member_title">会员</string>
     <string name="supervise">监管</string>
     <string name="supervise_first">日常管理</string>
+    <string name="supervise_second">精细化管理</string>
     <string name="me">个人中心</string>
 
 
@@ -32,23 +33,24 @@
     <string name="trainsign">早会签到</string>
 
 
-
-    <string name="reportimg">上报图片：</string>
+    <string name="reportimg">排查图片：</string>
     <string name="locationdes">位置描述：</string>
-    <string name="myreport_title">病害明细</string>
+    <string name="myreport_title">设备问题明细</string>
 
 
-    <string name="reprote">上报</string>
-    <string name="review">通知</string>
+    <string name="reprote_task">我的排查任务</string>
+    <string name="reprote">排查</string>
+    <string name="updata">提交</string>
+    <string name="review">检查</string>
     <string name="send">审批</string>
-    <string name="deal">审核</string>
-    <string name="post">报验</string>
+    <string name="deal">整改</string>
+    <string name="post">处置</string>
     <string name="check">验收</string>
     <string name="home_scan">扫码上报</string>
 
-    <string name="processdetail">病害流程</string>
-    <string name="problem_detail">病害明细</string>
-    <string name="maintenance">养护作业</string>
+    <string name="processdetail">设备检查流程</string>
+    <string name="problem_detail">设备检查</string>
+    <string name="maintenance">设备检查</string>
 
 
     <string name="bottom_first">首页</string>
@@ -147,9 +149,9 @@
     <string name="sign">签到</string>
 
 
-    <string name="allreporter">上报人员：</string>
+    <string name="allreporter">排查人员：</string>
     <string name="problemlocation">设备位置：</string>
-    <string name="reportertime">上报时间：</string>
+    <string name="reportertime">排查时间：</string>
     <string name="review_tv_detail">详细</string>
     <string name="review_tv_pass">通过</string>
     <string name="review_tv_fail">驳回</string>
@@ -157,7 +159,8 @@
     <string name="input_number">手动输入设备号</string>
     <string name="open_light">打开手电筒</string>
 
-    <string name="report_image">病害图片：</string>
+    <string name="report_image">排查图片：</string>
+    <string name="review_image">检查图片：</string>
     <string name="report_locaiton">具体描述：</string>
     <string name="report_problemdes">设备问题描述：</string>
     <string name="detail_advice">您的意见：</string>
@@ -168,9 +171,9 @@
     <string name="report_uploading">开始上传</string>
     <string name="report_imgsuccess">图片上传成功</string>
     <string name="report_dialog_content2">相册</string>
-    <string name="report_request">至少选择一张上报图片</string>
-    <string name="report_notifica">上报一条新病害</string>
-    <string name="report_notifica_title">：新上报一条病害</string>
+    <string name="report_request">至少选择一张图片上报</string>
+    <string name="report_notifica">上报一条新数据</string>
+    <string name="report_notifica_title">：新上报一条数据</string>
     <string name="report_error">数据未获取，稍后重试</string>
     <string name="report_imageerror">图片未上报成功</string>
     <string name="report_uperror">数据未上传成功</string>
@@ -189,7 +192,7 @@
     <string name="video_fail">视频上传失败</string>
     <string name="audio_fail">音频上传失败</string>
     <string name="disrecord">请先录音</string>
-    <string name="reportmore">请重录</string>
+    <string name="reportmore">播放错误，请重录</string>
     <string name="reportlocation">请填写具体描述</string>
 
     <string name="add_video">添加视频</string>
@@ -200,32 +203,30 @@
     <string name="sign_up">提交</string>
 
 
-
-
     <string name="home_notnetwork">网络异常</string>
     <string name="home_refresh">刷新</string>
 
     <string name="review_nodata">未上报数据</string>
 
     <string name="deal_navi">导航</string>
-    <string name="deal_nodata">没有需要您处置数据</string>
+    <string name="deal_nodata">没有需要您整改数据</string>
     <string name="check_nodata">没有需要您处置数据</string>
 
     <string name="send_request_time">要求时间</string>
-    <string name="send_send">派发</string>
-    <string name="send_fail">驳回</string>
-    <string name="send_nodata">没有下派数据</string>
+    <string name="send_send">处置人</string>
+    <string name="send_check">验收人</string>
+    <string name="send_nodata">没有审批数据</string>
 
-    <string name="check_ireport">上报前</string>
+    <string name="check_ireport">排查前</string>
     <string name="check_irepair">维修后</string>
-    <string name="check_report">上报人：</string>
+    <string name="check_report">排查人：</string>
     <string name="check_dealer">处置人：</string>
 
-    <string name="check_detail_title">养护作业</string>
-    <string name="check_detail_reviewer">审核人员：</string>
+    <string name="check_detail_title">设备管理作业</string>
+    <string name="check_detail_reviewer">审批人员：</string>
     <string name="check_detail_dealer">处置人员：</string>
-    <string name="check_detail_reporttime">上报时间：</string>
-    <string name="check_detail_reviewtime">审核时间：</string>
+    <string name="check_detail_reporttime">排查时间：</string>
+    <string name="check_detail_reviewtime">检查时间：</string>
     <string name="check_detail_repair">维修备注：</string>
     <string name="check_detail_location">详细位置：</string>
     <string name="check_detail_requesttime">要求完成时间：</string>
@@ -235,8 +236,8 @@
 
 
     <string name="process_tasknumer">任务单号：</string>
-    <string name="process_report">上报人：</string>
-    <string name="process_review">审核人：</string>
+    <string name="process_report">排查人：</string>
+    <string name="process_review">检查人：</string>
     <string name="process_deal">处置人：</string>
     <string name="process_check">验收人：</string>
     <string name="process_redeal">处置前照片</string>
@@ -276,6 +277,9 @@
     <string name="problemdeal">病害处置</string>
     <string name="facilitymanage">设施管理</string>
     <string name="personsign">人员签到</string>
+    <string name="traintest">培训考试</string>
+    <string name="systemmanage">制度管理</string>
+    <string name="contingencyplan">应急预案</string>
 
     <string name="table_nodata">数据未加载</string>
     <string name="table_top_title">掌上市政使用数据</string>
@@ -304,13 +308,13 @@
 
 
     <string name="home_loading">正在加载数据</string>
-    <string name="home_noreporte">您没有上报的权限</string>
-    <string name="home_noreview">您没有审核的权限</string>
-    <string name="home_nosend">您没有下派的权限</string>
-    <string name="home_nodeal">您没有处置的权限</string>
-    <string name="home_nopost">您没有报验的权限</string>
+    <string name="home_noreporte">您没有排查的权限</string>
+    <string name="home_noreview">您没有检查的权限</string>
+    <string name="home_nosend">您没有审批的权限</string>
+    <string name="home_nodeal">您没有整改的权限</string>
+    <string name="home_nopost">您没有处置的权限</string>
     <string name="home_nocheck">您没有验收的权限</string>
-    
+
     <string name="information_compelet">请完善资料</string>
     <string name="information_save">保存</string>
     <string name="information_modification">修改密码</string>
@@ -336,5 +340,7 @@
         <item>@string/permission_read_external_hint</item>
         <item>@string/permission_white_external_hint</item>
     </string-array>
+
+
 
 </resources>

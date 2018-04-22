@@ -52,6 +52,7 @@ public class AppraiseActivity extends AppCompatActivity {
             switch (msg.what) {
                 case SUCCESS:
                     ToastUtil.shortToast(getApplicationContext(), "提交成功");
+                    finish();
                     break;
                 case FAIL:
                     ToastUtil.shortToast(getApplicationContext(), "提交失败");
@@ -123,7 +124,7 @@ public class AppraiseActivity extends AppCompatActivity {
             public void run() {
                 try{
 
-                    String result = uptoserver(appraise, role, barText);
+                   String result = uptoserver(appraise, role, barText);
                     if (result != null) {
                         if (result.equals("true")) {
                             Message message = Message.obtain();
@@ -147,7 +148,7 @@ public class AppraiseActivity extends AppCompatActivity {
         }.start();
 
 
-        finish();
+
     }
 
 

@@ -52,7 +52,7 @@
                         android:layout_height="30dp"
                         android:layout_margin="6dp"
                         android:background="@drawable/slecetor_btn_uncheck"
-                        android:text="@string/reprote"
+                        android:text="@string/updata"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </LinearLayout>
@@ -133,7 +133,7 @@
                         android:layout_height="30dp"
                         android:layout_margin="6dp"
                         android:background="@drawable/slecetor_btn_uncheck"
-                        android:text="@string/reprote"
+                        android:text="@string/updata"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
 
@@ -280,7 +280,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:background="@drawable/slecetor_btn_post"
-                android:text="@string/post"
+                android:text="@string/updata"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 

@@ -22,9 +22,14 @@ import com.xytsz.xytaj.bean.AudioUrl;
 import com.xytsz.xytaj.bean.ImageUrl;
 import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
+import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
+
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,7 +42,7 @@ import java.util.List;
  */
 public class DealActivity extends AppCompatActivity {
 
-    private static final int ISDEAL = 3003;
+    private static final int NODEAL = 3003;
     private static final int FAIL = 500;
     private ListView mLv;
     private int personID;
@@ -46,7 +51,7 @@ public class DealActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case ISDEAL:
+                case NODEAL:
                     mProgressBar.setVisibility(View.GONE);
                     mtvfail.setText(nodata);
                     mtvfail.setVisibility(View.VISIBLE);
@@ -93,7 +98,7 @@ public class DealActivity extends AppCompatActivity {
             public void run() {
                 try {
 
-                    String dealData = RoadActivity.getServiceData(GlobalContanstant.GETDEAL);
+                    String dealData = getServiceData(NetUrl.getdealtask,personID);
                     if (dealData != null) {
 
                         reviews = JsonUtil.jsonToBean(dealData, new TypeToken<List<Review>>() {
@@ -102,7 +107,7 @@ public class DealActivity extends AppCompatActivity {
                         if (reviews.size() == 0) {
 
                             Message message = Message.obtain();
-                            message.what = ISDEAL;
+                            message.what = NODEAL;
                             handler.sendMessage(message);
 
                         } else {
@@ -145,9 +150,9 @@ public class DealActivity extends AppCompatActivity {
                                     mLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                            Intent intent = new Intent(DealActivity.this,DiseaseDetailActivity.class);
+                                            Intent intent = new Intent(DealActivity.this,SendRoadDetailActivity.class);
                                             intent.putExtra("position",position);
-                                            intent.putExtra("tag",1);
+                                            intent.putExtra("tag",GlobalContanstant.NOTIFY);
                                             intent.putExtra("detail", reviews.get(position));
                                             intent.putExtra("audioUrl", audioUrls.get(position));
                                             intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position));
@@ -172,6 +177,24 @@ public class DealActivity extends AppCompatActivity {
 
     }
 
+    public static String getServiceData(String method,int personID) throws Exception {
+
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace,method);
+        soapObject.addProperty("personId",personID);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
+        envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(NetUrl.getTasklist_SOAP_ACTION,envelope);
+
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        String json = object.getProperty(0).toString();
+
+        return json;
+    }
 
 
     private void initAcitionbar() {
@@ -196,10 +219,11 @@ public class DealActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 400 ){
-            if (resultCode == 301 ||resultCode == 302){
+            if (resultCode == 301 ){
                 int backedPosition = data.getIntExtra("position", -1);
                 reviews.remove(backedPosition);
                 imageUrlLists.remove(backedPosition);
+                audioUrls.remove(backedPosition);
                 adapter.notifyDataSetChanged();
             }
         }

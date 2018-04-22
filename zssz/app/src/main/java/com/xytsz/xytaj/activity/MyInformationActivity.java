@@ -81,7 +81,7 @@ public class MyInformationActivity extends AppCompatActivity {
         username = SpUtils.getString(getApplicationContext(), GlobalContanstant.USERNAME);
 
         role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
-        int department = SpUtils.getInt(getApplicationContext(), GlobalContanstant.DEPARATMENT);
+        String department = SpUtils.getString(getApplicationContext(), GlobalContanstant.DEPARATMENT);
 
 
         String phones = SpUtils.getString(getApplicationContext(), GlobalContanstant.PHONE);
@@ -141,7 +141,7 @@ public class MyInformationActivity extends AppCompatActivity {
             myName.setFocusable(false);
             myName.setFocusableInTouchMode(false);
             myTelephone.setText(phones);
-            myDepartment.setText(Data.departments[department - 1]);
+            myDepartment.setText(department);
         }
 
 

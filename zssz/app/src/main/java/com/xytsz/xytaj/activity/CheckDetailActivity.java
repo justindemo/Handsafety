@@ -46,8 +46,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private static final int ISUNCHECKPASS = 600002;
     @Bind(R.id.tv_check_detail_diseasedes)
     TextView tvCheckDetailDiseasedes;
-    @Bind(R.id.tv_check_reporter)
-    TextView tvCheckReporter;
     @Bind(R.id.tv_check_facility)
     TextView tvCheckFacility;
     @Bind(R.id.tv_check_facility_person)
@@ -200,9 +198,8 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void initData() {
 
-        tvCheckReporter.setText(detail.getCheckPersonName());
         tvCheckFacility.setText(detail.getDeviceName());
-        tvCheckFacilityPerson.setText(detail.getAdministrator());
+        tvCheckFacilityPerson.setText(detail.getCheckPersonName());
         tvCheckFacilityTeam.setText(detail.getDeptName());
         tvCheckFacilityLoca.setText(detail.getAddressInfo());
         tvCheckReviewer.setText(detail.getZZCSSHPersonName());
@@ -339,7 +336,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
                     public void run() {
                         try {
                             personID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
-                            String result = toInspection(GlobalContanstant.GETUNCHECK, personID);
+                            String result = toInspection(GlobalContanstant.GETPOST, personID);
                             Message message = Message.obtain();
                             message.what = ISUNCHECKPASS;
                             Bundle bundle = new Bundle();
@@ -370,6 +367,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
                             Bundle bundle = new Bundle();
                             bundle.putInt("passpostion", position);
                             bundle.putString("ispass", result);
+
                             message.setData(bundle);
                             handler.sendMessage(message);
 
@@ -388,8 +386,8 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
 
     private String toInspection(int phaseIndication, int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reviewmethodName);
-        soapObject.addProperty("DeciceCheckNum", detail.getDeciceCheckNum());
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
+        soapObject.addProperty("id", detail.getId());
         soapObject.addProperty("state", phaseIndication);
         soapObject.addProperty("personId", personID);
         soapObject.addProperty("opinion", "");

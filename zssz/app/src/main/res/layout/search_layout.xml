@@ -29,7 +29,7 @@
                 android:textSize="16sp"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:hint="请输入路名"/>
+                android:hint="请输入姓名"/>
 
             <ImageView
                 android:visibility="gone"
@@ -41,17 +41,6 @@
                 android:layout_height="wrap_content"/>
         </FrameLayout>
 
-        <Button
-            android:id="@+id/search_btn_back"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/btn_search_bg"
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:text="返回"
-            android:textColor="@color/cc_white"/>
     </LinearLayout>
 
 

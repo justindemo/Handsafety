@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.MyApplication;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.CheckRoadAdapter;
+import com.xytsz.xytaj.adapter.DealAdapter;
 import com.xytsz.xytaj.bean.AudioUrl;
 import com.xytsz.xytaj.bean.ImageUrl;
 import com.xytsz.xytaj.bean.Review;
@@ -25,6 +26,7 @@ import com.xytsz.xytaj.global.GlobalContanstant;
 
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
 import org.ksoap2.SoapEnvelope;
@@ -94,6 +96,7 @@ public class CheckRoadActivity extends AppCompatActivity {
     private List<AudioUrl> audioUrls = new ArrayList<>();
     private List<Review> list;
     private ProgressBar mProgressBar;
+    private int personid;
 
 
     @Override
@@ -107,7 +110,7 @@ public class CheckRoadActivity extends AppCompatActivity {
         initAcitionbar();
         mlv = (ListView) findViewById(R.id.lv_checkroad);
         mProgressBar = (ProgressBar) findViewById(R.id.review_progressbar);
-
+        personid = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initData();
 
 
@@ -122,7 +125,7 @@ public class CheckRoadActivity extends AppCompatActivity {
 
                 try {
 
-                    String checkData = RoadActivity.getServiceData(GlobalContanstant.GETCHECK);
+                    String checkData = PostRoadActivity.getDealData(NetUrl.CHECKMETHODNAME,personid);
 
                     if (checkData != null) {
 

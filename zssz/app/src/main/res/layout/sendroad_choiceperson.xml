@@ -1,26 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="6dp"
     android:background="@drawable/dialog_bg"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <com.xytsz.xytaj.ui.SearchView
+        android:id="@+id/search_check_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <ListView
-        android:id="@+id/lv_sendroad_list"
+        android:padding="6dp"
+        android:layout_below="@+id/search_check_layout"
+        android:id="@+id/lv_sendroad_checklist"
         android:layout_width="match_parent"
         android:layout_height="300dp"/>
     <LinearLayout
-        android:id="@+id/ll_sendroad_advice"
-        android:layout_marginTop="6dp"
+        android:id="@+id/ll_sendroad_person"
+        android:layout_margin="6dp"
         android:orientation="horizontal"
-        android:layout_below="@+id/lv_sendroad_list"
+        android:layout_below="@+id/lv_sendroad_checklist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
             android:textSize="16sp"
-            android:text="整改措施："
+            android:text="处置人："
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:padding="3dp"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_sendroad_dealperson"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_sendroad_advice"
+        android:layout_margin="6dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/ll_sendroad_person"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textSize="16sp"
+            android:text="审批意见："
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <EditText
@@ -36,7 +63,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginTop="10dp"
+        android:layout_margin="6dp"
         android:layout_below="@+id/ll_sendroad_advice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

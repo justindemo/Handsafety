@@ -404,7 +404,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     private String getPreImgUrl(String taskNumber) throws Exception {
         SoapObject soapobject = new SoapObject(NetUrl.nameSpace, NetUrl.getAllImageURLmethodName);
         soapobject.addProperty("DeciceCheckNum", taskNumber);
-        soapobject.addProperty("PhaseId", GlobalContanstant.GETSEND);
+        soapobject.addProperty("PhaseId", GlobalContanstant.GETNOTIFY);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.dotNet = true;
         envelope.bodyOut = soapobject;
@@ -428,7 +428,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     private String getRngImgUrl(String taskNumber) throws Exception {
         SoapObject soapobject = new SoapObject(NetUrl.nameSpace, NetUrl.getAllImageURLmethodName);
         soapobject.addProperty("DeciceCheckNum", taskNumber);
-        soapobject.addProperty("PhaseId", GlobalContanstant.GETDEAL);
+        soapobject.addProperty("PhaseId", GlobalContanstant.GETSEND);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.dotNet = true;
         envelope.bodyOut = soapobject;
@@ -480,16 +480,11 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private String getCurrentTime() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-        String actualTime = format.format(new Date(System.currentTimeMillis()));
-        return actualTime;
-    }
 
     private String toManagement(int phaseIndication, Review reviewRoadDetail) throws Exception {
 
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reviewmethodName);
-        soapObject.addProperty("DeciceCheckNum", reviewRoadDetail.getDeciceCheckNum());
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
+        soapObject.addProperty("id", reviewRoadDetail.getId());
         soapObject.addProperty("opinion", reviewRoadDetail.getWXInfo());
         soapObject.addProperty("personId", personID);
         soapObject.addProperty("state", phaseIndication);
@@ -572,17 +567,20 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
 
         switch (view.getId()) {
             case R.id.iv_predeal_icon1:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file = new File(getPhotopath(1));
+                fileUri = Uri.fromFile(file);
+                intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent1, 9001);
+
+               /* new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file = new File(getPhotopath(1));
-                                fileUri = Uri.fromFile(file);
-                                intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent1, 9001);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -591,20 +589,23 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             case R.id.iv_predeal_icon2:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file1 = new File(getPhotopath(2));
+                fileUri = Uri.fromFile(file1);
+                intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent2, 9002);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file1 = new File(getPhotopath(2));
-                                fileUri = Uri.fromFile(file1);
-                                intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent2, 9002);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -613,22 +614,24 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             case R.id.iv_predeal_icon3:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
+
+                File file2 = new File(getPhotopath(3));
+                fileUri = Uri.fromFile(file2);
+                intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+                startActivityForResult(intent3, 9003);
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
 
-                                File file2 = new File(getPhotopath(3));
-                                fileUri = Uri.fromFile(file2);
-                                intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-                                startActivityForResult(intent3, 9003);
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -637,7 +640,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
 
                 break;
 
@@ -653,7 +656,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                             diseaseInformation.encode = imageBase64Strings.get(i);
                             diseaseInformation.diviceNum = taskNumber;
                             try {
-                                isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETSEND);
+                                isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETNOTIFY);
                             } catch (Exception e) {
                                 Message message = Message.obtain();
                                 message.what = GlobalContanstant.CHECKFAIL;
@@ -672,17 +675,20 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
 
                 break;
             case R.id.iv_dealing_icon1:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent4 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file3 = new File(getPhotopath(4));
+                fileUri = Uri.fromFile(file3);
+                intent4.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent4, 9004);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent4 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file3 = new File(getPhotopath(4));
-                                fileUri = Uri.fromFile(file3);
-                                intent4.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent4, 9004);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -691,22 +697,24 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
 
                 break;
             case R.id.iv_dealing_icon2:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+                Intent intent5 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file4 = new File(getPhotopath(5));
+                fileUri = Uri.fromFile(file4);
+                intent5.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+                startActivityForResult(intent5, 9005);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent5 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file4 = new File(getPhotopath(5));
-                                fileUri = Uri.fromFile(file4);
-                                intent5.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
-                                startActivityForResult(intent5, 9005);
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -715,20 +723,23 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             case R.id.iv_dealing_icon3:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent6 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file5 = new File(getPhotopath(6));
+                fileUri = Uri.fromFile(file5);
+                intent6.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent6, 9006);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent6 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file5 = new File(getPhotopath(6));
-                                fileUri = Uri.fromFile(file5);
-                                intent6.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent6, 9006);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -737,7 +748,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             //点击上报正在处置图片
             case R.id.bt_uncheck_dealing:
@@ -756,7 +767,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 Log.i("diviceNum", diseaseInformation.diviceNum);
 
                                 try {
-                                    isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETDEAL);
+                                    isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETSEND);
                                 } catch (Exception e) {
                                     Message message = Message.obtain();
                                     message.what = GlobalContanstant.CHECKFAIL;
@@ -778,17 +789,20 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
             case R.id.iv_dealed_icon1:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+
+                Intent intent7 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file6 = new File(getPhotopath(7));
+                fileUri = Uri.fromFile(file6);
+                intent7.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent7, 9007);
+
+               /* new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent7 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file6 = new File(getPhotopath(7));
-                                fileUri = Uri.fromFile(file6);
-                                intent7.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent7, 9007);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -797,20 +811,22 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             case R.id.iv_dealed_icon2:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+                Intent intent8 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file7 = new File(getPhotopath(8));
+                fileUri = Uri.fromFile(file7);
+                intent8.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent8, 9008);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent8 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file7 = new File(getPhotopath(8));
-                                fileUri = Uri.fromFile(file7);
-                                intent8.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent8, 9008);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -819,22 +835,24 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
 
                 break;
             case R.id.iv_dealed_icon3:
-                new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
+                Intent intent9 = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file8 = new File(getPhotopath(9));
+                fileUri = Uri.fromFile(file8);
+                intent9.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent9, 9009);
+                btUncheckDealed.setFocusable(true);
+
+                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
                                 dialog.dismiss();
-                                Intent intent9 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                File file8 = new File(getPhotopath(9));
-                                fileUri = Uri.fromFile(file8);
-                                intent9.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                startActivityForResult(intent9, 9009);
-                                btUncheckDealed.setFocusable(true);
+
                                 break;
                             case 1:
                                 dialog.dismiss();
@@ -844,7 +862,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
-                }).create().show();
+                }).create().show();*/
                 break;
             case R.id.bt_uncheck_dealed:
 

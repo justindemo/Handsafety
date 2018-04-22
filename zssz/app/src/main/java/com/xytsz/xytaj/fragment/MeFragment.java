@@ -160,7 +160,7 @@ public class MeFragment extends BaseFragment {
 
         if (role != 0) {
            // meActivity.setVisibility(View.VISIBLE);
-            getNumber();
+            //getNumber();
             mine_tv_sign.setVisibility(View.GONE);
         } else {
             //获取是否签到
@@ -674,7 +674,7 @@ public class MeFragment extends BaseFragment {
         userName = SpUtils.getString(getContext(), GlobalContanstant.USERNAME);
         mTvLogin.setText(userName);
         personID = SpUtils.getInt(getContext(), GlobalContanstant.PERSONID);
-        getNumber();
+        //getNumber();
         //是否签到
         issign = SpUtils.getBoolean(getContext(), GlobalContanstant.SIGN, false);
         if (issign) {
@@ -689,7 +689,7 @@ public class MeFragment extends BaseFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.me_information:
-                //IntentUtil.startActivity(view.getContext(), MyInformationActivity.class);
+
                 Intent intent = new Intent(view.getContext(), MyInformationActivity.class);
                 startActivityForResult(intent, 300);
                 break;
@@ -717,8 +717,6 @@ public class MeFragment extends BaseFragment {
             //分享
             case R.id.me_share:
                 PermissionUtils.requestPermission(MeFragment.this.getActivity(), PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermission);
-                PermissionUtils.requestPermission(MeFragment.this.getActivity(), PermissionUtils.CODE_READ_EXTERNAL_STORAGE, mPermission);
-                //showShare();
                 break;
 
             //退出登录

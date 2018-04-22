@@ -172,7 +172,7 @@ public class BikingRouteOverlay extends OverlayManager {
 
     @Override
     public boolean onPolylineClick(Polyline polyline) {
-        // TODO Auto-generated method stub
+
         return false;
     }
 }

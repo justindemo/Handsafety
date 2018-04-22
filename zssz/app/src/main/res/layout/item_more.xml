@@ -4,22 +4,43 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="5dp">
+    android:padding="6dp">
 
-    <ImageView
-        android:id="@+id/more_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher" />
+    <RelativeLayout
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/more_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/sup_mytask" />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_mytask_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="-12dp"
+            android:layout_toRightOf="@+id/more_icon"
+            android:background="@mipmap/iv_text_number"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="10sp" />
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/more_tv"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="10dp"
         android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/more_icon"
         android:text="定位" />
+
+
 
     <View
         android:layout_width="match_parent"

@@ -50,6 +50,19 @@
         <item name="android:textColor">@drawable/selector_homeactivity_rbtn_text_color</item>
     </style>
 
+    <style name="ReadFragmentRadioButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/clickeffect</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@drawable/selector_homeactivity_rbtn_text_color</item>
+    </style>
+
     <style name="MyDialog" parent="Base.AlertDialog.AppCompat.Light">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@mipmap/none</item>

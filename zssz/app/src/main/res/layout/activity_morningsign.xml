@@ -25,7 +25,7 @@
 
             <TextView
                 android:id="@+id/tv_sign_team"
-                android:text="仓储队"
+                android:text=""
                 android:textSize="16sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -79,7 +79,7 @@
             <ImageView
                 android:id="@+id/iv_sign_picture"
                 android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_height="120dp"
                 android:layout_marginTop="6dp"
                 android:background="@mipmap/iv_add"
                 android:scaleType="fitXY" />

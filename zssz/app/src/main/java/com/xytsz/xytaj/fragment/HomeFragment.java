@@ -27,18 +27,21 @@ import com.google.zxing.activity.CaptureActivity;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.CheckRoadActivity;
 import com.xytsz.xytaj.activity.DealActivity;
+import com.xytsz.xytaj.activity.PatrolListActivity;
 import com.xytsz.xytaj.activity.PostRoadActivity;
 import com.xytsz.xytaj.activity.ReportActivity;
 import com.xytsz.xytaj.activity.RoadActivity;
 import com.xytsz.xytaj.activity.SendRoadActivity;
 import com.xytsz.xytaj.base.BaseFragment;
 
+import com.xytsz.xytaj.bean.Person;
 import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
 
 import com.xytsz.xytaj.net.NetUrl;
 
 import com.xytsz.xytaj.util.IntentUtil;
+import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
@@ -55,13 +58,13 @@ import java.util.List;
  * Created by admin on 2017/1/4.
  * 首页
  */
-public class HomeFragment extends BaseFragment implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class HomeFragment extends BaseFragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
 
     private static final int FAIL = 404;
     private static final int MANAGER = 111120;
     private static final int SIMPLER = 111122;
-    private static final int REQUEST_CODE =0x01 ;
+    private static final int REQUEST_CODE = 0x01;
     private int RESULT_OK = 0xA1;
     private TextureMapView mapview;
     private BaiduMap map;
@@ -98,7 +101,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
             }
         }
     };
-    private MarqueeView mtvMarquee;
+
     private int alluser;
     private String noreport;
     private String noreview;
@@ -116,17 +119,19 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     private int checkNumber;
     private int dealNumber;
 
-    private List<Integer> manageNumbers = new ArrayList<>();
+    private List<String> manageNumbers = new ArrayList<>();
     private String loading;
     private TextView mActionbartext;
     private LinearLayout mllScan;
+    private TextView mtvPatrolNumber;
+    private List<String> patrolNumbers = new ArrayList<>();
 
 
     @Override
     public View initView() {
         View view = View.inflate(getActivity(), R.layout.fragment_home, null);
         mActionbartext = (TextView) view.findViewById(R.id.actionbar_text);
-        mtvMarquee = (MarqueeView) view.findViewById(R.id.tv_marquee);
+
         mapview = (TextureMapView) view.findViewById(R.id.home_mv);
         mllReport = view.findViewById(R.id.ll_home_report);
         mllReview = view.findViewById(R.id.ll_home_review);
@@ -140,6 +145,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         mtvsendNumber = (TextView) view.findViewById(R.id.tv_home_send_number);
         mtvuncheckNumber = (TextView) view.findViewById(R.id.tv_home_unchecek_number);
         mtvcheckNumber = (TextView) view.findViewById(R.id.tv_home_check_number);
+        mtvPatrolNumber = (TextView) view.findViewById(R.id.tv_home_patrol_number);
         return view;
     }
 
@@ -159,18 +165,13 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         noData = getString(R.string.table_nodata);
 
         alluser = SpUtils.getInt(getContext(), GlobalContanstant.ALLUSERCOUNT);
-        mtvMarquee.setText(alltitle + alluser);
-        mtvMarquee.setFocusable(true);
-        mtvMarquee.requestFocus();
-        mtvMarquee.sepX = 2;
-        mtvMarquee.startScroll();
+
 
         mActionbartext.setText(R.string.app_name);
 
         //获取当前登陆人的ID
         personId = SpUtils.getInt(getContext(), GlobalContanstant.PERSONID);
-        getData();
-
+//        getData();
 
         //是否显示缩放按钮
         mapview.showZoomControls(false);
@@ -178,8 +179,6 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         mapview.showScaleControl(false);
         map = mapview.getMap();
 
-        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
-        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
 
         map.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
         //1,纬度double latitude  2，经度longitude  116.347005,39.812991
@@ -195,11 +194,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
 
     private void getData() {
-        reviewNumber = 0;
-        sendNumber = 0;
-        checkNumber = 0;
-        dealNumber = 0;
-        manageNumbers.clear();
+        patrolNumbers.clear();
         new Thread() {
             @Override
             public void run() {
@@ -212,55 +207,25 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
                     // 如果是处置者就显示第一行，
                     // 如果是下派领导，显示下拍和验收  先不做处理
 
-//                    if (role == 1) {
-//
-//                        String reviewData = getManageData(GlobalContanstant.GETREVIEW);
-//                        String sendData = getManageData(GlobalContanstant.GETSEND);
-//                        String checkData = getManageData(GlobalContanstant.GETCHECK);
-//                        Review review = JsonUtil.jsonToBean(reviewData, Review.class);
-//                        Review send = JsonUtil.jsonToBean(sendData, Review.class);
-//                        Review check = JsonUtil.jsonToBean(checkData, Review.class);
-//
-//                        reviewList = review.getReviewRoadList();
-//                        sendList = send.getReviewRoadList();
-//                        checkList = check.getReviewRoadList();
-//
-//                        for (Review.ReviewRoad reviewRoad : reviewList) {
-//                            reviewNumber += reviewRoad.getList().size();
-//                        }
-//                        manageNumbers.add(reviewNumber);
-//                        for (Review.ReviewRoad reviewRoad : sendList) {
-//                            sendNumber += reviewRoad.getList().size();
-//                        }
-//                        manageNumbers.add(sendNumber);
-//                        for (Review.ReviewRoad reviewRoad : checkList) {
-//                            checkNumber += reviewRoad.getList().size();
-//                        }
-//                        manageNumbers.add(checkNumber);
-//
-//
-//                        Message message = Message.obtain();
-//                        message.what = MANAGER;
-//                        message.obj = manageNumbers;
-//                        handler.sendMessage(message);
-//
-//
-//                    }
-//
-//                    if (role == 1 || role == 2) {
-//                        String simpleData = getSimpleData(GlobalContanstant.GETDEAL, personId);
-//                        Review review = JsonUtil.jsonToBean(simpleData, Review.class);
-//                        List<Review.ReviewRoad> reviewRoadList = review.getReviewRoadList();
-//                        for (Review.ReviewRoad reviewRoad : reviewRoadList) {
-//                            dealNumber += reviewRoad.getList().size();
-//                        }
-//
-//                        Message message = Message.obtain();
-//                        message.what = SIMPLER;
-//                        message.obj = dealNumber;
-//                        handler.sendMessage(message);
-//                    }
+                    String patrolcount = getManageData(NetUrl.getMytaskmethod, personId);
+                    String dealcount = getManageData(NetUrl.getDealcountMethod, personId);
+                    String examinecount = getManageData(NetUrl.getRepeatmethod, personId);
+                    String reviewcount = getManageData(NetUrl.getreviewcountmethod, personId);
+                    String postcount = getManageData(NetUrl.getpostcountmethod, personId);
+                    String checkcount = getManageData(NetUrl.getcheckcountmethod, personId);
 
+                    patrolNumbers.add(patrolcount);
+                    patrolNumbers.add(examinecount);
+                    patrolNumbers.add(dealcount);
+                    patrolNumbers.add(reviewcount);
+                    patrolNumbers.add(postcount);
+                    patrolNumbers.add(checkcount);
+
+
+                    Message message = Message.obtain();
+                    message.what = MANAGER;
+                    message.obj = patrolNumbers;
+                    handler.sendMessage(message);
 
                 } catch (Exception e) {
                     Message message = Message.obtain();
@@ -271,31 +236,12 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         }.start();
     }
 
-    private String getSimpleData(int state, int personId) throws Exception {
-
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getManagementList);
-        soapObject.addProperty("PhaseIndication", state);
-        soapObject.addProperty("personId", personId);
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
-        envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getManagementList_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        String json = object.getProperty(0).toString();
-
-        return json;
-
-    }
 
     //根据personId 去获取
-    private String getManageData(int state) throws Exception {
+    private String getManageData(String methodName, int personId) throws Exception {
 
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskList);
-        soapObject.addProperty("PhaseIndication", state);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, methodName);
+        soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
         envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
@@ -356,7 +302,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
             locationClient.start();
         }
         role = SpUtils.getInt(getContext(), GlobalContanstant.ROLE);
-        mtvMarquee.startScroll();
+
     }
 
 
@@ -364,10 +310,11 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     public void onResume() {
         super.onResume();
         mapview.onResume();
-        mtvMarquee.startScroll();
 
         getData();
 
+        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
+        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
 
     }
 
@@ -375,8 +322,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     public void onPause() {
         super.onPause();
         mapview.onPause();
-        mtvMarquee.stopScroll();
-        if (locationClient != null){
+        if (locationClient != null) {
             locationClient.unRegisterLocationListener(myListener);
             locationClient.stop();
         }
@@ -396,48 +342,50 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
             switch (msg.what) {
                 case MANAGER:
+                    mtvPatrolNumber.setVisibility(View.VISIBLE);
                     mtvreviewNumber.setVisibility(View.VISIBLE);
                     mtvsendNumber.setVisibility(View.VISIBLE);
                     mtvcheckNumber.setVisibility(View.VISIBLE);
+                    mtvuncheckNumber.setVisibility(View.VISIBLE);
+                    mtvdealNumber.setVisibility(View.VISIBLE);
 
-                    List<Integer> list = (List<Integer>) msg.obj;
+                    List<String> list = (List<String>) msg.obj;
                     for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i) == 0) {
-                            if (i == 0) {
-                                mtvreviewNumber.setVisibility(View.GONE);
-                            } else if (i == 1) {
-                                mtvsendNumber.setVisibility(View.GONE);
-                            } else if (i == 2) {
-                                mtvcheckNumber.setVisibility(View.GONE);
+                        if (list.get(i).equals("0")) {
+                            switch (i) {
+                                case 0:
+                                    mtvPatrolNumber.setVisibility(View.GONE);
+                                    break;
+                                case 1:
+                                    mtvreviewNumber.setVisibility(View.GONE);
+                                    break;
+                                case 2:
+                                    mtvdealNumber.setVisibility(View.GONE);
+                                    break;
+                                case 3:
+                                    mtvsendNumber.setVisibility(View.GONE);
+                                    break;
+                                case 4:
+                                    mtvuncheckNumber.setVisibility(View.GONE);
+                                    break;
+                                case 5:
+                                    mtvcheckNumber.setVisibility(View.GONE);
+                                    break;
                             }
                         } else {
-                            mtvreviewNumber.setText(String.valueOf(list.get(0)));
-                            mtvsendNumber.setText(String.valueOf(list.get(1)));
-                            mtvcheckNumber.setText(String.valueOf(list.get(2)));
+                            mtvPatrolNumber.setText(list.get(0));
+                            mtvreviewNumber.setText(list.get(1));
+                            mtvdealNumber.setText(list.get(2));
+                            mtvsendNumber.setText(list.get(3));
+                            mtvuncheckNumber.setText(list.get(4));
+                            mtvcheckNumber.setText(list.get(5));
                         }
                     }
 
-                    reviewNumber = 0;
-                    sendNumber = 0;
-                    checkNumber = 0;
 
                     break;
-                case SIMPLER:
-                    mtvuncheckNumber.setVisibility(View.VISIBLE);
-                    mtvdealNumber.setVisibility(View.VISIBLE);
-                    int number = (int) msg.obj;
-                    if (number == 0) {
-                        mtvdealNumber.setVisibility(View.GONE);
-                        mtvuncheckNumber.setVisibility(View.GONE);
-                    } else {
-                        mtvdealNumber.setText(String.valueOf(number));
-                        mtvuncheckNumber.setText(String.valueOf(number));
-                    }
-                    dealNumber = 0;
-                    break;
-
                 case FAIL:
-                    ToastUtil.shortToast(getContext(), noData);
+                    ToastUtil.shortToast(HomeFragment.this.getActivity(), noData);
                     break;
                 case ISLOAD:
                     String isload = (String) msg.obj;
@@ -471,80 +419,43 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
             }
 
-            new Thread() {
-                @Override
-                public void run() {
-
-                    try {
-                        String isLoad = toUpLoadLocation(personId, latitude + "", longitude + "");
-
-                        Message message = Message.obtain();
-                        message.what = ISLOAD;
-                        message.obj = isLoad;
-                        handler.sendMessage(message);
-
-                    } catch (Exception e) {
-
-                    }
-
-                }
-            }.start();
 
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
+                //排查
                 case R.id.ll_home_report:
-                    PermissionUtils.requestPermission(HomeFragment.this.getActivity(),PermissionUtils.CODE_CAMERA,mPermissionGrant);
+                    PermissionUtils.requestPermission(HomeFragment.this.getActivity(), PermissionUtils.CODE_CAMERA, mPermissionGrant);
                     break;
+                //检查
                 case R.id.ll_home_review:
-                    if (role == 1) {
-                        IntentUtil.startActivity(getContext(), RoadActivity.class);
-                    } else {
-                        ToastUtil.shortToast(getContext(), noreview);
-                    }
+                    IntentUtil.startActivity(getContext(), RoadActivity.class);
                     break;
+                //审批
                 case R.id.ll_home_send:
                     //下派
-                    if (role == 1) {
-                        IntentUtil.startActivity(getContext(), SendRoadActivity.class);
-                    } else {
-                        ToastUtil.shortToast(getContext(), nosend);
-                    }
-
+                    IntentUtil.startActivity(getContext(), SendRoadActivity.class);
                     break;
+                //整改
                 case R.id.ll_home_deal:
                     //处置 1，2
-                    if (role == 1 || role == 2) {
-                        IntentUtil.startActivity(getContext(), DealActivity.class);
-                    } else {
-                        ToastUtil.shortToast(getContext(), nodeal);
-                    }
+                    IntentUtil.startActivity(getContext(), DealActivity.class);
                     break;
+                //处置
                 case R.id.ll_home_uncheck:
                     //报验
-                    if (role == 1 || role == 2) {
-                        IntentUtil.startActivity(getContext(), PostRoadActivity.class);
-                    } else {
-                        ToastUtil.shortToast(getContext(), nopost);
-                    }
-
+                    IntentUtil.startActivity(getContext(), PostRoadActivity.class);
                     break;
+                //验收
                 case R.id.ll_home_check:
                     //验收
-                    if (role == 1) {
-                        IntentUtil.startActivity(getContext(), CheckRoadActivity.class);
-                    } else {
-                        ToastUtil.shortToast(getContext(), "您没有验收的权限");
-                    }
-
+                    IntentUtil.startActivity(getContext(), CheckRoadActivity.class);
                     break;
-
                 case R.id.ll_home_scan:
 
-                   // PermissionUtils.requestPermission(HomeFragment.this.getActivity(),PermissionUtils.CODE_CAMERA,mPermissionGrant);
-
+                    // PermissionUtils.requestPermission(HomeFragment.this.getActivity(),PermissionUtils.CODE_CAMERA,mPermissionGrant);
                     break;
             }
         }
@@ -574,20 +485,17 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) { //RESULT_OK = -1
             Bundle bundle = data.getExtras();
-            ToastUtil.shortToast(getActivity(),"扫描成功");
+            ToastUtil.shortToast(getActivity(), "扫描成功");
             String scanResult = bundle.getString("qr_scan_result");
             //将扫描出的信息显示出来
-            Intent intent = new Intent(getContext(),ReportActivity.class);
-            intent.putExtra("scan",scanResult);
+            Intent intent = new Intent(getContext(), ReportActivity.class);
+            intent.putExtra("scan", scanResult);
             startActivity(intent);
 
         }
-
-
-
     }
 }

@@ -38,9 +38,9 @@ public class MyApplication extends MobApplication {
 
     }
 
-
-    public static String getAllPersonList() throws Exception {
+    public static String getAllPersonList(int personId) throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getPersonList);
+        soapObject.addProperty("ID",personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.setOutputSoapObject(soapObject);
@@ -53,9 +53,7 @@ public class MyApplication extends MobApplication {
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
-
     }
-
 
     public static String getAllImagUrl(String taskNumber, int phaseIndication) throws Exception {
 

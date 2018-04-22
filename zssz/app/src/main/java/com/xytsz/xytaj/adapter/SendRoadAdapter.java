@@ -14,6 +14,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.xytsz.xytaj.activity.PhotoShowActivity;
+import com.xytsz.xytaj.activity.SearchRoadActivity;
 import com.xytsz.xytaj.activity.SendRoadDetailActivity;
 import com.xytsz.xytaj.bean.AudioUrl;
 import com.xytsz.xytaj.bean.ImageUrl;
@@ -35,6 +38,7 @@ import com.xytsz.xytaj.bean.Person;
 import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.ui.SearchView;
 import com.xytsz.xytaj.ui.TimeChoiceButton;
 import com.xytsz.xytaj.R;
 
@@ -54,12 +58,11 @@ import java.util.List;
  * Created by admin on 2017/2/17.
  * xiapai
  */
-public class SendRoadAdapter extends BaseAdapter {
+public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchViewListener {
 
 
     private static final int ISSEND = 1000002;
     private static final int ISSENDPERSON = 1000003;
-    private static final int ISSENDBACK = 1000004;
 
     private String str;
     private List<Review> reviews;
@@ -73,9 +76,36 @@ public class SendRoadAdapter extends BaseAdapter {
     private String imgurl;
     private EditText etAdvice;
     private SoundUtil soundUtil;
-    private String advise;
 
     private Context context;
+    private TextView mtvdealperson;
+    private ArrayAdapter<String> autoCompleteAdapter;
+    /**
+     * 搜索结果列表adapter
+     */
+    private SearchAdapter resultAdapter;
+    /**
+     * 搜索过程中自动补全数据
+     */
+    private List<String> autoCompleteData;
+
+    /**
+     * 搜索结果的数据
+     */
+    private List<String> resultData;
+
+    /**
+     * 默认提示框显示项的个数
+     */
+    private static int DEFAULT_HINT_SIZE = 8;
+
+    /**
+     * 提示框显示项的个数
+     */
+    private static int hintSize = DEFAULT_HINT_SIZE;
+
+    private List<String> dbData = new ArrayList<>();
+    private ListView lv;
 
     public SendRoadAdapter(Context context, Handler handler, List<Review> reviews,
                            List<List<ImageUrl>> imageUrlLists,
@@ -141,25 +171,12 @@ public class SendRoadAdapter extends BaseAdapter {
         }
 
         final Review reviewRoadDetail = reviews.get(position);
-        //String upload_person_id = reviewRoadDetail.getUpload_Person_ID() + "";
-        //通过上报人的ID 拿到上报人的名字
-        //获取到所有人的列表 把对应的 id 找出名字
-//        List<String> personNamelist = SpUtils.getStrListValue(parent.getContext(), GlobalContanstant.PERSONNAMELIST);
-//        List<String> personIDlist = SpUtils.getStrListValue(parent.getContext(), GlobalContanstant.PERSONIDLIST);
-//
-//        for (int i = 0; i < personIDlist.size(); i++) {
-//            if (upload_person_id.equals(personIDlist.get(i))) {
-//                id = i;
-//            }
-//        }
-
-        //String userName = personNamelist.get(id);
 
         String userName = reviewRoadDetail.getCheckPersonName();
         String uploadTime = reviewRoadDetail.getCheckTime();
 
         holder.btChoice.setReviewRoadDetail(this, reviewRoadDetail);
-        //String userName = SpUtils.getString(parent.getContext(), GlobalContanstant.USERNAME);
+
         //赋值
         holder.Vname.setText(userName);
         holder.Pname.setText(reviewRoadDetail.getRemarks());
@@ -218,8 +235,9 @@ public class SendRoadAdapter extends BaseAdapter {
         });
 
 
-        //选择派发人
+        //选择处置人
         holder.btSend.setTag(position);
+        //选择验收人
         holder.btSendBack.setTag(position);
 
         holder.btSend.setOnClickListener(new View.OnClickListener() {
@@ -228,24 +246,40 @@ public class SendRoadAdapter extends BaseAdapter {
                 //点击的时候弹出对话框 都是一样的 人员名字
 
                 //改变bean类的参数
-                if (reviewRoadDetail.getRequestTime() == null) {
-                    ToastUtil.shortToast(view.getContext(), "请先选择要求时间");
+                if (reviewRoadDetail.getRequestTime() == null || reviewRoadDetail.getSendCheckPerson() == null) {
+                    ToastUtil.shortToast(view.getContext(), "请先选择要求时间或验收人");
 
                 } else {
+
+                   /* Intent intent = new Intent(context, SearchRoadActivity.class);
+                    intent.putExtra("person", servicePerson);
+                    context.startActivity(intent);*/
+
+
                     final Dialog dialog = new AlertDialog.Builder(context).create();
                     dialog.setCancelable(true);// 可以用“返回键”取消
                     dialog.setCanceledOnTouchOutside(true);//
                     dialog.show();
                     dialog.setContentView(R.layout.sendroad_choiceperson);
-                    ListView lv = (ListView) dialog.findViewById(R.id.lv_sendroad_list);
+                    lv = (ListView) dialog.findViewById(R.id.lv_sendroad_checklist);
                     final EditText mEtAdvice = (EditText) dialog.findViewById(R.id.et_sendroad_advice);
+                    mtvdealperson = (TextView) dialog.findViewById(R.id.tv_sendroad_dealperson);
+                    SearchView searchView = (SearchView) dialog.findViewById(R.id.search_check_layout);
                     Button mBtOk = (Button) dialog.findViewById(R.id.btn_sendroad_ok);
                     Button mBtCancle = (Button) dialog.findViewById(R.id.btn_sendroad_cancel);
-                    SendroadAdviceAdapter sendroadAdviceAdapter = new SendroadAdviceAdapter(personlist, reviewRoadDetail);
-
+                    searchView.setSearchViewListener(SendRoadAdapter.this);
+                    searchView.setAutoCompleteAdapter(autoCompleteAdapter);
                     if (lv != null) {
-                        lv.setAdapter(sendroadAdviceAdapter);
+                        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                //得到人名，显示
+                                String dealperson = resultData.get(position);
+                                mtvdealperson.setText(dealperson);
+                                reviewRoadDetail.setSendPerson(dealperson);
 
+                            }
+                        });
                     }
                     dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
@@ -261,12 +295,12 @@ public class SendRoadAdapter extends BaseAdapter {
                         private String advice;
 
                         @Override
-                        public void onClick( View v) {
+                        public void onClick(View v) {
 
                             advice = mEtAdvice.getText().toString();
                             dialog.dismiss();
 
-                            str  = reviewRoadDetail.getSendPerson();
+                            str = reviewRoadDetail.getSendPerson();
 
                             new AlertDialog.Builder(v.getContext()).setTitle("维修人").
                                     setMessage("确定让：" + str + " 维修?").setPositiveButton("确定",
@@ -282,7 +316,17 @@ public class SendRoadAdapter extends BaseAdapter {
 
                                             //上传服务器数据
                                             final int passposition = (int) view.getTag();
-                                            SendRoadAdapter.this.taskNumber = reviewRoadDetail.getDeciceCheckNum();
+                                            SendRoadAdapter.this.taskNumber = reviewRoadDetail.getId();
+                                            //设置ID
+                                            for (int i = 0; i < personlist.size(); i++) {
+
+                                                if (str.equals(personlist.get(i).getName())) {
+                                                    int requirementsComplete_person_id = personlist.get(i).getId();
+                                                    reviewRoadDetail.setSendpersonID(requirementsComplete_person_id);
+                                                }
+
+                                            }
+
                                             requstPersonID = reviewRoadDetail.getSendpersonID();
                                             requstTime = getRequstTime(passposition);
                                             new Thread() {
@@ -290,7 +334,11 @@ public class SendRoadAdapter extends BaseAdapter {
                                                 public void run() {
 
                                                     try {
-                                                        String isSend = toDispatching(SendRoadAdapter.this.taskNumber, requstPersonID, requstTime, GlobalContanstant.GETDEAL, personid,advice);
+                                                        //
+                                                        String isSend = toDispatching(SendRoadAdapter.this.taskNumber,
+                                                                requstPersonID, requstTime,
+                                                                GlobalContanstant.GETPOST, personid,
+                                                                advice, reviewRoadDetail.getSendCheckPersonId());
 
                                                         Message message = Message.obtain();
                                                         message.what = ISSEND;
@@ -322,14 +370,22 @@ public class SendRoadAdapter extends BaseAdapter {
                         }
                     });
 
+
+
                 }
             }
         });
 
         if (reviewRoadDetail.getSendPerson() == null) {
-            holder.btSend.setText("派发");
+            holder.btSend.setText("处置人");
         } else {
             holder.btSend.setText(reviewRoadDetail.getSendPerson());
+
+        }
+        if (reviewRoadDetail.getSendCheckPerson() == null) {
+            holder.btSendBack.setText("验收人");
+        } else {
+            holder.btSendBack.setText(reviewRoadDetail.getSendCheckPerson());
 
         }
 
@@ -434,82 +490,69 @@ public class SendRoadAdapter extends BaseAdapter {
                     intent.putExtra("detail", reviews.get(position1));
                     intent.putExtra("audioUrl", audioUrls.get(position1));
                     intent.putExtra("position", position1);
-                    intent.putExtra("tag",2);
+                    intent.putExtra("tag", GlobalContanstant.SEND);
                     intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position1));
                     v.getContext().startActivity(intent);
                 }
             }
         });
 
-        //修改
+        //验收人
         holder.btSendBack.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View v) {
-                //去除当前条目
-                final int failposition = (int) v.getTag();
-                final String taskNumber = reviewRoadDetail.getDeciceCheckNum();
-
-                final AlertDialog dialog = new AlertDialog.Builder(context).create();
-                View view = View.inflate(v.getContext(), R.layout.dialog_reject, null);
-                etAdvice = (EditText) view.findViewById(R.id.dialog_et_advise);
-                final Button btnOk = (Button) view.findViewById(R.id.btn_ok);
-                Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
-                RadioGroup radiogroup = (RadioGroup) view.findViewById(R.id.back_rg);
-
-                radiogroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-                    @Override
-                    public void onCheckedChanged(RadioGroup group, int checkedId) {
-                        switch (checkedId) {
-                            case R.id.noblong_me_rb:
-                                advise = "非管护段";
-                                break;
-                            case R.id.noblong_rb:
-                                advise = "非权属";
-                                break;
-                        }
-                    }
-                });
-
-
-                dialog.setView(view);
+            public void onClick(final View v) {
+                final Dialog dialog = new AlertDialog.Builder(context).create();
+                dialog.setCancelable(true);// 可以用“返回键”取消
+                dialog.setCanceledOnTouchOutside(true);//
                 dialog.show();
+                dialog.setContentView(R.layout.sendroad_choicecheckperson);
+                lv = (ListView) dialog.findViewById(R.id.lv_sendroad_list);
+                SearchView searchView = (SearchView) dialog.findViewById(R.id.search_layout);
+                searchView.setSearchViewListener(SendRoadAdapter.this);
+                searchView.setAutoCompleteAdapter(autoCompleteAdapter);
+                initData();
+                if (lv != null) {
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            //得到人名，显示
+                            str = resultData.get(position);
+                            dialog.dismiss();
+                            new AlertDialog.Builder(v.getContext()).setTitle("验收人").
+                                    setMessage("确定让：" + str + " 验收?").setPositiveButton("确定",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                btnOk.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        String advice = advise + " " + etAdvice.getText().toString();
-                        backList.add(taskNumber);
-                        backList.add(advice);
+                                            //添加选中的条目的人员 都是一个
+                                            TextView btn = (TextView) v;
+                                            btn.setText(str);
+                                            reviewRoadDetail.setSendCheckPerson(str);
+                                            //设置ID
+                                            for (int i = 0; i < personlist.size(); i++) {
 
+                                                if (str.equals(personlist.get(i).getName())) {
+                                                    int requirementsComplete_person_id = personlist.get(i).getId();
+                                                    reviewRoadDetail.setSendCheckPersonId(requirementsComplete_person_id);
+                                                }
 
-                        Message message = Message.obtain();
-                        message.what = ISSENDTASK;
+                                            }
 
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("failposition", failposition);
-                        bundle.putString("taskNumber", taskNumber);
-                        bundle.putString("advice", advice);
-                        message.setData(bundle);
+                                            dialog.dismiss();
 
-                        //message.obj = backList;
-                        handler.sendMessage(message);
+                                        }
+                                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
 
-                        reviews.remove(failposition);
-                        imageUrlLists.remove(failposition);
-                        audioUrls.remove(failposition);
-                    }
-                });
-
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-
+                        }
+                    });
+                }
+                dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
                 notifyDataSetChanged();
 
@@ -521,17 +564,108 @@ public class SendRoadAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private static final int ISSENDTASK = 1000005;
-    private List<String> backList = new ArrayList<>();
-    private int id;
+    private void initData() {
+        autoCompleteData= null;
+        resultData = null;
+        autoCompleteAdapter = null;
+        resultAdapter = null;
+        //从数据库获取数据
+        getDbData();
+        //初始化热搜版数据
+        //getHintData();
+        //初始化自动补全数据
+        getAutoCompleteData(null);
+        //初始化搜索结果数据
+        getResultData(null);
+    }
+
+
+    private void getDbData() {
+
+        dbData.clear();
+        for (int i = 0; i < servicePerson.length; i++) {
+            dbData.add(servicePerson[i]);
+        }
+
+    }
+
+    private void getAutoCompleteData(String text) {
+
+        if (autoCompleteData == null) {
+            //初始化
+            autoCompleteData = new ArrayList<>(hintSize);
+        } else {
+            // 根据text 获取auto data
+            autoCompleteData.clear();
+            for (int i = 0, count = 0; i < dbData.size()
+                    && count < hintSize; i++) {
+                if (dbData.get(i).contains(text.trim())) {
+                    autoCompleteData.add(dbData.get(i));
+                    count++;
+                }
+            }
+        }
+        if (autoCompleteAdapter == null) {
+            autoCompleteAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, autoCompleteData);
+        } else {
+            autoCompleteAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void getResultData(String text) {
+
+        if (resultData == null) {
+            // 初始化
+            resultData = new ArrayList<>();
+        } else {
+            resultData.clear();
+            for (int i = 0; i < dbData.size(); i++) {
+                if (dbData.get(i).contains(text.trim())) {
+                    resultData.add(dbData.get(i));
+                }
+            }
+        }
+        if (resultAdapter == null) {
+            resultAdapter = new SearchAdapter(context, resultData);
+        } else {
+            resultAdapter.notifyDataSetChanged();
+        }
+    }
+
+
     private List<ImageUrl> urlList;
-    private List<Boolean> b = new ArrayList<>();
 
     private String getRequstTime(int position) {
         Review reviewRoadDetail = reviews.get(position);
         String requestTime = reviewRoadDetail.getRequestTime();
 
         return requestTime;
+    }
+
+    @Override
+    public void onRefreshAutoComplete(String text) {
+        getAutoCompleteData(text);
+    }
+
+    @Override
+    public void onSearch(String text) {
+        //更新result数据
+        getResultData(text);
+        lv.setVisibility(View.VISIBLE);
+        //第一次获取结果 还未配置适配器
+        if (lv.getAdapter() == null) {
+            //获取搜索数据 设置适配器
+            lv.setAdapter(resultAdapter);
+        } else {
+            //更新搜索数据
+            resultAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    @Override
+    public void onClear(SearchView.EditChangedListener editChangedListener) {
+        editChangedListener= null;
     }
 
 
@@ -551,16 +685,17 @@ public class SendRoadAdapter extends BaseAdapter {
     }
 
     private String requstTime;
-    private String taskNumber;
+    private int taskNumber;
     private int requstPersonID;
 
 
-    public String toDispatching(String taskNumber, int requstPersonID, String requestTime, int phaseIndication, int personid,String advice) throws Exception {
+    public String toDispatching(int taskNumber, int requstPersonID, String requestTime, int phaseIndication, int personid, String advice, int sendCheckPersonID) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.sendmethodName);
-        soapObject.addProperty("DeciceCheckNum", taskNumber);
+        soapObject.addProperty("id", taskNumber);
         soapObject.addProperty("RequirementsComplete_Person_ID", requstPersonID);
         soapObject.addProperty("RequirementsCompleteTime", requestTime);
+        soapObject.addProperty("YSPersonId", sendCheckPersonID);
         soapObject.addProperty("opinion", advice);
         soapObject.addProperty("state", phaseIndication);
         soapObject.addProperty("personId", personid);

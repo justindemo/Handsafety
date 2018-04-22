@@ -182,7 +182,6 @@ public class PostRoadAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DiseaseDetailActivity.class);
                 intent.putExtra("position",position);
-                intent.putExtra("tag",2);
                 intent.putExtra("detail", reviewRoad.get(position));
                 intent.putExtra("audioUrl", audioUrls.get(position));
                 intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position));
@@ -193,7 +192,7 @@ public class PostRoadAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private int id;
+
 
     private List<ImageUrl> urlList;
 

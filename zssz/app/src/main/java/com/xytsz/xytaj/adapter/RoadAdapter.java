@@ -82,17 +82,6 @@ public class RoadAdapter extends BaseAdapter {
         Review review = reviews.get(position);
         String  userName  = review.getCheckPersonName();
 
-        //通过上报人的ID 拿到上报人的名字
-        //获取到所有人的列表 把对应的 id 找出名字
-      /*  List<String> personNamelist = SpUtils.getStrListValue(parent.getContext(), GlobalContanstant.PERSONNAMELIST);
-        List<String> personIDlist = SpUtils.getStrListValue(parent.getContext(), GlobalContanstant.PERSONIDLIST);
-
-        for (int i = 0; i < personIDlist.size(); i++) {
-            if (upload_person_id.equals(personIDlist.get(i))) {
-                id = i;
-            }
-        }
-*/
 
         holder.tvProblemtime.setText(review.getCheckTime());
 
@@ -166,6 +155,9 @@ public class RoadAdapter extends BaseAdapter {
                         holder.tvProblemlocaname.setVisibility(View.VISIBLE);
                         holder.tvProblemAudio.setVisibility(View.GONE);
                     }
+                }else {
+                    holder.tvProblemlocaname.setVisibility(View.VISIBLE);
+                    holder.tvProblemAudio.setVisibility(View.GONE);
                 }
             } else {
                 holder.tvProblemlocaname.setVisibility(View.VISIBLE);

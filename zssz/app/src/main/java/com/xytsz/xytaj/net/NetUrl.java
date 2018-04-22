@@ -20,27 +20,19 @@ public class NetUrl {
     public static final String loginmethodName = "ToLogin";
     public static final String photomethodName = "ToUploadImg";
     public static final String reportmethodName = "ToCheck";
-    public static final String getTaskList = "GetDeviceCheckInfoByState";
+    public static final String getdealtask = "GetListZG";
     //获取当前人员要处置的信息
     public static final String getManagementList = "GetMyTask";
-    /*
-    * 去派工*/
+
     public static final String sendmethodName = "ToDispatching";
-    /**
-     * 养护驳回 TODO:
-     */
+
     public static final String sendbackmethodName = "ToDispatching";
 
-    /*
-    * 审核*/
-    public static final String reviewmethodName = "ToNextState";
 
-    /*
-    * 报验*/
-    public static final String postmethodName = "ToManagement";
-    /*
-    * 验收*/
-    public static final String checkmethodName = "ToInspection";
+    public static final String reviewmethodName = "GetRepeatTask";
+    public static final String dealmethodName = "ToNextState";
+
+
     /*
     * 上传位置信息到服务器*/
     public static final String uploadLocationmethodName = "toUploadLocation";
@@ -93,7 +85,7 @@ public class NetUrl {
     /*
     * 方法*/
     public static final  String photo_SOAP_ACTION = "http://AJ.org/toReportImg";
-    public static final  String report_SOAP_ACTION = "http://AJ.org/toReport";
+
     public static final  String getTasklist_SOAP_ACTION = "http://AJ.org/GetDeviceCheckInfoByState";
     public static final  String toExamine_SOAP_ACTION = "http://AJ.org/ToExamine";
     public static final  String toDispatching_SOAP_ACTION = "http://AJ.org/ToDispatching";
@@ -119,7 +111,7 @@ public class NetUrl {
     public static final String getRngImageURLSoap_Action = "http://AJ.org/getRngImgUrl";
 
 
-    public static final String getPersonList_SOAP_ACTION ="http://AJ.org/getPersonList";
+    public static final String getPersonList_SOAP_ACTION ="http://AJ.org/GetPersonByDept";
 
     public static final String getVersionInfo_SOAP_ACTION = "http://AJ.org/getVersionInfo";
     public static final String dealtype_SOAP_ACTION = "http://AJ.org/getAllSZDealType";
@@ -169,6 +161,24 @@ public class NetUrl {
     public static final String getReportDataMethodname = "GetCheckTermByDeviceId";
     public static final String getReport_SOAP_ACTION = "http://AJ.org/GetCheckTermByDeviceId";
     public static final String getSignpersonMethodname ="";
-    public static final String MoringSignmethod ="";
+    public static final String MoringSignmethod ="ToSign";
     public static final String TrainSignmethod ="";
+    public static final String getTaskByPersonID = "GetMyTaskToCheck";
+    public static final String REVIEWSTATEMETHOD = "ToRepeatTask";
+
+    public static final String CHECKMETHODNAME = "GetYSTask";
+    public static final String getMytaskmethod = "GetCountMyCheck";
+    public static final String getRepeatmethod ="GetCountRepeat";
+    public static final String getDealcountMethod = "GetCountZG";
+    public static final String getreviewcountmethod ="GetCountDispatching";
+    public static final String getpostcountmethod ="GetCountMyTask";
+    public static final String getcheckcountmethod ="GetCountYSTask";
+    public static final String getsendtask = "GetListDispatching";
+    public static final String getImageCode = "GetAPPQRCode";
+    public static final String trainTestshowmethod = "";
+    public static final String trainDemomethod ="";
+    public static final String REVIEWSTATEBACKMETHOD = "ToRepeatTaskBack";
+    public static final String getMoringMeeting = "GetMorningMeeting";
+    public static final String getSignCheck ="GetSignCheckDic";
+    public static final String EndSignmethod ="EndSign";
 }

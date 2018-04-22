@@ -199,7 +199,7 @@
     <string name="check_dealer">處置人：</string>
 
     <string name="check_detail_title">養護作業</string>
-    <string name="check_detail_reviewer">審核人員：</string>
+    <string name="check_detail_reviewer">審批人員：</string>
     <string name="check_detail_dealer">處置人員：</string>
     <string name="check_detail_reporttime">上報時間：</string>
     <string name="check_detail_reviewtime">審核時間：</string>

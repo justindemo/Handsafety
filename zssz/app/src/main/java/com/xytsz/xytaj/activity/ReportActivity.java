@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
@@ -169,6 +170,8 @@ public class ReportActivity extends AppCompatActivity {
     private ReportData reportData;
     private String[] problemitems;
     private String number;
+    private String userName;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -177,13 +180,14 @@ public class ReportActivity extends AppCompatActivity {
         if (getIntent() != null) {
             scanResult = getIntent().getStringExtra("scan");
             number = getIntent().getStringExtra("number");
+
         }
         setContentView(R.layout.activity_report);
 
         initAcitionbar();
 
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
-
+        userName = SpUtils.getString(getApplicationContext(), GlobalContanstant.USERNAME);
 
         dialogtitle = this.getString(R.string.report_dialog_title);
         uploading = this.getString(R.string.report_uploading);
@@ -235,9 +239,9 @@ public class ReportActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (HomeActivity.isNetworkAvailable(getApplicationContext())) {
                     ll_report.setVisibility(View.INVISIBLE);
-                    getData();
                     rl_notonlie.setVisibility(View.GONE);
                     mprogressbar.setVisibility(View.VISIBLE);
+                    getData();
 
                 } else {
                     ToastUtil.shortToast(getApplicationContext(), "请检查网络");
@@ -477,10 +481,10 @@ public class ReportActivity extends AppCompatActivity {
                     ToastUtil.shortToast(getApplicationContext(), disrecord);
                     return;
                 } else {
-
                     final Drawable drawableleft = getResources().getDrawable(R.mipmap.iv_audio_play);
                     final Drawable drawable = getResources().getDrawable(R.mipmap.iv_audio_pause);
                     mtvAudio.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+
 
                     soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
                         @Override
@@ -491,7 +495,6 @@ public class ReportActivity extends AppCompatActivity {
                         @Override
                         public void onError() {
                             ToastUtil.shortToast(getApplicationContext(), reportMore);
-                            mtvAudio.setCompoundDrawablesWithIntrinsicBounds(drawableleft, null, null, null);
                         }
                     });
 
@@ -509,8 +512,9 @@ public class ReportActivity extends AppCompatActivity {
                         File file = new File(audioNamepath);
                         if (file.isFile() && file.exists()) {
                             file.delete();
-                        }
 
+                        }
+                        audioNamepath = null;
                         mtvReset.setVisibility(View.GONE);
                         mtvAudio.setText("");
                         mtvPressAudio.setEnabled(true);
@@ -629,34 +633,12 @@ public class ReportActivity extends AppCompatActivity {
 
                 case PermissionUtils.CODE_CAMERA:
 
-                    new AlertDialog.Builder(ReportActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
+                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    File file = new File(getPhotopath(1));
+                    fileUri = Uri.fromFile(file);
+                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent1, 1);
 
-                                    dialog.dismiss();
-                                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                    File file = new File(getPhotopath(1));
-                                    fileUri = Uri.fromFile(file);
-                                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                    startActivityForResult(intent1, 1);
-                                    break;
-                                case 1:
-
-                                    dialog.dismiss();
-                                    Intent intent4 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                    startActivityForResult(intent4, 4);
-                                    break;
-                            }
-                        }
-                    }).create().show();
-                    break;
-
-//                //case PermissionUtils.CODE_ACCESS_FINE_LOCATION:
-//                case PermissionUtils.CODE_ACCESS_COARSE_LOCATION:
-//                    locat();
-//                    break;
 
             }
         }
@@ -691,12 +673,37 @@ public class ReportActivity extends AppCompatActivity {
                     new AlertDialog.Builder(ReportActivity.this).setTitle("问题项").setMultiChoiceItems(problemitems, b, new DialogInterface.OnMultiChoiceClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+
                             b[which] = isChecked;
                             problemId[which] = 0;
                         }
                     }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            int tatolNum = 0;
+                            for (int i = 0; i < b.length; i++) {
+                                if (!b[i]){
+                                    ++tatolNum;
+                                }
+                            }
+
+                            if (tatolNum == b.length){
+                                ToastUtil.shortToast(getApplicationContext(),"必须填写问题项");
+                                return;
+                            }
+
+
+                            if (b[0]){
+                                for (int i = 1; i < b.length; i++) {
+                                    if (b[i]){
+                                        ToastUtil.shortToast(getApplicationContext(),"请正确填写问题项");
+                                        mFacilityProblem.setText("");
+                                        return;
+                                    }
+                                }
+                            }
+
+
 
                             StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < problemitems.length; i++) {
@@ -705,7 +712,6 @@ public class ReportActivity extends AppCompatActivity {
                                 }
                             }
                             String problemtext = sb.toString().substring(0, sb.toString().length() - 1);
-
                             mFacilityProblem.setText(problemtext);
                             dialog.dismiss();
 
@@ -818,56 +824,23 @@ public class ReportActivity extends AppCompatActivity {
                     break;
                 case R.id.iv_report_icon2:
                     //拍照
-                    new AlertDialog.Builder(ReportActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
+                    Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    File file2 = new File(getPhotopath(2));
+                    fileUri = Uri.fromFile(file2);
+                    intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent2, 2);
 
-                                    dialog.dismiss();
-                                    Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                    File file2 = new File(getPhotopath(2));
-                                    fileUri = Uri.fromFile(file2);
-                                    intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                    startActivityForResult(intent2, 2);
-                                    break;
-                                case 1:
-                                    dialog.dismiss();
-                                    Intent intent5 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                    startActivityForResult(intent5, 5);
-                                    break;
-                            }
-                        }
-                    }).create().show();
 
 
                     break;
                 case R.id.iv_report_icon3:
-                    //拍照
-                    new AlertDialog.Builder(ReportActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
 
-                                    dialog.dismiss();
-                                    Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
-                                    File file3 = new File(getPhotopath(3));
-                                    fileUri = Uri.fromFile(file3);
-                                    intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                                    startActivityForResult(intent3, 3);
-                                    break;
-                                case 1:
-                                    dialog.dismiss();
-                                    Intent intent6 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                    startActivityForResult(intent6, 6);
-                                    break;
-                            }
-                        }
-                    }).create().show();
+                    Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
+                    File file3 = new File(getPhotopath(3));
+                    fileUri = Uri.fromFile(file3);
+                    intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent3, 3);
 
-
-                    //并显示到iv 上
                     break;
                 case R.id.report:
 
@@ -876,22 +849,25 @@ public class ReportActivity extends AppCompatActivity {
                     mprogressbar.setVisibility(View.VISIBLE);
                     ToastUtil.shortToast(getApplicationContext(), uploading);
 
-
                     String facilityProblem = mFacilityProblem.getText().toString();
 
                     if (facilityProblem.isEmpty()) {
                         ToastUtil.shortToast(getApplicationContext(), "请先选择问题项");
+                        mprogressbar.setVisibility(View.GONE);
                         return;
                     }
+
                     //判断是否正常
                     if (facilityProblem.equals("正常")) {
                         diseaseInformation.problemTag = 1;
                         diseaseInformation.problem = "";
-                        diseaseInformation.problemID = "1,1,1,1";
+                        for (int i = 1; i < problemId.length; i++) {
+                            sb1.append(1).append(",");
+                        }
+                        diseaseInformation.problemID = sb1.toString().substring(0, sb1.toString().length() - 1);
                     } else {
                         String p[] = facilityProblem.split(",");
-                        StringBuilder sb = new StringBuilder();
-                        StringBuilder sb1 = new StringBuilder();
+
                         for (int i = 0; i < p.length; i++) {
                             for (ReportData.Problem pro : reportData.getList()) {
                                 if (p[i].equals(pro.getCheckInfo())) {
@@ -964,6 +940,7 @@ public class ReportActivity extends AppCompatActivity {
                                             Message message = Message.obtain();
                                             message.what = AUDIO_FAIL;
                                             handler.sendMessage(message);
+                                          return;
                                         }
 
 
@@ -1054,13 +1031,13 @@ public class ReportActivity extends AppCompatActivity {
         }
     };
 
-
+   private StringBuilder sb = new StringBuilder();
+   private StringBuilder sb1 = new StringBuilder();
     //上传所有的数据
     public String getRemoteInfo(DiseaseInformation diseaseInformation) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reportmethodName);
         //传递的参数
-
         soapObject.addProperty("DeciceCheckNum", diseaseInformation.taskNumber);
         soapObject.addProperty("DeviceNum", diseaseInformation.diviceNum);
         //tag
@@ -1069,8 +1046,9 @@ public class ReportActivity extends AppCompatActivity {
         soapObject.addProperty("error", diseaseInformation.problem);
         //具体的描述
         soapObject.addProperty("Remarks", diseaseInformation.locationDesc);
-        //设备问题描述
+        //设备问题描述标签
         soapObject.addProperty("Info", diseaseInformation.problemID);
+        soapObject.addProperty("personId", personId);
 
         //创建SoapSerializationEnvelope 对象，同时指定soap版本号(之前在wsdl中看到的)
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
@@ -1078,7 +1056,7 @@ public class ReportActivity extends AppCompatActivity {
         envelope.dotNet = true;//由于是.net开发的webservice，所以这里要设置为true
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.report_SOAP_ACTION, envelope);//调用
+        httpTransportSE.call(null, envelope);//调用
 
         // 获取返回的数据
         SoapObject object = (SoapObject) envelope.bodyIn;
@@ -1491,11 +1469,19 @@ public class ReportActivity extends AppCompatActivity {
                     reportData = (ReportData) msg.obj;
                     if (reportData != null) {
                         if (reportData.getList() != null) {
-                            ll_report.setVisibility(View.VISIBLE);
-                            rl_notonlie.setVisibility(View.GONE);
-                            mprogressbar.setVisibility(View.GONE);
-                            initView();
-                            initData();
+                            if (reportData.getAdministrator().equals(userName) || reportData.getChargeperson2().equals(userName)){
+                                ll_report.setVisibility(View.VISIBLE);
+                                rl_notonlie.setVisibility(View.GONE);
+                                mprogressbar.setVisibility(View.GONE);
+                                initView();
+                                initData();
+                            }else {
+                                ToastUtil.shortToast(getApplicationContext(),"此设备不属于您维护");
+                                goHome();
+                                return;
+                            }
+
+
                         } else {
                             ToastUtil.shortToast(getApplicationContext(), "未获取数据");
                         }
@@ -1520,6 +1506,7 @@ public class ReportActivity extends AppCompatActivity {
                     String reportSuccess = (String) msg.obj;
                     if (reportSuccess != null) {
                         if (reportSuccess.equals("true")) {
+
                             //弹出通知：并提示音
                             List<String> personNamelist = SpUtils.getStrListValue(getApplicationContext(), GlobalContanstant.PERSONNAMELIST);
                             List<String> personIDlist = SpUtils.getStrListValue(getApplicationContext(), GlobalContanstant.PERSONIDLIST);
@@ -1542,9 +1529,9 @@ public class ReportActivity extends AppCompatActivity {
                                         .setSmallIcon(R.mipmap.ic_launcher)
                                         .setLargeIcon(largeBitmap)
                                         .setContentIntent(getContentIntent())
-                                        .setPriority(Notification.PRIORITY_HIGH)//高优先级
-                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                                        .setVisibility(Notification.VISIBILITY_PRIVATE)
+                                        .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_HIGH)//高优先级
+                                        .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         //自动隐藏
                                         .setAutoCancel(true)
                                         .build();
@@ -1556,6 +1543,7 @@ public class ReportActivity extends AppCompatActivity {
                                 diseaseInformation = null;
 
                                 mprogressbar.setVisibility(View.GONE);
+
                                 goHome();
                             }
                         } else {
@@ -1572,7 +1560,6 @@ public class ReportActivity extends AppCompatActivity {
 
                 case GlobalContanstant.IMAGEFAIL:
                     ToastUtil.shortToast(getApplicationContext(), imageerror);
-
                     mbtReport.setVisibility(View.VISIBLE);
                     mprogressbar.setVisibility(View.GONE);
                     break;
