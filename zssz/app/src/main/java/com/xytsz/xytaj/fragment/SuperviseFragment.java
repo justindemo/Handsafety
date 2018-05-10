@@ -2,6 +2,7 @@ package com.xytsz.xytaj.fragment;
 
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
@@ -44,7 +45,7 @@ import java.util.List;
 
 /**
  * Created by admin on 2017/6/29.
- * <p>
+ * <p/>
  * 监管界面
  */
 public class SuperviseFragment extends BaseFragment {
@@ -100,51 +101,58 @@ public class SuperviseFragment extends BaseFragment {
                             if (patrolListBeens.size() != 0) {
                                 //展示
                                 number = patrolListBeens.size();
-                                adapter.notifyDataSetChanged();
-
                             }
 
                         }
+                    } else {
+                        number = 0;
                     }
+                    adapter = new SuperviseAdapter(titles, role, number);
+                    adapter.notifyDataSetChanged();
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
                     ToastUtil.shortToast(getContext(), "数据未加载");
                     break;
                 case GlobalContanstant.TRAINLISTSUCCESS:
-                    String trainList = (String) msg.obj;
+                    Bundle data = msg.getData();
+                    String trainList = data.getString("trainlist");
+                    String nocheckData = data.getString("nocheckData");
                     if (!trainList.equals("[]")) {
                         trainContents = JsonUtil.jsonToBean(trainList, new TypeToken<List<TrainContent>>() {
-                           }.getType());
+                        }.getType());
 
                         if (trainContents != null) {
                             if (trainContents.size() != 0) {
                                 //展示
                                 listnumber = trainContents.size();
-                                secondAdapter.notifyDataSetChanged();
+
 
                             }
 
                         }
+                    } else {
+                        listnumber = 0;
                     }
-                    break;
 
-                case GlobalContanstant.MYSENDSUCCESS:
-                    String nocheckJson = (String) msg.obj;
-                    if (!nocheckJson.equals("[]")) {
-                        patrolListBeens = JsonUtil.jsonToBean(nocheckJson, new TypeToken<List<PatrolListBean>>() {
+                    if (!nocheckData.equals("[]")) {
+                        List<PatrolListBean>  patrolListBeens1 = JsonUtil.jsonToBean(nocheckData, new TypeToken<List<PatrolListBean>>() {
                         }.getType());
 
-                        if (patrolListBeens != null) {
-                            if (patrolListBeens.size() != 0) {
+                        if (patrolListBeens1 != null) {
+                            if (patrolListBeens1.size() != 0) {
                                 //展示
-                                nocheckNumber = patrolListBeens.size();
-                                secondAdapter.notifyDataSetChanged();
+                                nocheckNumber = patrolListBeens1.size();
 
                             }
 
                         }
+                    } else {
+                        nocheckNumber = 0;
                     }
+                    secondAdapter = new SuperviseSecondAdapter(titles1, role, listnumber, nocheckNumber);
+                    secondAdapter.notifyDataSetChanged();
                     break;
+
 
             }
         }
@@ -169,61 +177,63 @@ public class SuperviseFragment extends BaseFragment {
         role = SpUtils.getInt(getContext(), GlobalContanstant.ROLE);
         getData();
 
-
         mActionbartext.setText(R.string.supervise);
-        adapter = new SuperviseAdapter(titles, role, number);
-        recycleView.setAdapter(adapter);
 
-        adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                switch (position) {
-                    case SIGN:
-                        IntentUtil.startActivity(SuperviseFragment.this.getActivity(), MoringSignListActivity.class);
-                        break;
 
-                    case MYTASK:
-                        //我的任务
-                        IntentUtil.startActivity(getContext(), PatrolListActivity.class);
-                        break;
-                    case SYSTEMMANAGE:
-                        IntentUtil.startActivity(getContext(), SystemManageActivity.class);
-                        break;
+        if (adapter != null) {
+            recycleView.setAdapter(adapter);
+            adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    switch (position) {
+                        case SIGN:
+                            IntentUtil.startActivity(SuperviseFragment.this.getActivity(), MoringSignListActivity.class);
+                            break;
+
+                        case MYTASK:
+                            //我的任务
+                            IntentUtil.startActivity(getContext(), PatrolListActivity.class);
+                            break;
+                        case SYSTEMMANAGE:
+                            IntentUtil.startActivity(getContext(), SystemManageActivity.class);
+                            break;
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        if (secondAdapter != null) {
+            recycleViewSecond.setAdapter(secondAdapter);
+            secondAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    switch (position) {
+                        case SIGN:
+                            //培训考试
+                            IntentUtil.startActivity(getContext(), TrainTestActivity.class);
+
+                            break;
+                        case MYTASK:
+                            //应急预案
+                            IntentUtil.startActivity(getContext(), ContingencyPlanActivity.class);
+                            break;
+                        case SYSTEMMANAGE:
+                            if (role != 1) {
+                                IntentUtil.startActivity(getContext(), NoCheckActivity.class);
+                            } else {
+                                ToastUtil.shortToast(getContext(), "您没有权限");
+                            }
+                            break;
+                        case MEETING:
+                            IntentUtil.startActivity(getContext(), SupMeetingActivity.class);
+                            break;
 
 
-        secondAdapter = new SuperviseSecondAdapter(titles1, role,listnumber,nocheckNumber);
-        recycleViewSecond.setAdapter(secondAdapter);
-        secondAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                switch (position) {
-                    case SIGN:
-                        //培训考试
-                        IntentUtil.startActivity(getContext(), TrainTestActivity.class);
-
-                        break;
-                    case MYTASK:
-                        //应急预案
-                        IntentUtil.startActivity(getContext(), ContingencyPlanActivity.class);
-                        break;
-                    case SYSTEMMANAGE:
-                        if (role != 1) {
-                            IntentUtil.startActivity(getContext(), NoCheckActivity.class);
-                        } else {
-                            ToastUtil.shortToast(getContext(), "您没有权限");
-                        }
-                        break;
-                    case MEETING:
-                        IntentUtil.startActivity(getContext(), SupMeetingActivity.class);
-                        break;
-
-
+                    }
                 }
-            }
-        });
+            });
+
+        }
 
     }
 
@@ -240,24 +250,21 @@ public class SuperviseFragment extends BaseFragment {
                     String trainList = getTrainList();
                     String nocheckData = getUncheck();
                     if (jsonData != null) {
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.PATROLLISTSUCCESS;
-                        message.obj = jsonData;
-                        handler.sendMessage(message);
+                        Message message1 = Message.obtain();
+                        message1.what = GlobalContanstant.PATROLLISTSUCCESS;
+                        message1.obj = jsonData;
+                        handler.sendMessage(message1);
                     }
-                    if (trainList != null) {
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.TRAINLISTSUCCESS;
-                        message.obj = trainList;
-                        handler.sendMessage(message);
+                    if (trainList != null && nocheckData != null) {
+                        Message message2 = Message.obtain();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("trainlist",trainList);
+                        bundle.putString("nocheckData",nocheckData);
+                        message2.what = GlobalContanstant.TRAINLISTSUCCESS;
+                        message2.setData(bundle);
+                        handler.sendMessage(message2);
                     }
 
-                    if (nocheckData != null){
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.MYSENDSUCCESS;
-                        message.obj = trainList;
-                        handler.sendMessage(message);
-                    }
 
                 } catch (Exception e) {
                     Message message = Message.obtain();
@@ -268,7 +275,7 @@ public class SuperviseFragment extends BaseFragment {
         }.start();
     }
 
-    private String getUncheck()  throws Exception{
+    private String getUncheck() throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getnoTaskByPersonID);
         soapObject.addProperty("personId", personId);

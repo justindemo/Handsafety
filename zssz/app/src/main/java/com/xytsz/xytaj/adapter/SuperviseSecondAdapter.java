@@ -34,14 +34,13 @@ public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
                 helper.setText(R.id.tv_mytask_number,number+"");
             }
 
-        }else if (layoutPosition == 2){
+        }
+        if (layoutPosition == 2){
             if (nocheckNumber != 0){
                 helper.setVisible(R.id.tv_mytask_number,true);
                 helper.setText(R.id.tv_mytask_number,nocheckNumber+"");
             }
         }
-
-
         helper.setImageResource(R.id.more_icon,mIcons[layoutPosition]);
     }
 }
