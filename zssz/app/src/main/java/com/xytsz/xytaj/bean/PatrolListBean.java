@@ -16,6 +16,7 @@ public class PatrolListBean implements Serializable{
      * Dept_Name : 仓储队
      * Administrator : 王蒙蒙
      * AJDeviceType : 灭火器
+     * State:状态
      */
 
 
@@ -26,6 +27,26 @@ public class PatrolListBean implements Serializable{
     private String Dept_Name;
     private String Administrator;
     private String AJDeviceType;
+
+    public String getCheckPersonName() {
+        return CheckPersonName;
+    }
+
+    public void setCheckPersonName(String checkPersonName) {
+        CheckPersonName = checkPersonName;
+    }
+
+    public String getCheckPersonName2() {
+        return CheckPersonName2;
+    }
+
+    public void setCheckPersonName2(String checkPersonName2) {
+        CheckPersonName2 = checkPersonName2;
+    }
+
+    private String CheckPersonName;
+    private String CheckPersonName2;
+
 
 
     public String getState() {

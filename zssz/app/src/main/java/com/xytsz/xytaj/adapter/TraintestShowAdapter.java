@@ -20,6 +20,10 @@ public class TraintestShowAdapter extends BaseQuickAdapter<TrainContent>{
 
     @Override
     protected void convert(BaseViewHolder helper, TrainContent item) {
+        helper.setText(R.id.tv_train_title,item.getTitle());
+        helper.setText(R.id.tv_train_adress,item.getAddress());
+        helper.setText(R.id.tv_train_team,item.getDeptName());
+        helper.setText(R.id.tv_train_stime,item.getBeginTime());
 
     }
 }

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.MoringCheckAdapter;
@@ -94,12 +99,12 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 case GlobalContanstant.CHECKFAIL:
                     reportSign.setVisibility(View.VISIBLE);
                     morningProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"上传失败");
+                    ToastUtil.shortToast(getApplicationContext(), "上传失败");
                     break;
                 case GlobalContanstant.CHECKPASS:
-                    String endsign  = (String) msg.obj;
-                    if (endsign.equals("true")){
-                        ToastUtil.shortToast(getApplicationContext(),"签到结束");
+                    String endsign = (String) msg.obj;
+                    if (endsign.equals("true")) {
+                        ToastUtil.shortToast(getApplicationContext(), "签到结束");
                         finish();
                     }
 
@@ -154,14 +159,14 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
                     //默认是0 就
 
-
+                    finish();
                     //退出又进来  count = totalcount;
 
-                    count = totalcount;
-                    ++count;
-                    if (count == personlist.length) {
-                        reportSign.setText("结束签到");
-                    }
+//                    count = totalcount;
+//                    ++count;
+//                    if (count == personlist.length) {
+//                        reportSign.setText("结束签到");
+//                    }
 
 
                     break;
@@ -194,21 +199,32 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private ListView lv;
     private Dialog dialog;
     private int totalcount;
-
+    private SoapObject soapObject;
+    private int trainId;
+    private String userName;
+    private LocationClient locationClient;
+    public BDAbstractLocationListener myListener = new MyListener();
+    private int meetingId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null){
+            fileResult = savedInstanceState.getString("file_path");
+        }
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             tag = getIntent().getStringExtra("tag");
             signId = getIntent().getIntExtra("singnid", -1);
             totalcount = getIntent().getIntExtra("count", -1);
+            trainId = getIntent().getIntExtra("trainId", -1);
+
         }
         setContentView(R.layout.activity_morningsign);
         ButterKnife.bind(this);
 
         personID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         department = SpUtils.getString(getApplicationContext(), GlobalContanstant.DEPARATMENT);
+        userName = SpUtils.getString(getApplicationContext(), GlobalContanstant.USERNAME);
         switch (tag) {
             case "moringsign":
                 method = NetUrl.MoringSignmethod;
@@ -218,14 +234,39 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 method = NetUrl.TrainSignmethod;
                 title = getResources().getString(R.string.trainsign);
                 break;
+            case "meetingsign":
+                method = NetUrl.MeetingSignmethod;
+                title = getResources().getString(R.string.meetingsign);
+                break;
         }
         initActionbar(title);
 
         initData();
         diseaseInformation = new DiseaseInformation();
-
+        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
 
     }
+
+
+    private void locat() {
+        //进入上报页面的 时候 开始定位
+        locationClient = new LocationClient(this);
+        locationClient.registerLocationListener(myListener);
+
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);// 可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setCoorType("bd09ll");// 可选，默认gcj02，设置返回的定位结果坐标系
+        int span = 5 * 1000;
+        option.setScanSpan(span);// 可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+        option.setIsNeedAddress(true);// 可选，设置是否需要地址信息，默认不需要
+        option.setOpenGps(true);// 可选，默认false,设置是否使用gps
+        option.setLocationNotify(false);// 可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
+        option.setIgnoreKillProcess(false);// 可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
+        option.SetIgnoreCacheException(false);// 可选，默认false，设置是否收集CRASH信息，默认收集
+        locationClient.setLocOption(option);
+        locationClient.start();
+    }
+
 
     private void initActionbar(String title) {
         ActionBar actionBar = getSupportActionBar();
@@ -246,6 +287,8 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private void initData() {
         reportSign.setVisibility(View.GONE);
         tvSignTeam.setText(department);
+        tvSignPerson.setText(userName);
+        tvSignPerson.setClickable(false);
         new Thread() {
             @Override
             public void run() {
@@ -281,16 +324,22 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
         switch (tag) {
             case "person":
-                method = NetUrl.getPersonList;
+                soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getPersonList);
+                soapObject.addProperty("ID", personID);
                 break;
             case "check":
-                method = NetUrl.getSignCheck;
+                soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getSignCheck);
+                if (this.tag.equals("trainsign")) {
+                    soapObject.addProperty("Type", 2);
+                } else if (this.tag.equals("moringsign")){
+                    soapObject.addProperty("Type", 1);
+                }else {
+                    soapObject.addProperty("Type", 3);
+                }
 
                 break;
         }
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
 
-        soapObject.addProperty("ID", personID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
@@ -308,6 +357,8 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private String problemtext;
     private final String Tag = "com.xytsz.xytaj.fileprovider";
     private static final int Take_Photo = 1;
+    private String fileResult;
+    private String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
     private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
 
         @Override
@@ -315,19 +366,21 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
             switch (requestCode) {
 
                 case PermissionUtils.CODE_CAMERA:
-                    file = new File(getExternalCacheDir(), "personsign.jpg");
-                    try {
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
                     if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(), "personsign.jpg");
+                        deleteFile(file);
                         fileUri = FileProvider.getUriForFile(MoringSignActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
                     } else {
+                        File   fileUrl =new File(filepath);
+                        if (!fileUrl.exists()){
+                            fileUrl.mkdirs();
+                        }
+                        file = new File(filepath + "personsign.jpg");
+                        deleteFile(file);
                         fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
                     }
 
                     Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -336,15 +389,40 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                     startActivityForResult(intent1, Take_Photo);
                     break;
 
+                case PermissionUtils.CODE_ACCESS_COARSE_LOCATION:
+                    locat();
+                    break;
+
 //
             }
         }
     };
 
+    private void deleteFile(File file) {
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if (Build.VERSION.SDK_INT >= 24){
+            outState.putString("file_path",file.getAbsolutePath());
+        }else {
+            outState.putString("file_path",fileUri.getPath());
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
@@ -354,19 +432,9 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 if (resultCode == RESULT_OK) {
 
                     Bitmap bitmap = null;
-//                    try {
-//                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(fileUri));
-//
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
 
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        bitmap = ReportActivity.getBitmap(ivSignPicture, file.getAbsolutePath());
-                    } else {
+                    bitmap = ReportActivity.getBitmap(ivSignPicture, fileResult);
 
-                        bitmap = ReportActivity.getBitmap(ivSignPicture, fileUri.getPath());
-                    }
                     ivSignPicture.setImageBitmap(bitmap);
                     diseaseInformation.fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -457,7 +525,6 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
 
-
                 break;
             case R.id.iv_sign_picture:
                 //添加照片
@@ -470,7 +537,6 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 //没有图片不能上报
                 //没有选择检查项不能上报
                 //选择正常和不正常的同时的时候 不能上报。
-                if (count != personlist.length) {
 
 
                     String personName = tvSignPerson.getText().toString();
@@ -507,54 +573,11 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                     problemtext = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
 
                     upData();
-                } else {
-                    closeSign();
-                }
+
                 break;
         }
     }
 
-    private void closeSign() {
-        morningProgressbar.setVisibility(View.VISIBLE);
-        reportSign.setVisibility(View.GONE);
-        //提交服务器；
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String result = EndSign();
-                    if (result != null) {
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.CHECKPASS;
-                        message.obj = result;
-                        handler.sendMessage(message);
-                    }
-                } catch (Exception e) {
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.CHECKFAIL;
-                    handler.sendMessage(message);
-                }
-            }
-        }.start();
-
-    }
-
-    private String EndSign() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.EndSignmethod);
-        soapObject.addProperty("SignID", signId);
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.setOutputSoapObject(soapObject);
-        envelope.dotNet = true;
-        envelope.bodyOut = soapObject;
-
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-
-        httpTransportSE.call(null, envelope);
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        String result = object.getProperty(0).toString();
-        return result;
-    }
 
     private void initPersonData() {
 
@@ -651,8 +674,15 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
     private String up2Service() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
-        soapObject.addProperty("SignID", signId);
-        soapObject.addProperty("AdminPersonId", personID);
+        if (tag.equals("trainsign")) {
+            soapObject.addProperty("TrainId", trainId);
+        } else if (tag.equals("moringsign")){
+            soapObject.addProperty("SignID", signId);
+            soapObject.addProperty("latitude", diseaseInformation.latitude);
+            soapObject.addProperty("longitude", diseaseInformation.longitude);
+        }else {
+            soapObject.addProperty("MeetingID", trainId);
+        }
         soapObject.addProperty("SignPersonId", selectPersonID);
         soapObject.addProperty("CheckInfo", problemTag);
         soapObject.addProperty("Info", problemtext);
@@ -726,4 +756,14 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
     private List<String> dbData = new ArrayList<>();
 
+    private class MyListener extends BDAbstractLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            if (diseaseInformation != null){
+                diseaseInformation.longitude = bdLocation.getLongitude() +"";
+                diseaseInformation.latitude = bdLocation.getLatitude() +"";
+            }
+        }
+    }
 }

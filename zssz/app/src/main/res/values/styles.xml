@@ -58,8 +58,8 @@
         <item name="android:layout_marginTop">6dp</item>
         <item name="android:padding">5dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:drawablePadding">3dp</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@drawable/selector_homeactivity_rbtn_text_color</item>
     </style>
 

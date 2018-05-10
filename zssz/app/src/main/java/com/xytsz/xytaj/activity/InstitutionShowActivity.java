@@ -14,6 +14,7 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import com.xytsz.xytaj.R;
+import com.xytsz.xytaj.bean.SytemManageList;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.ToastUtil;
@@ -39,24 +40,8 @@ public class InstitutionShowActivity extends AppCompatActivity {
     LinearLayout institutionshowPb;
     private int tag;
     private String title;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case GlobalContanstant.MYSENDSUCCESS:
-                    String json = (String) msg.obj;
-                    initView(json);
+    private String  url;
 
-                    break;
-                case GlobalContanstant.FAIL:
-                    institutionshowPb.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(), "数据未加载");
-                    break;
-            }
-        }
-    };
-    private int tagdetail;
 
     private void initView(String json) {
         institutionshowWv.loadUrl(json);
@@ -87,17 +72,19 @@ public class InstitutionShowActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         if (getIntent() != null) {
             tag = getIntent().getIntExtra("tag", -1);
-            tagdetail = getIntent().getIntExtra("tagdetail", -1);
+            url = getIntent().getStringExtra("content");
 
         }
+
+
         switch (tag) {
-            case 0:
+            case 1:
                 title = "粉尘防爆";
                 break;
-            case 1:
+            case 2:
                 title = "消防安全";
                 break;
-            case 2:
+            case 0:
                 title = "职业卫生";
                 break;
             case 3:
@@ -107,68 +94,20 @@ public class InstitutionShowActivity extends AppCompatActivity {
                 title = "防洪演练";
                 break;
 
-
         }
 
-        switch (tagdetail){
-            case 0:
-                //预案
-                break;
-            case 1:
-                //演练
-                break;
-        }
         initActionBar(title);
-
         initData();
+
     }
 
     private void initData() {
         institutionshowPb.setVisibility(View.VISIBLE);
-
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String data = getData();
-                    if (data != null) {
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.MYSENDSUCCESS;
-                        message.obj = data;
-                        handler.sendMessage(message);
-                    }
-                } catch (Exception e) {
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.FAIL;
-
-                    handler.sendMessage(message);
-                }
-
-            }
-        }.start();
-    }
-
-    private String getData() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.audiomethodName);
-        //传递的参数
-        soapObject.addProperty("DeciceCheckNum", tag);
-
-        //设置访问地址 和 超时时间
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
-        //链接后执行的回调
-        httpTranstation.call(null, envelope);
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String result = object.getProperty(0).toString();
-        return result;
+        initView(url);
 
     }
+
+
 
     private void initActionBar(String title) {
         ActionBar actionBar = getSupportActionBar();

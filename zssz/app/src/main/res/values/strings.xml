@@ -30,7 +30,8 @@
     <string name="personsign_tip">请选择人员</string>
     <string name="play_video">视频播放</string>
     <string name="morningsign">早会签到</string>
-    <string name="trainsign">早会签到</string>
+    <string name="trainsign">培训签到</string>
+    <string name="meetingsign">会议签到</string>
 
 
     <string name="reportimg">排查图片：</string>
@@ -160,6 +161,7 @@
     <string name="open_light">打开手电筒</string>
 
     <string name="report_image">排查图片：</string>
+    <string name="train_image">培训图片：</string>
     <string name="review_image">检查图片：</string>
     <string name="report_locaiton">具体描述：</string>
     <string name="report_problemdes">设备问题描述：</string>
@@ -278,8 +280,12 @@
     <string name="facilitymanage">设施管理</string>
     <string name="personsign">人员签到</string>
     <string name="traintest">培训考试</string>
+    <string name="trainphoto">培训照片</string>
+    <string name="testcollect">成绩汇总</string>
+
     <string name="systemmanage">制度管理</string>
     <string name="contingencyplan">应急预案</string>
+    <string name="supmeeting">会议纪要</string>
 
     <string name="table_nodata">数据未加载</string>
     <string name="table_top_title">掌上市政使用数据</string>

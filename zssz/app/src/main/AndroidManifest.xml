@@ -37,6 +37,7 @@
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
 
@@ -111,18 +112,23 @@
             android:theme="@style/ThemeHome" />
         <activity
             android:name="com.xytsz.xytaj.activity.ReportActivity"
-            android:screenOrientation="portrait" />
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
         <activity android:name="com.xytsz.xytaj.activity.RoadActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MemberLocationActivity" />
         <activity android:name="com.xytsz.xytaj.activity.DealActivity" />
         <activity
             android:name="com.xytsz.xytaj.activity.UnCheckActivity"
-            android:screenOrientation="portrait" />
+            android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.CheckRoadActivity" />
         <activity android:name="com.xytsz.xytaj.activity.PostRoadActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.SendRoadActivity"
-            android:windowSoftInputMode="adjustPan|stateHidden"/>
-        <activity android:name=".activity.MoringSignActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.SendRoadActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity
+            android:name=".activity.MoringSignActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
         <activity android:name="com.xytsz.xytaj.activity.AppraiseActivity" />
         <activity
             android:name="com.xytsz.xytaj.activity.MakerProblemActivty"
@@ -137,7 +143,9 @@
         <activity android:name="com.xytsz.xytaj.activity.MyReviewedActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MyReporteDetailActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MyDealedDetailActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.SendRoadDetailActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.SendRoadDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.PatrolListActivity" />
 
         <activity android:name="com.xytsz.xytaj.activity.RoadNumberActivity" />
@@ -148,31 +156,34 @@
         <activity android:name="com.xytsz.xytaj.activity.MemberMapActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ForUsActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TestActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.TestSultActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TrainTestActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ModificationActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MySendDetailActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MySendActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MarkPositionActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.InputNumberActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TrainTestShowActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TrainInfoActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TrainPhotoActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TestCollectActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TrainDemoActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.TrainDemoShowActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.InstitutionShowActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.SystemManageActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanShowActivity"/>
-        <activity android:name="com.xytsz.xytaj.activity.MoringSignListActivity"/>
-
-
+        <activity android:name="com.xytsz.xytaj.activity.InputNumberActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.TrainTestShowActivity" />
+        <activity
+            android:name="com.xytsz.xytaj.activity.TrainPhotoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity android:name="com.xytsz.xytaj.activity.TestCollectActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.InstitutionShowActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SystemManageActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanShowActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MoringSignListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.TrainTestDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.NoCheckActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SupMeetingActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SupMeetingListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SupMeetingContentActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.SystemManageListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanListActivity" />
 
 
         <activity
             android:name="com.google.zxing.activity.CaptureActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
         <activity android:name="com.xytsz.xytaj.activity.FacilityManageActivity" />
         <activity
@@ -264,7 +275,6 @@
         </activity>
 
 
-
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
@@ -281,8 +291,8 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.xytsz.xytaj.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />

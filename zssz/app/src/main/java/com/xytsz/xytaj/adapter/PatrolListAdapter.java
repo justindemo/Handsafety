@@ -20,10 +20,14 @@ public class PatrolListAdapter extends BaseQuickAdapter<PatrolListBean> {
 
     @Override
     protected void convert(BaseViewHolder helper, PatrolListBean item) {
+
+        //添加检查人1 和二
         helper.setText(R.id.tv_facility_name,item.getDeviceName());
         helper.setText(R.id.tv_facility_code,item.getDeviceNum());
         helper.setText(R.id.tv_facility_location,item.getAddressInfo());
         helper.setText(R.id.tv_facility_team,item.getDept_Name());
         helper.setText(R.id.tv_facility_state,item.getState());
+        helper.setText(R.id.tv_facility_person1,item.getCheckPersonName());
+        helper.setText(R.id.tv_facility_person2,item.getCheckPersonName2());
     }
 }

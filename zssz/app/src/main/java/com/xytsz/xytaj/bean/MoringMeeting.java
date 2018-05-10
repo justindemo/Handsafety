@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by admin on 2018/4/21.

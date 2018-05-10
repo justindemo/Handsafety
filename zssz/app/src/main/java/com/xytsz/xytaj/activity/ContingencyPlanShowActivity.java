@@ -43,13 +43,13 @@ public class ContingencyPlanShowActivity extends AppCompatActivity {
 
         }
         switch (tag) {
-            case 0:
+            case 1:
                 title = "粉尘防爆";
                 break;
-            case 1:
+            case 2:
                 title = "消防安全";
                 break;
-            case 2:
+            case 0:
                 title = "职业卫生";
                 break;
             case 3:
@@ -81,7 +81,7 @@ public class ContingencyPlanShowActivity extends AppCompatActivity {
         contingencyplanshowAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(ContingencyPlanShowActivity.this, InstitutionShowActivity.class);
+                Intent intent = new Intent(ContingencyPlanShowActivity.this, ContingencyPlanListActivity.class);
                 intent.putExtra("tag",tag);
                 //代表展示的预案 或者演练
                 intent.putExtra("tagdetail",position);

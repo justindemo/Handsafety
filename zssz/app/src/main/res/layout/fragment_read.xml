@@ -24,25 +24,25 @@
         <RadioButton
             android:id="@+id/read_rb_a"
             style="@style/ReadFragmentRadioButtonStyle"
-            android:drawableLeft="@drawable/ic_action_favor_normal"
+            android:drawableLeft="@drawable/selector_choice_answera"
             android:text="3年"
            />
         <RadioButton
             android:id="@+id/read_rb_b"
             style="@style/ReadFragmentRadioButtonStyle"
-            android:drawableLeft="@drawable/bg_topic_no"
+            android:drawableLeft="@drawable/selector_choice_answerb"
             android:text="3年"
             />
         <RadioButton
             android:id="@+id/read_rb_c"
             style="@style/ReadFragmentRadioButtonStyle"
-            android:drawableLeft="@drawable/bg_topic_no"
+            android:drawableLeft="@drawable/selector_choice_answerc"
             android:text="3年"
              />
         <RadioButton
             android:id="@+id/read_rb_d"
             style="@style/ReadFragmentRadioButtonStyle"
-            android:drawableLeft="@drawable/bg_topic_no"
+            android:drawableLeft="@drawable/selector_choice_answerd"
             android:text="3年"
              />
     </RadioGroup>

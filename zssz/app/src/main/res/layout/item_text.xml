@@ -5,20 +5,31 @@
     android:orientation="vertical"
     android:padding="6dp">
 
-
-    <TextView
-        android:id="@+id/item_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:gravity="center_vertical"
-        android:drawablePadding="6dp"
-        android:drawableLeft="@mipmap/sup_contingency"
-        android:padding="6dp"
-        android:text="应急预案"
-        android:textSize="18sp" />
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/item_iv"
+            android:src="@mipmap/sup_contingency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/item_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="应急预案"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
 
 
     <View
+        android:layout_marginTop="3dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/cc_dark_fade" />

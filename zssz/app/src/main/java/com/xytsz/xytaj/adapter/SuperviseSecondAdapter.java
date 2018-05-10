@@ -13,16 +13,35 @@ import java.util.List;
  *
  */
 public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
-    private int[] mIcons = {R.mipmap.sup_traintest ,R.mipmap.sup_contingencyplan};
+    private int[] mIcons = {R.mipmap.sup_traintest ,R.mipmap.sup_contingencyplan,R.mipmap.sup_nocheck,
+    R.mipmap.sup_meeting};
+    private int number;
+    private int nocheckNumber;
 
-    public SuperviseSecondAdapter( List<String> data,int role) {
+    public SuperviseSecondAdapter( List<String> data,int role,int number,int nocheckNumber) {
         super(R.layout.item_more, data);
+        this.number = number;
+        this.nocheckNumber = nocheckNumber;
     }
 
     @Override
     protected void convert(BaseViewHolder helper, String item) {
         helper.setText(R.id.more_tv,item);
         int layoutPosition = helper.getLayoutPosition();
+        if (layoutPosition == 0){
+            if (number != 0){
+                helper.setVisible(R.id.tv_mytask_number,true);
+                helper.setText(R.id.tv_mytask_number,number+"");
+            }
+
+        }else if (layoutPosition == 2){
+            if (nocheckNumber != 0){
+                helper.setVisible(R.id.tv_mytask_number,true);
+                helper.setText(R.id.tv_mytask_number,nocheckNumber+"");
+            }
+        }
+
+
         helper.setImageResource(R.id.more_icon,mIcons[layoutPosition]);
     }
 }

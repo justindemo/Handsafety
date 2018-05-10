@@ -58,9 +58,10 @@ public class TrainTestActivity extends AppCompatActivity {
         trainTestAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                //点击2 的时候进入考试
 
-                intent2TrainTestShow(position);
+                Intent intent = new Intent(TrainTestActivity.this,TrainTestShowActivity.class);
+                intent.putExtra("tag",position);
+                startActivity(intent);
 
             }
         });
@@ -68,13 +69,6 @@ public class TrainTestActivity extends AppCompatActivity {
 
     }
 
-    private void intent2TrainTestShow(int position) {
-
-        Intent intent = new Intent(TrainTestActivity.this,TrainTestShowActivity.class);
-        intent.putExtra("tag",position);
-        startActivity(intent);
-
-    }
 
     private void initActionbar() {
         ActionBar actionBar = getSupportActionBar();

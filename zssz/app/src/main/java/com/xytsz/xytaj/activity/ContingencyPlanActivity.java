@@ -61,7 +61,7 @@ public class ContingencyPlanActivity extends AppCompatActivity {
         GridLayoutManager manager = new GridLayoutManager(getApplicationContext(),3);
         systemRv.setLayoutManager(manager);
 
-        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists);
+        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists,false);
         systemRv.setAdapter(systemManageAdapter);
         systemManageAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
@@ -76,9 +76,9 @@ public class ContingencyPlanActivity extends AppCompatActivity {
     private void initData() {
         lists = new ArrayList<>();
         lists.clear();
+        lists.add("职业卫生");
         lists.add("粉尘防爆");
         lists.add("消防安全");
-        lists.add("职业卫生");
         lists.add("环境保护");
         lists.add("防洪演练");
 

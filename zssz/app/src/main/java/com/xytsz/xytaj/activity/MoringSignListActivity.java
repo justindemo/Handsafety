@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.reflect.TypeToken;
@@ -45,13 +46,22 @@ public class MoringSignListActivity extends AppCompatActivity {
     @Bind(R.id.moringsign_progressbar)
     LinearLayout moringsignProgressbar;
     private Handler handler = new Handler() {
+
+        private List<String> noPersonlist;
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case GlobalContanstant.MYSENDSUCCESS:
                     moringsignProgressbar.setVisibility(View.GONE);
-                    String meetingJson = (String) msg.obj;
+                    Bundle bundle = msg.getData();
+                    String meetingJson = bundle.getString("data");
+                    String personData = bundle.getString("personData");
+                    if (personData != null && !personData.equals("[]")) {
+                        noPersonlist = JsonUtil.jsonToBean(personData, new TypeToken<List<String>>() {
+                        }.getType());
+                    }
                     if (meetingJson != null && !meetingJson.equals("[]")){
                         moringMeetings = JsonUtil.jsonToBean(meetingJson, new TypeToken<List<MoringMeeting>>() {
                         }.getType());
@@ -60,7 +70,7 @@ public class MoringSignListActivity extends AppCompatActivity {
                             ToastUtil.shortToast(getApplicationContext(), "签到完毕");
                         }
 
-                        MoringSignAdapter moringSignAdapter = new MoringSignAdapter(moringMeetings);
+                        moringSignAdapter = new MoringSignAdapter(moringMeetings,MoringSignListActivity.this,noPersonlist);
                         moringsignRv.setAdapter(moringSignAdapter);
 
                         moringSignAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -79,6 +89,7 @@ public class MoringSignListActivity extends AppCompatActivity {
                             }
 
                         });
+
                     }
 
                     break;
@@ -86,12 +97,14 @@ public class MoringSignListActivity extends AppCompatActivity {
                     moringsignProgressbar.setVisibility(View.GONE);
                     ToastUtil.shortToast(getApplicationContext(), "数据未获取");
                     break;
+
             }
         }
     };
 
     private List<MoringMeeting> moringMeetings;
     private int personId;
+    private MoringSignAdapter moringSignAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,12 +141,20 @@ public class MoringSignListActivity extends AppCompatActivity {
             public void run() {
 
                 try {
+                    String personData = getPersonData();
                     String data = getData();
 
-                    Message message = Message.obtain();
-                    message.obj = data;
-                    message.what = GlobalContanstant.MYSENDSUCCESS;
-                    handler.sendMessage(message);
+                    if (data != null && personData != null) {
+                        Message message = Message.obtain();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("data",data);
+                        bundle.putString("personData",personData);
+                        message.what = GlobalContanstant.MYSENDSUCCESS;
+                        message.setData(bundle);
+                        handler.sendMessage(message);
+
+                    }
+
 
                 } catch (Exception e) {
                     Message message = Message.obtain();
@@ -142,6 +163,25 @@ public class MoringSignListActivity extends AppCompatActivity {
                 }
             }
         }.start();
+    }
+
+    private String getPersonData()throws Exception {
+
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getnoPersonList);
+
+        soapObject.addProperty("personId", personId);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(null, envelope);
+
+        SoapObject object = (SoapObject) envelope.bodyIn;
+
+        return object.getProperty(0).toString();
     }
 
     private String getData() throws Exception {

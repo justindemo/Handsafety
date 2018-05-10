@@ -60,12 +60,12 @@ public class SystemManageActivity extends AppCompatActivity {
         GridLayoutManager manager = new GridLayoutManager(getApplicationContext(),3);
         systemRv.setLayoutManager(manager);
 
-        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists);
+        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists,false);
         systemRv.setAdapter(systemManageAdapter);
         systemManageAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(SystemManageActivity.this,InstitutionShowActivity.class);
+                Intent intent = new Intent(SystemManageActivity.this,SystemManageListActivity.class);
                 intent.putExtra("tag",position);
                 startActivity(intent);
             }
@@ -75,9 +75,9 @@ public class SystemManageActivity extends AppCompatActivity {
     private void initData() {
         lists = new ArrayList<>();
         lists.clear();
+        lists.add("职业卫生");
         lists.add("粉尘防爆");
         lists.add("消防安全");
-        lists.add("职业卫生");
         lists.add("环境保护");
 
     }

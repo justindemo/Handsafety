@@ -20,6 +20,7 @@ import com.xytsz.xytaj.bean.TrainContent;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
 import org.ksoap2.SoapEnvelope;
@@ -34,7 +35,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/4/12.
- * 展示内容
+ * 展示培训内容
  */
 public class TrainTestShowActivity extends AppCompatActivity {
 
@@ -51,34 +52,53 @@ public class TrainTestShowActivity extends AppCompatActivity {
             switch (msg.what){
                 case GlobalContanstant.FAIL:
                     traintestshowProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"获取数据异常");
+                    ToastUtil.shortToast(getApplicationContext(),"数据未获取");
                     break;
                 case GlobalContanstant.MYSENDSUCCESS:
                     traintestshowProgressbar.setVisibility(View.GONE);
                     String json = (String) msg.obj;
                     if (json != null && !json.equals("[]")){
-                        final List<TrainContent> trainContents = JsonUtil.jsonToBean(json, new TypeToken<List<TrainContent>>() {
+                        trainContents = JsonUtil.jsonToBean(json, new TypeToken<List<TrainContent>>() {
                         }.getType());
 
                         if (trainContents.size()!= 0){
+                            LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
+                            traintestshowRv.setLayoutManager(manager);
                             TraintestShowAdapter traintestShowAdapter = new TraintestShowAdapter(trainContents);
                             traintestshowRv.setAdapter(traintestShowAdapter);
-                            traintestShowAdapter.setOnRecyclerViewItemChildClickListener(new BaseQuickAdapter.OnRecyclerViewItemChildClickListener() {
+                            traintestShowAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                                 @Override
-                                public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                                public void onItemClick(View view, int position) {
                                     switch (tag){
+                                        //传递哪一场培训，
+                                        //传递环节
+                                        //跳转到指定界面
+                                        case 0:
+                                            //实施方案//总结评估  内容资料，培训记录，培训通知
                                         case 1:
-                                            //传递哪一场培训，
+                                        case 2:
+                                        case 3:
+                                        case 4:
+                                            intent2show(position, trainContents,TrainTestDetailActivity.class,tag);
+                                            break;
+                                        case 5:
+//                                             培训签到
+
                                             intent2show(position, trainContents,MoringSignActivity.class,true);
                                             break;
-                                        case 2:
-                                            intent2show(position,trainContents,TrainPhotoActivity.class,false);
+                                        case 6:
+//                                            培训照片
+
+                                            intent2show(position, trainContents,TrainPhotoActivity.class,true);
                                             break;
-                                        case 3:
-                                            intent2show(position,trainContents,TestActivity.class,false);
+                                        case 7:
+//                                            培训考试
+                                            //判断 考试状态
+                                            intent2show(position, trainContents,TestActivity.class,false);
                                             break;
-                                        case 4:
-                                            intent2show(position,trainContents,TestCollectActivity.class,false);
+                                        case 8:
+//                                            成绩汇总
+                                            intent2show(position, trainContents,TestCollectActivity.class,false);
                                             break;
                                     }
                                 }
@@ -88,18 +108,45 @@ public class TrainTestShowActivity extends AppCompatActivity {
                         }else {
                             ToastUtil.shortToast(getApplicationContext(),"当前没有培训");
                         }
+                    }else {
+                        ToastUtil.shortToast(getApplicationContext(),"当前没有培训");
                     }
                     break;
             }
         }
     };
+    private int personId;
+    private List<TrainContent> trainContents;
 
+    /**
+     *
+     * @param position 培训场次
+     * @param trainContents 培训内容
+     * @param activity 培训展示
+     * @param tag 培训标签（环节）
+     */
+    private void intent2show(int position, List<TrainContent> trainContents, Class<TrainTestDetailActivity> activity, int tag) {
+        Intent intent = new Intent(TrainTestShowActivity.this,activity);
+        //传递哪一场培训
+        intent.putExtra("train",trainContents.get(position));
+        intent.putExtra("tag",tag);
+        startActivity(intent);
+    }
+
+    /**
+     *
+     * @param position 哪一场培训
+     * @param trainContents 培训内容
+     * @param activity 指定环节
+     *
+     */
     private void intent2show(int position, List<TrainContent> trainContents, Class<?> activity,boolean t) {
         Intent intent = new Intent(TrainTestShowActivity.this,activity);
+        //传递哪一场培训
         if (t){
             intent.putExtra("tag","trainsign");
         }
-        //intent.putExtra("traintag",trainContents.get(position).getId());
+        intent.putExtra("trainId",trainContents.get(position).getId());
         startActivity(intent);
     }
 
@@ -142,19 +189,19 @@ public class TrainTestShowActivity extends AppCompatActivity {
                 break;
         }
 
+        personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initactionbar(title);
         initData();
     }
 
     private void initData() {
-        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
-        traintestshowRv.setLayoutManager(manager);
+
         traintestshowProgressbar.setVisibility(View.VISIBLE);
         new Thread(){
             @Override
             public void run() {
                 try {
-                    String data = getData(tag);
+                    String data = getData();
                     Message message = Message.obtain();
                     message.what = GlobalContanstant.MYSENDSUCCESS;
                     message.obj = data;
@@ -170,10 +217,9 @@ public class TrainTestShowActivity extends AppCompatActivity {
 
     }
 
-    private String getData(int tag)throws Exception{
+    private String getData()throws Exception{
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.trainTestshowmethod);
-//        soapObject.addProperty("login_ID", loginID);
-//        soapObject.addProperty("pwd", pWD);
+        soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;

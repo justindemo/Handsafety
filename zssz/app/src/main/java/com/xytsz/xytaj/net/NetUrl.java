@@ -162,7 +162,7 @@ public class NetUrl {
     public static final String getReport_SOAP_ACTION = "http://AJ.org/GetCheckTermByDeviceId";
     public static final String getSignpersonMethodname ="";
     public static final String MoringSignmethod ="ToSign";
-    public static final String TrainSignmethod ="";
+    public static final String TrainSignmethod ="ToTrainSign";
     public static final String getTaskByPersonID = "GetMyTaskToCheck";
     public static final String REVIEWSTATEMETHOD = "ToRepeatTask";
 
@@ -175,10 +175,25 @@ public class NetUrl {
     public static final String getcheckcountmethod ="GetCountYSTask";
     public static final String getsendtask = "GetListDispatching";
     public static final String getImageCode = "GetAPPQRCode";
-    public static final String trainTestshowmethod = "";
-    public static final String trainDemomethod ="";
+    public static final String trainTestshowmethod = "GetALLTrain";
+
     public static final String REVIEWSTATEBACKMETHOD = "ToRepeatTaskBack";
     public static final String getMoringMeeting = "GetMorningMeeting";
     public static final String getSignCheck ="GetSignCheckDic";
     public static final String EndSignmethod ="EndSign";
+    public static final String trainTestdetailmethod = "";
+    public static final String testcollectmethod ="GetGrades";
+    public static final String TrainphotomethodName ="ToUploadTrainImg";
+    public static final String gettestmethod = "GetExamByTrainId";
+    public static final String uploadtestmethod ="ToAddExam";
+    public static final String getnoTaskByPersonID ="GetTodayNotCheck";
+
+
+    public static final String MeetingPhotoMethodName= "ToUploadMeetingImg";
+    public static final String getSystemmanagelist ="GetSystemManagement";
+    public static final String getcontingencylist ="GetEmergencyPlan";
+    public static final String getExerciselist = "GetExercise";
+    public static final String getsupMeetingList ="GetALLMeeting";
+    public static final String MeetingSignmethod ="ToMeetingSign";
+    public static final String getnoPersonList = "GetPersonNameByNotSign";
 }

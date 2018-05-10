@@ -6,217 +6,142 @@ import java.util.List;
 /**
  * 考题实体类
  * <p>
- * Created by Mjj on 2016/12/20.
+ *
  */
 public class AnwerInfo extends BaseInfo {
 
-    private DataBean data;
 
-    public DataBean getData() {
-        return data;
+    private List<SubDataBean> list;
+
+    public List<SubDataBean> getList() {
+        return list;
     }
 
-    public void setData(DataBean data) {
-        this.data = data;
+    public void setList(List<SubDataBean> list) {
+        this.list = list;
     }
 
-    public static class DataBean {
+    public static class SubDataBean implements Serializable {
+        /**
+         * questionid : 1
+         * question : 测试题主要为测试题主要为测试题主要为测试题主要为测试题1
+         * optiona : A选项
+         * optionb : B选项
+         * optionc : C选项
+         * optiond : D选项
+         * answer : A
+         * mark : 5
+         */
 
-        private List<SubDataBean> data;
+        private int questionid;
+        private String question;
+        private String optiona;
+        private String optionb;
+        private String optionc;
+        private String optiond;
+        private String answer;
+        private int mark;
+        private int id;
 
-        public List<SubDataBean> getData() {
-            return data;
+        public int getId() {
+            return id;
         }
 
-        public void setData(List<SubDataBean> data) {
-            this.data = data;
+        public void setId(int id) {
+            this.id = id;
         }
 
-        public static class SubDataBean implements Serializable {
+        public boolean isVisibility() {
+            return visibility;
+        }
 
+        public void setVisibility(boolean visibility) {
+            this.visibility = visibility;
+        }
 
-            /**
-             * answer : 2
-             * explain : “违反道路交通安全法”，违反法律法规即为违法行为。官方已无违章/违规的说法。
-             * optiona : 违章行为
-             * optionb : 违法行为
-             * optionc : 过失行为
-             * optiond : 违规行为
-             * optione : null
-             * optionf : null
-             * optiong : null
-             * optionh : null
-             * question : 驾驶机动车在道路上违反道路交通安全法的行为，属于什么行为？
-             * questionid : 1
-             * mediatype : 0
-             * mediacontent :
-             * optiontype : 1
-             */
+        private boolean visibility;
 
-            private String answer;
-            private String explain;
-            private String optiona;
-            private String optionb;
-            private String optionc;
-            private String optiond;
-            private Object optione;
-            private Object optionf;
-            private Object optiong;
-            private Object optionh;
-            private String question;
-            private String questionid;
-            private String mediatype;
-            private String mediacontent;
-            private String optiontype;
-            private boolean isVisibility;
+        public int getScore() {
+            return score;
+        }
 
-            public int getScore() {
-                return score;
-            }
+        public void setScore(int score) {
+            this.score = score;
+        }
 
-            public void setScore(int score) {
-                this.score = score;
-            }
+        public String getUserAnswer() {
+            return userAnswer;
+        }
 
-            private int score;
+        public void setUserAnswer(String userAnswer) {
+            this.userAnswer = userAnswer;
+        }
 
-            public boolean isVisibility() {
-                return isVisibility;
-            }
+        private String userAnswer;
+        private int score;
 
-            public void setVisibility(boolean visibility) {
-                isVisibility = visibility;
-            }
+        public int getQuestionid() {
+            return questionid;
+        }
 
-            public String getUserAnswer() {
-                return userAnswer;
-            }
+        public void setQuestionid(int questionid) {
+            this.questionid = questionid;
+        }
 
-            public void setUserAnswer(String userAnswer) {
-                this.userAnswer = userAnswer;
-            }
+        public String getQuestion() {
+            return question;
+        }
 
-            private String userAnswer;
+        public void setQuestion(String question) {
+            this.question = question;
+        }
 
-            public String getAnswer() {
-                return answer;
-            }
+        public String getOptiona() {
+            return optiona;
+        }
 
-            public void setAnswer(String answer) {
-                this.answer = answer;
-            }
+        public void setOptiona(String optiona) {
+            this.optiona = optiona;
+        }
 
-            public String getExplain() {
-                return explain;
-            }
+        public String getOptionb() {
+            return optionb;
+        }
 
-            public void setExplain(String explain) {
-                this.explain = explain;
-            }
+        public void setOptionb(String optionb) {
+            this.optionb = optionb;
+        }
 
-            public String getOptiona() {
-                return optiona;
-            }
+        public String getOptionc() {
+            return optionc;
+        }
 
-            public void setOptiona(String optiona) {
-                this.optiona = optiona;
-            }
+        public void setOptionc(String optionc) {
+            this.optionc = optionc;
+        }
 
-            public String getOptionb() {
-                return optionb;
-            }
+        public String getOptiond() {
+            return optiond;
+        }
 
-            public void setOptionb(String optionb) {
-                this.optionb = optionb;
-            }
+        public void setOptiond(String optiond) {
+            this.optiond = optiond;
+        }
 
-            public String getOptionc() {
-                return optionc;
-            }
+        public String getAnswer() {
+            return answer;
+        }
 
-            public void setOptionc(String optionc) {
-                this.optionc = optionc;
-            }
+        public void setAnswer(String answer) {
+            this.answer = answer;
+        }
 
-            public String getOptiond() {
-                return optiond;
-            }
+        public int getMark() {
+            return mark;
+        }
 
-            public void setOptiond(String optiond) {
-                this.optiond = optiond;
-            }
-
-            public Object getOptione() {
-                return optione;
-            }
-
-            public void setOptione(Object optione) {
-                this.optione = optione;
-            }
-
-            public Object getOptionf() {
-                return optionf;
-            }
-
-            public void setOptionf(Object optionf) {
-                this.optionf = optionf;
-            }
-
-            public Object getOptiong() {
-                return optiong;
-            }
-
-            public void setOptiong(Object optiong) {
-                this.optiong = optiong;
-            }
-
-            public Object getOptionh() {
-                return optionh;
-            }
-
-            public void setOptionh(Object optionh) {
-                this.optionh = optionh;
-            }
-
-            public String getQuestion() {
-                return question;
-            }
-
-            public void setQuestion(String question) {
-                this.question = question;
-            }
-
-            public String getQuestionid() {
-                return questionid;
-            }
-
-            public void setQuestionid(String questionid) {
-                this.questionid = questionid;
-            }
-
-            public String getMediatype() {
-                return mediatype;
-            }
-
-            public void setMediatype(String mediatype) {
-                this.mediatype = mediatype;
-            }
-
-            public String getMediacontent() {
-                return mediacontent;
-            }
-
-            public void setMediacontent(String mediacontent) {
-                this.mediacontent = mediacontent;
-            }
-
-            public String getOptiontype() {
-                return optiontype;
-            }
-
-            public void setOptiontype(String optiontype) {
-                this.optiontype = optiontype;
-            }
+        public void setMark(int mark) {
+            this.mark = mark;
         }
     }
 }

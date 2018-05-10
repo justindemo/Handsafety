@@ -1,6 +1,6 @@
 package com.xytsz.xytaj.activity;
 
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,9 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.zxing.activity.CaptureActivity;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.PatrolListAdapter;
 import com.xytsz.xytaj.bean.PatrolListBean;
@@ -46,8 +44,6 @@ public class PatrolListActivity extends AppCompatActivity {
     @Bind(R.id.patrol_progressbar)
     ProgressBar patrolProgressbar;
     private int personId;
-    private static final int REQUEST_CODE = 0x01;
-    public static final int RESULT_CODE_QR_SCAN = 0xA1;
     private List<PatrolListBean> patrolListBeens;
     private int position;
     private Handler handler = new Handler() {

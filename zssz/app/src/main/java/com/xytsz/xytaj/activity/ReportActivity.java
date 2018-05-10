@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,16 +14,19 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -171,10 +175,14 @@ public class ReportActivity extends AppCompatActivity {
     private String[] problemitems;
     private String number;
     private String userName;
+    private File file;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null){
+            fileResult = savedInstanceState.getString("file_path");
+        }
         super.onCreate(savedInstanceState);
 
         if (getIntent() != null) {
@@ -393,10 +401,6 @@ public class ReportActivity extends AppCompatActivity {
             diseaseInformation.diviceNum = number;
         }
 
-
-
-//        PermissionUtils.requestPermission(this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
-//        PermissionUtils.requestPermission(this, PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
         PermissionUtils.requestPermission(this, PermissionUtils.CODE_READ_EXTERNAL_STORAGE, mPermissionGrant);
         PermissionUtils.requestPermission(this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
         PermissionUtils.requestPermission(this, PermissionUtils.CODE_RECORD_AUDIO, mPermissionGrant);
@@ -623,19 +627,34 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private String person_id;
-
-    private String[] items = new String[]{"拍照", "照片"};
+    private static final String Tag = "com.xytsz.xytaj.fileprovider";
 
     private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
         @Override
         public void onPermissionGranted(int requestCode) {
             switch (requestCode) {
 
+                case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
+                    File filePath = new File(pathUrl);
+                    filePath.mkdirs();
+                    break;
+
                 case PermissionUtils.CODE_CAMERA:
 
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(),"reviewimg.jpg");
+                        deletFile(file);
+                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
+                    } else {
+                        file = new File(getPhotopath(1));
+                        deletFile(file);
+                        fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
+                    }
+
                     Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    File file = new File(getPhotopath(1));
-                    fileUri = Uri.fromFile(file);
+                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                     startActivityForResult(intent1, 1);
 
@@ -643,6 +662,18 @@ public class ReportActivity extends AppCompatActivity {
             }
         }
     };
+
+    private String fileResult;
+    private void deletFile(File file){
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+        } catch (IOException e) {
+
+        }
+    }
 
 
     @Override
@@ -819,14 +850,27 @@ public class ReportActivity extends AppCompatActivity {
                     break;
                 case R.id.iv_report_icon1:
                     //拍照
+                    PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                     PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
 
                     break;
                 case R.id.iv_report_icon2:
                     //拍照
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(),"reviewimg2.jpg");
+                        deletFile(file);
+                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
+                    } else {
+                        file = new File(getPhotopath(2));
+                        deletFile(file);
+                        fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
+                    }
+
+
                     Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    File file2 = new File(getPhotopath(2));
-                    fileUri = Uri.fromFile(file2);
+                    intent2.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                     startActivityForResult(intent2, 2);
 
@@ -834,10 +878,19 @@ public class ReportActivity extends AppCompatActivity {
 
                     break;
                 case R.id.iv_report_icon3:
-
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(),"reviewimg3.jpg");
+                        deletFile(file);
+                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
+                    } else {
+                        file = new File(getPhotopath(3));
+                        deletFile(file);
+                        fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
+                    }
                     Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    File file3 = new File(getPhotopath(3));
-                    fileUri = Uri.fromFile(file3);
+                    intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                     startActivityForResult(intent3, 3);
 
@@ -1152,7 +1205,7 @@ public class ReportActivity extends AppCompatActivity {
         return fileName;
     }
 
-
+    private  String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
     /**
      * 获取原图片存储路径
      *
@@ -1163,12 +1216,12 @@ public class ReportActivity extends AppCompatActivity {
         // 照片全路径
         String fileName = "";
         // 文件夹路径
-        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
-        //String pathUrl = "/sdcard/Zssz/Image/mymy/";
-        //String pathUrl = Environment.getExternalStorageDirectory().getPath()+"/Zssz/Image/mymy/";
         String imageName = "imageTest" + i + ".jpg";
+
         File file = new File(pathUrl);
-        file.mkdirs();// 创建文件夹
+        if(!file.exists()){
+            file.mkdirs();
+        }
         fileName = pathUrl + imageName;
         return fileName;
     }
@@ -1192,7 +1245,7 @@ public class ReportActivity extends AppCompatActivity {
 
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+
             } finally {
                 if (outputStream != null) {
                     try {
@@ -1209,6 +1262,15 @@ public class ReportActivity extends AppCompatActivity {
         return photoName;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if (Build.VERSION.SDK_INT >= 24){
+            outState.putString("file_path",file.getAbsolutePath());
+        }else {
+            outState.putString("file_path",fileUri.getPath());
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
 
     /**
      * 显示图片
@@ -1234,11 +1296,11 @@ public class ReportActivity extends AppCompatActivity {
 
 
         Bitmap bitmap = null;
-        if (data == null) {
-            //当data为空的时候，不做任何处理
             if (resultCode == RESULT_OK) {
                 if (requestCode == 1) {
-                    bitmap = getBitmap(mIvphoto1, fileUri.getPath());
+
+                    bitmap = getBitmap(mIvphoto1, fileResult);
+
                     mIvphoto1.setImageBitmap(bitmap);
                     String fileName1 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -1248,7 +1310,8 @@ public class ReportActivity extends AppCompatActivity {
                     imageBase64Strings.add(encode1);
                 } else if (requestCode == 2) {
 
-                    bitmap = getBitmap(mIvphoto2, fileUri.getPath());
+                    bitmap = getBitmap(mIvphoto2, fileResult);
+
                     mIvphoto2.setImageBitmap(bitmap);
                     String fileName2 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -1258,7 +1321,9 @@ public class ReportActivity extends AppCompatActivity {
                     imageBase64Strings.add(encode2);
 
                 } else if (requestCode == 3) {
-                    bitmap = getBitmap(mIvphoto3, fileUri.getPath());
+
+                    bitmap = getBitmap(mIvphoto3, fileResult);
+
                     mIvphoto3.setImageBitmap(bitmap);
                     String fileName3 = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -1270,87 +1335,7 @@ public class ReportActivity extends AppCompatActivity {
                 }
             }
             //新加的
-        } else if (requestCode == 4) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            bitmap = getBitmap(mIvphoto1, picturePath);
-            if (bitmap == null) {
-                ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                return;
-            }
-            mIvphoto1.setImageBitmap(bitmap);
-            String fileName4 = saveToSDCard(bitmap);
-            //将选择的图片设置到控件上
-            mIvphoto1.setClickable(false);
-
-            String encode4 = photo2Base64(path);
-            fileNames.add(fileName4);
-
-            imageBase64Strings.add(encode4);
-
-        } else if (requestCode == 5) {
-
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            bitmap = getBitmap(mIvphoto2, picturePath);
-            if (bitmap == null) {
-                ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                return;
-            }
-            mIvphoto2.setImageBitmap(bitmap);
-            String fileName5 = saveToSDCard(bitmap);
-            //将选择的图片设置到控件上
-            mIvphoto2.setClickable(false);
-
-            String encode5 = photo2Base64(path);
-            fileNames.add(fileName5);
-            imageBase64Strings.add(encode5);
-        } else if (requestCode == 6) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            bitmap = getBitmap(mIvphoto3, picturePath);
-            if (bitmap == null) {
-                ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                return;
-            }
-            mIvphoto3.setImageBitmap(bitmap);
-            String fileName6 = saveToSDCard(bitmap);
-            //将选择的图片设置到控件上
-            mIvphoto3.setClickable(false);
-
-            String encode6 = photo2Base64(path);
-            fileNames.add(fileName6);
-
-            imageBase64Strings.add(encode6);
-
-        }
     }
 
     protected static Bitmap getBitmap(ImageView imageView, String path) {
@@ -1503,6 +1488,9 @@ public class ReportActivity extends AppCompatActivity {
                     break;
 
                 case GlobalContanstant.REPORTESUCCESS:
+
+                    mprogressbar.setVisibility(View.GONE);
+
                     String reportSuccess = (String) msg.obj;
                     if (reportSuccess != null) {
                         if (reportSuccess.equals("true")) {
@@ -1541,20 +1529,15 @@ public class ReportActivity extends AppCompatActivity {
                                 ToastUtil.shortToast(getApplicationContext(), reportsuccess);
 
                                 diseaseInformation = null;
-
-                                mprogressbar.setVisibility(View.GONE);
-
-                                goHome();
                             }
+                            goHome();
                         } else {
                             ToastUtil.shortToast(getApplicationContext(), uperror);
                             mbtReport.setVisibility(View.VISIBLE);
-                            mprogressbar.setVisibility(View.GONE);
                         }
                     } else {
                         ToastUtil.shortToast(getApplicationContext(), uperror);
                         mbtReport.setVisibility(View.VISIBLE);
-                        mprogressbar.setVisibility(View.GONE);
                     }
                     break;
 
@@ -1706,5 +1689,8 @@ public class ReportActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 }

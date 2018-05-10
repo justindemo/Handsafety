@@ -29,7 +29,7 @@ public class ReadFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private  int score;
 
-    private AnwerInfo.DataBean.SubDataBean subDataBean;
+    private AnwerInfo.SubDataBean subDataBean;
     private View view;
     private LinearLayout mllanswer;
     private RadioGroup mRg;
@@ -51,7 +51,7 @@ public class ReadFragment extends Fragment {
      *
      * @return A new instance of fragment ReadFragment.
      */
-    public static ReadFragment newInstance(AnwerInfo.DataBean.SubDataBean subDataBean) {
+    public static ReadFragment newInstance(AnwerInfo.SubDataBean subDataBean) {
         ReadFragment fragment = new ReadFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, subDataBean);
@@ -64,7 +64,7 @@ public class ReadFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            subDataBean = (AnwerInfo.DataBean.SubDataBean) getArguments().getSerializable(ARG_PARAM1);
+            subDataBean = (AnwerInfo.SubDataBean) getArguments().getSerializable(ARG_PARAM1);
 
         }
     }
@@ -98,8 +98,17 @@ public class ReadFragment extends Fragment {
         mreadRB_d.setText(subDataBean.getOptiond());
         tv_answer.setText(subDataBean.getAnswer());
 
-        position = Integer.valueOf(subDataBean.getQuestionid());
+        if (subDataBean.getOptionc().isEmpty() ||subDataBean.getOptionc() ==null){
+            mreadRB_c.setVisibility(View.GONE);
+            mreadRB_d.setVisibility(View.GONE);
+        }else if (subDataBean.getOptiond().isEmpty() || subDataBean.getOptiond() == null){
+            mreadRB_d.setVisibility(View.GONE);
+        }
+
+
+        position = subDataBean.getQuestionid();
         score =subDataBean.getScore();
+
 
 
         mRg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -108,27 +117,27 @@ public class ReadFragment extends Fragment {
                 switch (checkedId){
                     case R.id.read_rb_a:
                         //保存答案 并进入下一题，
-                        subDataBean.setUserAnswer("1");
+                        subDataBean.setUserAnswer("A");
                         break;
                     case R.id.read_rb_b:
                         //保存答案 并进入下一题，
-                        subDataBean.setUserAnswer("2");
+                        subDataBean.setUserAnswer("B");
 
                         break;
                     case R.id.read_rb_c:
                         //保存答案 并进入下一题，
-                        subDataBean.setUserAnswer("3");
+                        subDataBean.setUserAnswer("C");
                         break;
                     case R.id.read_rb_d:
                         //保存答案 并进入下一题，
-                        subDataBean.setUserAnswer("4");
+                        subDataBean.setUserAnswer("D");
                         break;
                 }
 
                 subDataBean.setVisibility(true);
                 if (isAnswer(subDataBean.getUserAnswer())){
                     //分数加2
-                    score = score +2;
+                    score = subDataBean.getMark();
                     subDataBean.setScore(score);
                 }
                 mllanswer.setVisibility(View.VISIBLE);
@@ -149,16 +158,16 @@ public class ReadFragment extends Fragment {
         String userAnswer = subDataBean.getUserAnswer();
         if (userAnswer != null){
             switch (userAnswer){
-                case "1":
+                case "A":
                     mRg.check(R.id.read_rb_a);
                     break;
-                case "2":
+                case "B":
                     mRg.check(R.id.read_rb_b);
                     break;
-                case "3":
+                case "C":
                     mRg.check(R.id.read_rb_c);
                     break;
-                case "4":
+                case "D":
                     mRg.check(R.id.read_rb_d);
                     break;
             }

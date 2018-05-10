@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/dialog_bg"
+    android:layout_width="wrap_content"
+    android:layout_height="300dp">
+
+    <TextView
+        android:text="未签到人员"
+        android:textSize="18sp"
+        android:padding="6dp"
+        android:id="@+id/tv_moringsigner_title"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/view_diver"
+        android:layout_below="@+id/tv_moringsigner_title"
+        android:background="@color/graybackground"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/view_diver"
+        android:id="@+id/moringsigned_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+</RelativeLayout>

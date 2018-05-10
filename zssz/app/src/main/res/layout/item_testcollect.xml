@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_testcollect_name"
+        android:text="唐浩"
+        android:background="@drawable/shape_interval"
+        android:padding="6dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_testcollect_dep"
+        android:visibility="gone"
+        android:text="前台大厅"
+        android:background="@drawable/shape_interval"
+        android:padding="6dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_testcollect_score"
+        android:text="98"
+        android:background="@drawable/shape_interval"
+        android:padding="6dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_testcollect_state"
+        android:text="否"
+        android:background="@drawable/shape_interval"
+        android:padding="6dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -199,24 +201,32 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private int personID;
     private static final int Take_Photo = 100;
     private static final String Tag = "com.xytsz.xytaj.fileprovider";
+    private static final String filepath = Environment.getExternalStorageDirectory().getAbsolutePath()
+            +"/Zsaj/Image/";
     private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
         @Override
         public void onPermissionGranted(int requestCode) {
             switch (requestCode) {
+                case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
+                    File file = new File(filepath);
+                    file.mkdirs();
+                    break;
                 case PermissionUtils.CODE_CAMERA:
-                    file = new File(getExternalCacheDir(), "reviewimg.jpg");
-                    try {
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
                     if (Build.VERSION.SDK_INT >= 24) {
-                        fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                        SendRoadDetailActivity.this.file = new File(getExternalCacheDir(), "reviewimg.jpg");
+                        deleteFile(SendRoadDetailActivity.this.file);
+                        fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, SendRoadDetailActivity.this.file);
+                        fileResult = SendRoadDetailActivity.this.file.getAbsolutePath();
                     } else {
-                        fileUri = Uri.fromFile(file);
+                        File   fileUrl =new File(filepath);
+                        if (!fileUrl.exists()){
+                            fileUrl.mkdirs();
+                        }
+                        SendRoadDetailActivity.this.file = new File(filepath,"reviewimg.jpg");
+                        deleteFile(SendRoadDetailActivity.this.file);
+                        fileUri = Uri.fromFile(SendRoadDetailActivity.this.file);
+                        fileResult = fileUri.getPath();
                     }
 
                     Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -233,10 +243,14 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private DiseaseInformation diseaseInformation;
     private String isphotoSuccess1;
     private String mineAdvice;
+    private String fileResult;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if(savedInstanceState != null){
+            fileResult = savedInstanceState.getString("file_path");
+        }
         super.onCreate(savedInstanceState);
 
         if (getIntent() != null) {
@@ -413,6 +427,17 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         startActivity(intent);
     }
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if(Build.VERSION.SDK_INT >= 24){
+            outState.putString("file_path",file.getAbsolutePath());
+        }else {
+            outState.putString("file_path",fileUri.getPath());
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
     @OnClick({R.id.iv_play_video, R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
             R.id.iv_review_icon3,R.id.tv_check_pass, R.id.tv_check_back})
     public void onViewClicked(View view) {
@@ -465,6 +490,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 if (firstbitmap != null) {
                     return;
                 } else {
+                    PermissionUtils.requestPermission(SendRoadDetailActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                     PermissionUtils.requestPermission(SendRoadDetailActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
                 }
                 break;
@@ -473,19 +499,20 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 if (secondbitmap != null) {
                     return;
                 } else {
-                    file = new File(getExternalCacheDir(), "reviewimg2.jpg");
-                    try {
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(), "reviewimg2.jpg");
+                        deleteFile(file);
                         fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
                     } else {
+                        File fileUrl =new File(filepath);
+                        if (!fileUrl.exists()){
+                            fileUrl.mkdirs();
+                        }
+                        file = new File(filepath,"reviewimg2.jpg");
+                        deleteFile(file);
                         fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
                     }
 
                     Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -498,19 +525,21 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 if (thirdbitmap != null) {
                     return;
                 } else {
-                    file = new File(getExternalCacheDir(), "reviewimg3.jpg");
-                    try {
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
                     if (Build.VERSION.SDK_INT >= 24) {
+                        file = new File(getExternalCacheDir(),"reviewimg3.jpg");
+                        deleteFile(file);
                         fileUri = FileProvider.getUriForFile(SendRoadDetailActivity.this, Tag, file);
+                        fileResult = file.getAbsolutePath();
                     } else {
+                        File   fileUrl =new File(filepath);
+                        if (!fileUrl.exists()){
+                            fileUrl.mkdirs();
+                        }
+                        file = new File(filepath,"reviewimg3.jpg");
+                        deleteFile(file);
                         fileUri = Uri.fromFile(file);
+                        fileResult = fileUri.getPath();
                     }
 
                     Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -519,6 +548,18 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     startActivityForResult(intent3, 300);
                 }
                 break;
+        }
+    }
+
+    private void deleteFile(File file) {
+
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+        } catch (IOException e) {
+
         }
     }
 
@@ -671,19 +712,8 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
             switch (requestCode) {
                 case Take_Photo:
 
-//                    try {
-//                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(fileUri));
-//
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
+                    firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, fileResult);
 
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, file.getAbsolutePath());
-                    } else {
-
-                        firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, fileUri.getPath());
-                    }
                     ivReviewIcon1.setImageBitmap(firstbitmap);
                     String fileName1 = saveToSDCard(firstbitmap);
                     //将选择的图片设置到控件上
@@ -694,11 +724,8 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     break;
 
                 case 200:
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        secondbitmap = ReportActivity.getBitmap(ivReviewIcon2, file.getAbsolutePath());
-                    } else {
-                        secondbitmap = ReportActivity.getBitmap(ivReviewIcon2, fileUri.getPath());
-                    }
+                    secondbitmap = ReportActivity.getBitmap(ivReviewIcon2,fileResult);
+
                     ivReviewIcon2.setImageBitmap(secondbitmap);
                     String fileName2 = saveToSDCard(secondbitmap);
                     //将选择的图片设置到控件上
@@ -708,12 +735,8 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     imageBase64Strings.add(encode2);
                     break;
                 case 300:
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        thirdbitmap = ReportActivity.getBitmap(ivReviewIcon3, file.getAbsolutePath());
-                    } else {
 
-                        thirdbitmap = ReportActivity.getBitmap(ivReviewIcon3, fileUri.getPath());
-                    }
+                    thirdbitmap = ReportActivity.getBitmap(ivReviewIcon3, fileResult);
                     ivReviewIcon3.setImageBitmap(thirdbitmap);
                     String fileName3 = saveToSDCard(thirdbitmap);
                     ivReviewIcon3.setClickable(false);
@@ -726,6 +749,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
             }
 
 
+        }
+        if (resultCode == RESULT_CANCELED) {
+            return;
         }
 
     }
@@ -816,6 +842,11 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         String data = object.getProperty(0).toString();
 
         return data;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
 

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="6dp"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/train_image"
+        android:textSize="18sp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="6dp"
+        android:background="@color/graybackground" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/iv_train_icon1"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+
+            android:background="@mipmap/iv_add"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/iv_train_icon2"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:background="@mipmap/iv_add"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/iv_train_icon3"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:background="@mipmap/iv_add"
+            android:scaleType="fitXY" />
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/train_photo_bt"
+        android:background="@mipmap/report_update"
+        android:text="@string/report_commit"
+        android:textColor="@color/white"
+        android:textSize="19sp"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="35dp" />
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/trainphoto_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_modification_pb"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_loading" />
+    </LinearLayout>
+</FrameLayout>

@@ -102,25 +102,10 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         }
     };
 
-    private int alluser;
-    private String noreport;
-    private String noreview;
-    private String nosend;
-    private String nodeal;
-    private String nopost;
-    private String nocheck;
+
     private String noData;
-    private List<Review> reviewList;
-    private List<Review> sendList;
-    private List<Review> checkList;
 
-    private int reviewNumber;
-    private int sendNumber;
-    private int checkNumber;
-    private int dealNumber;
 
-    private List<String> manageNumbers = new ArrayList<>();
-    private String loading;
     private TextView mActionbartext;
     private LinearLayout mllScan;
     private TextView mtvPatrolNumber;
@@ -154,18 +139,8 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     @Override
     public void initData() {
 
-        String alltitle = getString(R.string.alltitle);
-        noreport = getString(R.string.home_noreporte);
-        loading = getString(R.string.home_loading);
-        noreview = getString(R.string.home_noreview);
-        nosend = getString(R.string.home_nosend);
-        nodeal = getString(R.string.home_nodeal);
-        nopost = getString(R.string.home_nopost);
-        nocheck = getString(R.string.home_nocheck);
+
         noData = getString(R.string.table_nodata);
-
-        alluser = SpUtils.getInt(getContext(), GlobalContanstant.ALLUSERCOUNT);
-
 
         mActionbartext.setText(R.string.app_name);
 
@@ -323,8 +298,8 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         super.onPause();
         mapview.onPause();
         if (locationClient != null) {
-            locationClient.unRegisterLocationListener(myListener);
             locationClient.stop();
+            locationClient.unRegisterLocationListener(myListener);
         }
 
     }
@@ -333,6 +308,10 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     public void onDestroy() {
         mapview.onDestroy();
         super.onDestroy();
+        if(locationClient != null){
+            locationClient.stop();
+            locationClient.unRegisterLocationListener(myListener);
+        }
     }
 
     private static final int ISLOAD = 33301;

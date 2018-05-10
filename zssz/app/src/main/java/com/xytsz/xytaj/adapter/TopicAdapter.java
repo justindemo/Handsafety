@@ -24,11 +24,11 @@ import java.util.List;
 public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHolder> {
 
     private Context mContext;
-    private List<AnwerInfo.DataBean.SubDataBean> datas;
+    private List<AnwerInfo.SubDataBean> datas;
     private final LayoutInflater inflater;
     private final Resources resources;
 
-    public TopicAdapter(Context mContext, List<AnwerInfo.DataBean.SubDataBean> datas) {
+    public TopicAdapter(Context mContext, List<AnwerInfo.SubDataBean> datas) {
         this.mContext = mContext;
         this.datas = datas;
         inflater = LayoutInflater.from(mContext);

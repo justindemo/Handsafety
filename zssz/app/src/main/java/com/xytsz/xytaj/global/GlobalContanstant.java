@@ -97,4 +97,6 @@ public class GlobalContanstant {
     public static final int REVIEWPICTURE = 10;
     public static final int REVIEWSTATESUCCESS = 300;
     public static final int REVIEWSTATEFAIL = 301;
+    public static final int TRAINLISTSUCCESS = 30001;
+    public static final int TRAINLISTFAIL = 30000;
 }

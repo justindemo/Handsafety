@@ -2,6 +2,7 @@ package com.xytsz.xytaj.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -574,22 +575,6 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent1, 9001);
 
-               /* new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
-
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9011);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             case R.id.iv_predeal_icon2:
 
@@ -599,22 +584,6 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent2, 9002);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
-
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9012);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             case R.id.iv_predeal_icon3:
 
@@ -625,22 +594,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
                 startActivityForResult(intent3, 9003);
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9013);
-                                break;
-                        }
-                    }
-                }).create().show();*/
 
                 break;
 
@@ -682,22 +636,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent4.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent4, 9004);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9014);
-                                break;
-                        }
-                    }
-                }).create().show();*/
 
                 break;
             case R.id.iv_dealing_icon2:
@@ -708,22 +647,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
 
                 startActivityForResult(intent5, 9005);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9015);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             case R.id.iv_dealing_icon3:
 
@@ -733,22 +657,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent6.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent6, 9006);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9016);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             //点击上报正在处置图片
             case R.id.bt_uncheck_dealing:
@@ -796,22 +705,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent7.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent7, 9007);
 
-               /* new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9017);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             case R.id.iv_dealed_icon2:
                 Intent intent8 = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -820,22 +714,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 intent8.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent8, 9008);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9018);
-                                break;
-                        }
-                    }
-                }).create().show();*/
 
                 break;
             case R.id.iv_dealed_icon3:
@@ -846,23 +725,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 startActivityForResult(intent9, 9009);
                 btUncheckDealed.setFocusable(true);
 
-                /*new AlertDialog.Builder(UnCheckActivity.this).setTitle(dialogtitle).setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                dialog.dismiss();
 
-                                break;
-                            case 1:
-                                dialog.dismiss();
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, 9019);
-                                btUncheckDealed.setFocusable(true);
-                                break;
-                        }
-                    }
-                }).create().show();*/
                 break;
             case R.id.bt_uncheck_dealed:
 
@@ -919,7 +782,7 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
         // 照片全路径
         String fileName;
         // 文件夹路径
-        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zssz/Image/mymy/";
+        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
         String imageName = "imageTest" + i + ".jpg";
         File file = new File(pathUrl);
         file.mkdirs();// 创建文件夹
@@ -1288,6 +1151,10 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
 }
