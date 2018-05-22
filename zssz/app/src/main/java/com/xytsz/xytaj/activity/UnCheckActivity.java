@@ -7,12 +7,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -32,7 +36,9 @@ import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.BitmapUtil;
+import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
@@ -62,7 +68,7 @@ import butterknife.OnClick;
  * Created by admin on 2017/2/17.
  * 验收核实
  */
-public class UnCheckActivity extends AppCompatActivity implements View.OnClickListener {
+public class UnCheckActivity extends AppCompatActivity {
 
 
     private static final int IS_PHOTO_SUCCESS1 = 10000003;
@@ -224,10 +230,14 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     private String isphotoSuccess;
     private String dialogtitle;
     private Uri fileUri;
-
+    private String fileResult;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            fileResult = savedInstanceState.getString("file_path");
+        }
+
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             reviewRoadDetail = (Review) getIntent().getSerializableExtra("reviewRoadDetail");
@@ -481,7 +491,6 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-
     private String toManagement(int phaseIndication, Review reviewRoadDetail) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
@@ -512,31 +521,28 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     public String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
+        path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File file = new File(iconPath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            path = iconPath + photoName;
-            FileOutputStream outputStream = null;
             try {
-                outputStream = new FileOutputStream(path);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
-                photo2Base64(path);
+                File pictureFile = new File(path);
+                //压缩图片
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                byte[] bytes = bos.toByteArray();
+                //将图片封装成File对象
+                FileOutputStream outputStream = new FileOutputStream(pictureFile);
+                outputStream.write(bytes);
+                outputStream.close();
+                bos.close();
             } catch (FileNotFoundException e) {
-
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
         }
+
 
         return photoName;
     }
@@ -563,38 +569,78 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
         return null;
     }
 
+    private static final String Tag = "com.xytsz.xytaj.fileprovider";
+
+    private File file;
+
+    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath()
+            + "/Zsaj/UncheckImage/demo/";
+
+    private void camera(int position) {
+
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (Build.VERSION.SDK_INT >= 24) {
+            file = new File(getExternalCacheDir(), "uncheck" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = FileProvider.getUriForFile(UnCheckActivity.this, Tag, file);
+            fileResult = file.getAbsolutePath();
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            file = new File(pathUrl, "uncheck" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = Uri.fromFile(file);
+            fileResult = fileUri.getPath();
+        }
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, position);
+    }
+
+
+    private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
+        @Override
+        public void onPermissionGranted(int requestCode) {
+            switch (requestCode) {
+
+                case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
+                    File filePath = new File(pathUrl);
+                    if (!filePath.exists()) {
+                        filePath.mkdirs();
+                    }
+                    break;
+
+                case PermissionUtils.CODE_CAMERA:
+                    camera(9001);
+                    break;
+
+            }
+        }
+    };
+
+
+
     @OnClick({R.id.iv_predeal_icon1, R.id.iv_predeal_icon2, R.id.iv_predeal_icon3, R.id.bt_uncheck_predeal, R.id.iv_dealing_icon1, R.id.iv_dealing_icon2, R.id.iv_dealing_icon3, R.id.bt_uncheck_dealing, R.id.iv_dealed_icon1, R.id.iv_dealed_icon2, R.id.iv_dealed_icon3, R.id.bt_uncheck_dealed})
     public void onClick(View view) {
 
         switch (view.getId()) {
             case R.id.iv_predeal_icon1:
 
-                Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file = new File(getPhotopath(1));
+                /*Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
+                file = new File(getPhotopath(1));
                 fileUri = Uri.fromFile(file);
                 intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent1, 9001);
+                startActivityForResult(intent1, 9001);*/
 
+                PermissionUtils.requestPermission(UnCheckActivity.this,PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE,
+                        mPermissionGrant);
+                PermissionUtils.requestPermission(UnCheckActivity.this,PermissionUtils.CODE_CAMERA,
+                        mPermissionGrant);
                 break;
             case R.id.iv_predeal_icon2:
-
-                Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file1 = new File(getPhotopath(2));
-                fileUri = Uri.fromFile(file1);
-                intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent2, 9002);
-
+                camera(9002);
                 break;
             case R.id.iv_predeal_icon3:
-
-                Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
-
-                File file2 = new File(getPhotopath(3));
-                fileUri = Uri.fromFile(file2);
-                intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-                startActivityForResult(intent3, 9003);
-
+                camera(9003);
 
                 break;
 
@@ -629,35 +675,13 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
 
                 break;
             case R.id.iv_dealing_icon1:
-
-                Intent intent4 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file3 = new File(getPhotopath(4));
-                fileUri = Uri.fromFile(file3);
-                intent4.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent4, 9004);
-
-
-
+                camera(9004);
                 break;
             case R.id.iv_dealing_icon2:
-                Intent intent5 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file4 = new File(getPhotopath(5));
-                fileUri = Uri.fromFile(file4);
-                intent5.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-                startActivityForResult(intent5, 9005);
-
-
+                camera(9005);
                 break;
             case R.id.iv_dealing_icon3:
-
-                Intent intent6 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file5 = new File(getPhotopath(6));
-                fileUri = Uri.fromFile(file5);
-                intent6.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent6, 9006);
-
-
+                camera(9006);
                 break;
             //点击上报正在处置图片
             case R.id.bt_uncheck_dealing:
@@ -698,41 +722,20 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
             case R.id.iv_dealed_icon1:
-
-                Intent intent7 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file6 = new File(getPhotopath(7));
-                fileUri = Uri.fromFile(file6);
-                intent7.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent7, 9007);
-
-
+                camera(9007);
                 break;
             case R.id.iv_dealed_icon2:
-                Intent intent8 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file7 = new File(getPhotopath(8));
-                fileUri = Uri.fromFile(file7);
-                intent8.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent8, 9008);
-
-
-
+                camera(9008);
                 break;
             case R.id.iv_dealed_icon3:
-                Intent intent9 = new Intent("android.media.action.IMAGE_CAPTURE");
-                File file8 = new File(getPhotopath(9));
-                fileUri = Uri.fromFile(file8);
-                intent9.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent9, 9009);
-                btUncheckDealed.setFocusable(true);
-
-
+                camera(9009);
                 break;
             case R.id.bt_uncheck_dealed:
 
                 if (isPostFirst) {
                     if (isPostSecond) {
                         uncheckProgressbar.setVisibility(View.VISIBLE);
-                        ToastUtil.shortToast(getApplicationContext(),"开始上传");
+                        ToastUtil.shortToast(getApplicationContext(), "开始上传");
                         btUncheckDealed.setVisibility(View.GONE);
 
                         personID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
@@ -778,18 +781,6 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private String getPhotopath(int i) {
-        // 照片全路径
-        String fileName;
-        // 文件夹路径
-        String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
-        String imageName = "imageTest" + i + ".jpg";
-        File file = new File(pathUrl);
-        file.mkdirs();// 创建文件夹
-        fileName = pathUrl + imageName;
-        return fileName;
-    }
-
 
     /**
      * 处置中的文件名集合
@@ -805,39 +796,6 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
     private List<String> imageBase64Stringsss = new ArrayList<>();
 
 
-    private Bitmap getBitmap(ImageView imageView, String path) {
-        Bitmap bitmap;
-        int width = imageView.getWidth();
-
-        int height = imageView.getHeight();
-
-        BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
-
-        factoryOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, factoryOptions);
-
-        int imageWidth = factoryOptions.outWidth;
-        int imageHeight = factoryOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(imageWidth / width, imageHeight
-                / height);
-
-        // Decode the image file into a Bitmap sized to fill the
-        // View
-        factoryOptions.inJustDecodeBounds = false;
-        factoryOptions.inSampleSize = scaleFactor;
-        factoryOptions.inPurgeable = true;
-
-        bitmap = BitmapFactory.decodeFile(path,
-                factoryOptions);
-
-        int bitmapDegree = BitmapUtil.getBitmapDegree(path);
-        Bitmap rotateBitmap = BitmapUtil.rotateBitmap(bitmap, bitmapDegree);
-        return rotateBitmap;
-    }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -846,15 +804,22 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
             return;
         }
 
-
         Bitmap bitmap;
         String fileName;
         String encode;
-        String picturePath;
-        if (data == null) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case 9001:
-                    bitmap = getBitmap(ivPredealIcon1, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivPredealIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -866,7 +831,16 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9002:
-                    bitmap = getBitmap(ivPredealIcon2, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivPredealIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -878,7 +852,15 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9003:
-                    bitmap = getBitmap(ivPredealIcon3, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivPredealIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -890,7 +872,16 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9004:
-                    bitmap = getBitmap(ivDealingIcon1, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealingIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -902,8 +893,16 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9005:
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
 
-                    bitmap = getBitmap(ivDealingIcon2, fileUri.getPath());
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealingIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -915,9 +914,17 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9006:
-                    //bitmap = (Bitmap) data.getExtras().get("data");
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
 
-                    bitmap = getBitmap(ivDealingIcon3, fileUri.getPath());
+
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealingIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -929,8 +936,15 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
                 case 9007:
-                    //bitmap = (Bitmap) data.getExtras().get("data");
-                    bitmap = getBitmap(ivDealedIcon1, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealedIcon1.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -942,8 +956,17 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
                 case 9008:
-                    //bitmap = (Bitmap) data.getExtras().get("data");
-                    bitmap = getBitmap(ivDealedIcon2, fileUri.getPath());
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
+
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealedIcon2.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -955,9 +978,17 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
                 case 9009:
-                    //bitmap = (Bitmap) data.getExtras().get("data");
+                    if (data != null) {
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    } else {
 
-                    bitmap = getBitmap(ivDealedIcon3, fileUri.getPath());
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+                    }
+
+                    if (bitmap == null) {
+                        return;
+                    }
                     ivDealedIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
@@ -968,164 +999,14 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
                     btUncheckDealed.setEnabled(true);
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
+
             }
         }
 
-        switch (requestCode) {
-            case 9011:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivPredealIcon1, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNames.add(fileName);
-                imageBase64Strings.add(encode);
-                setParameter(bitmap, ivPredealIcon1, btUncheckPredeal);
-                break;
-            case 9012:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivPredealIcon2, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNames.add(fileName);
-                imageBase64Strings.add(encode);
-                setParameter(bitmap, ivPredealIcon2, btUncheckPredeal);
-                break;
-            case 9013:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivPredealIcon3, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNames.add(fileName);
-                imageBase64Strings.add(encode);
-                setParameter(bitmap, ivPredealIcon3, btUncheckPredeal);
-                break;
-            case 9014:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealingIcon1, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamess.add(fileName);
-                imageBase64Stringss.add(encode);
-                setParameter(bitmap, ivDealingIcon1, btUncheckDealing);
-                break;
-            case 9015:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealingIcon2, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamess.add(fileName);
-                imageBase64Stringss.add(encode);
-                setParameter(bitmap, ivDealingIcon2, btUncheckDealing);
-                break;
-            case 9016:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealingIcon3, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamess.add(fileName);
-                imageBase64Stringss.add(encode);
-                setParameter(bitmap, ivDealingIcon3, btUncheckDealing);
-                break;
-            case 9017:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealedIcon1, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamesss.add(fileName);
-                imageBase64Stringsss.add(encode);
-                setParameter(bitmap, ivDealedIcon1, btUncheckDealed);
-                break;
-            case 9018:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealedIcon2, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamesss.add(fileName);
-                imageBase64Stringsss.add(encode);
-                setParameter(bitmap, ivDealedIcon2, btUncheckDealed);
-                break;
-            case 9019:
-                picturePath = getPicturePath(data);
-                bitmap = getBitmap(ivDealedIcon3, picturePath);
-                if (bitmap == null) {
-                    ToastUtil.shortToast(getApplicationContext(), "此照片为空,重新选择");
-                    return;
-                }
-                fileName = saveToSDCard(bitmap);
-                encode = photo2Base64(path);
-                fileNamesss.add(fileName);
-                imageBase64Stringsss.add(encode);
-                setParameter(bitmap, ivDealedIcon3, btUncheckDealed);
-                break;
+
+        super.onActivityResult(requestCode, resultCode, data);
 
 
-        }
-
-
-    }
-
-    private void setParameter(Bitmap bitmap, ImageView imageView,
-                              Button btn) {
-        //将选择的图片设置到控件上
-        imageView.setImageBitmap(bitmap);
-        imageView.setClickable(false);
-
-        btn.setEnabled(true);
-        if (btn.getId() == R.id.bt_uncheck_dealed) {
-            btn.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
-        } else {
-            btn.setBackgroundResource(R.drawable.btn_uncheck_press);
-        }
-
-    }
-
-    private String getPicturePath(Intent data) {
-        if (data != null) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            return picturePath;
-        }
-        return null;
     }
 
 
@@ -1152,11 +1033,28 @@ public class UnCheckActivity extends AppCompatActivity implements View.OnClickLi
         finish();
         return super.onSupportNavigateUp();
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        PermissionUtils.requestPermissionsResult(UnCheckActivity.this,requestCode,permissions,grantResults,mPermissionGrant);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if (Build.VERSION.SDK_INT >= 24) {
+            outState.putString("file_path", fileResult);
+        } else {
+            outState.putString("file_path", fileResult);
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
 }
 
 

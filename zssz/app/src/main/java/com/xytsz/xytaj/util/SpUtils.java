@@ -8,11 +8,14 @@ import java.util.List;
 
 /**
  * Created by admin on 2017/1/3.
+ *
+ *
  */
 public class SpUtils {
 
     private static final String CONFIG = "config";
     private static SharedPreferences sp;
+
 
     /**
      *

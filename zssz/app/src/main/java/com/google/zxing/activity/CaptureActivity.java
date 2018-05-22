@@ -101,7 +101,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
         //ViewUtil.addTopView(getApplicationContext(), this, R.string.scan_card);
-        CameraManager.init(getApplication());
+        CameraManager.init(getApplicationContext());
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
         back = (ImageView) findViewById(R.id.scanner_toolbar_back);
         //新添加的

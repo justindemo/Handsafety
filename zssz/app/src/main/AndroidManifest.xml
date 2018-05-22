@@ -111,6 +111,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/ThemeHome" />
         <activity
+            android:screenOrientation="portrait"
             android:name="com.xytsz.xytaj.activity.ReportActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
@@ -118,14 +119,17 @@
         <activity android:name="com.xytsz.xytaj.activity.MemberLocationActivity" />
         <activity android:name="com.xytsz.xytaj.activity.DealActivity" />
         <activity
+            android:screenOrientation="portrait"
             android:name="com.xytsz.xytaj.activity.UnCheckActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.CheckRoadActivity" />
         <activity android:name="com.xytsz.xytaj.activity.PostRoadActivity" />
         <activity
+
             android:name="com.xytsz.xytaj.activity.SendRoadActivity"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.MoringSignActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
@@ -144,11 +148,11 @@
         <activity android:name="com.xytsz.xytaj.activity.MyReporteDetailActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MyDealedDetailActivity" />
         <activity
+            android:screenOrientation="portrait"
             android:name="com.xytsz.xytaj.activity.SendRoadDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.PatrolListActivity" />
 
-        <activity android:name="com.xytsz.xytaj.activity.RoadNumberActivity" />
         <activity android:name="com.xytsz.xytaj.activity.BridgeNumberActivity" />
         <activity android:name="com.xytsz.xytaj.activity.RoadMapActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MyInformationActivity" />
@@ -164,6 +168,7 @@
         <activity android:name="com.xytsz.xytaj.activity.InputNumberActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TrainTestShowActivity" />
         <activity
+            android:screenOrientation="portrait"
             android:name="com.xytsz.xytaj.activity.TrainPhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.TestCollectActivity" />
@@ -185,7 +190,6 @@
             android:name="com.google.zxing.activity.CaptureActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
-        <activity android:name="com.xytsz.xytaj.activity.FacilityManageActivity" />
         <activity
             android:name="com.xytsz.xytaj.activity.RecordVideoActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
@@ -297,7 +301,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
 
     </application>
 

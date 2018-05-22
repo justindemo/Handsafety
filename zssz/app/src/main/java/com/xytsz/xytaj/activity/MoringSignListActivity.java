@@ -47,7 +47,7 @@ public class MoringSignListActivity extends AppCompatActivity {
     LinearLayout moringsignProgressbar;
     private Handler handler = new Handler() {
 
-        private List<String> noPersonlist;
+        private List<String>  noPersonlist;
 
         @Override
         public void handleMessage(Message msg) {

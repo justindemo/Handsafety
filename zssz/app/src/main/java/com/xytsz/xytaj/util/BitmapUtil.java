@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 
@@ -55,6 +56,16 @@ public class BitmapUtil {
         }
 
         return null;
+    }
+
+    public static Bitmap getScaleBitmap(String fileResult) {
+        Bitmap bitmap;
+        if (fileResult == null){
+            return null;
+        }
+        bitmap = BitmapFactory.decodeFile(fileResult);
+        bitmap = Bitmap.createScaledBitmap(bitmap,300,300,true);
+        return bitmap;
     }
 
 }

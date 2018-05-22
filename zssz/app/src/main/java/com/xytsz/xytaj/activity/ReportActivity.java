@@ -3,6 +3,7 @@ package com.xytsz.xytaj.activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -55,7 +56,9 @@ import com.xytsz.xytaj.bean.ReportData;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 
+import com.xytsz.xytaj.util.BitmapUtil;
 import com.xytsz.xytaj.util.FileBase64Util;
+import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SoundUtil;
@@ -81,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 
 /**
@@ -108,7 +112,7 @@ public class ReportActivity extends AppCompatActivity {
     private DiseaseInformation diseaseInformation;
     private String reportResult;
     private String isphotoSuccess1;
-    private  String path;
+    private String path;
     private List<String> fileNames = new ArrayList<>();
     private List<String> imageBase64Strings = new ArrayList<>();
     private String taskNumber;
@@ -176,11 +180,12 @@ public class ReportActivity extends AppCompatActivity {
     private String number;
     private String userName;
     private File file;
+    private Bitmap scaledBitmap;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             fileResult = savedInstanceState.getString("file_path");
         }
         super.onCreate(savedInstanceState);
@@ -262,6 +267,7 @@ public class ReportActivity extends AppCompatActivity {
 
     }
 
+
     private void refreshData() {
         if (HomeActivity.isNetworkAvailable(getApplicationContext())) {
             mprogressbar.setVisibility(View.VISIBLE);
@@ -313,9 +319,9 @@ public class ReportActivity extends AppCompatActivity {
 
     private String getJson(String method, String soap_action) throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
-        if (scanResult != null){
+        if (scanResult != null) {
             soapObject.addProperty("DeviceNum", scanResult);
-        }else {
+        } else {
             soapObject.addProperty("DeviceNum", number);
         }
 
@@ -395,9 +401,9 @@ public class ReportActivity extends AppCompatActivity {
         }
         //初始化上传图片列表
 
-        if (scanResult != null){
+        if (scanResult != null) {
             diseaseInformation.diviceNum = scanResult;
-        }else {
+        } else {
             diseaseInformation.diviceNum = number;
         }
 
@@ -636,44 +642,21 @@ public class ReportActivity extends AppCompatActivity {
 
                 case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
                     File filePath = new File(pathUrl);
-                    filePath.mkdirs();
+                    if (!filePath.exists()) {
+                        filePath.mkdirs();
+                    }
                     break;
 
                 case PermissionUtils.CODE_CAMERA:
-
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        file = new File(getExternalCacheDir(),"reviewimg.jpg");
-                        deletFile(file);
-                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
-                        fileResult = file.getAbsolutePath();
-                    } else {
-                        file = new File(getPhotopath(1));
-                        deletFile(file);
-                        fileUri = Uri.fromFile(file);
-                        fileResult = fileUri.getPath();
-                    }
-
-                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent1, 1);
-
+                    camera(1);
+                    break;
 
             }
         }
     };
 
     private String fileResult;
-    private void deletFile(File file){
-        try {
-            if (file.exists()) {
-                file.delete();
-            }
-            file.createNewFile();
-        } catch (IOException e) {
 
-        }
-    }
 
 
     @Override
@@ -684,6 +667,7 @@ public class ReportActivity extends AppCompatActivity {
         }
 
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -692,6 +676,7 @@ public class ReportActivity extends AppCompatActivity {
     private List<Integer> problemlist = new ArrayList<>();
     private boolean b[];
 
+    private int type;
     View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -713,27 +698,26 @@ public class ReportActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             int tatolNum = 0;
                             for (int i = 0; i < b.length; i++) {
-                                if (!b[i]){
+                                if (!b[i]) {
                                     ++tatolNum;
                                 }
                             }
 
-                            if (tatolNum == b.length){
-                                ToastUtil.shortToast(getApplicationContext(),"必须填写问题项");
+                            if (tatolNum == b.length) {
+                                ToastUtil.shortToast(getApplicationContext(), "必须填写问题项");
                                 return;
                             }
 
 
-                            if (b[0]){
+                            if (b[0]) {
                                 for (int i = 1; i < b.length; i++) {
-                                    if (b[i]){
-                                        ToastUtil.shortToast(getApplicationContext(),"请正确填写问题项");
+                                    if (b[i]) {
+                                        ToastUtil.shortToast(getApplicationContext(), "请正确填写问题项");
                                         mFacilityProblem.setText("");
                                         return;
                                     }
                                 }
                             }
-
 
 
                             StringBuilder sb = new StringBuilder();
@@ -853,47 +837,15 @@ public class ReportActivity extends AppCompatActivity {
                     PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                     PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
 
+
                     break;
                 case R.id.iv_report_icon2:
                     //拍照
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        file = new File(getExternalCacheDir(),"reviewimg2.jpg");
-                        deletFile(file);
-                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
-                        fileResult = file.getAbsolutePath();
-                    } else {
-                        file = new File(getPhotopath(2));
-                        deletFile(file);
-                        fileUri = Uri.fromFile(file);
-                        fileResult = fileUri.getPath();
-                    }
-
-
-                    Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent2.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent2, 2);
-
-
-
+                    camera(2);
                     break;
                 case R.id.iv_report_icon3:
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        file = new File(getExternalCacheDir(),"reviewimg3.jpg");
-                        deletFile(file);
-                        fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
-                        fileResult = file.getAbsolutePath();
-                    } else {
-                        file = new File(getPhotopath(3));
-                        deletFile(file);
-                        fileUri = Uri.fromFile(file);
-                        fileResult = fileUri.getPath();
-                    }
-                    Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent3, 3);
-
+                    //拍照
+                    camera(3);
                     break;
                 case R.id.report:
 
@@ -993,7 +945,7 @@ public class ReportActivity extends AppCompatActivity {
                                             Message message = Message.obtain();
                                             message.what = AUDIO_FAIL;
                                             handler.sendMessage(message);
-                                          return;
+                                            return;
                                         }
 
 
@@ -1084,8 +1036,28 @@ public class ReportActivity extends AppCompatActivity {
         }
     };
 
-   private StringBuilder sb = new StringBuilder();
-   private StringBuilder sb1 = new StringBuilder();
+    private void camera(int position) {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (Build.VERSION.SDK_INT >= 24) {
+            file = new File(getExternalCacheDir(), "reviewimg" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = FileProvider.getUriForFile(ReportActivity.this, Tag, file);
+            fileResult = file.getAbsolutePath();
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            file = new File(pathUrl, "imageTest" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = Uri.fromFile(file);
+            fileResult = fileUri.getPath();
+        }
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, position);
+    }
+
+    private StringBuilder sb = new StringBuilder();
+    private StringBuilder sb1 = new StringBuilder();
+
     //上传所有的数据
     public String getRemoteInfo(DiseaseInformation diseaseInformation) throws Exception {
 
@@ -1197,7 +1169,7 @@ public class ReportActivity extends AppCompatActivity {
     /**
      * 给拍的照片命名
      */
-    public  String createPhotoName() {
+    public String createPhotoName() {
         //以系统的当前时间给图片命名
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
@@ -1205,58 +1177,35 @@ public class ReportActivity extends AppCompatActivity {
         return fileName;
     }
 
-    private  String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
-    /**
-     * 获取原图片存储路径
-     *
-     * @param i
-     * @return
-     */
-    private String getPhotopath(int i) {
-        // 照片全路径
-        String fileName = "";
-        // 文件夹路径
-        String imageName = "imageTest" + i + ".jpg";
-
-        File file = new File(pathUrl);
-        if(!file.exists()){
-            file.mkdirs();
-        }
-        fileName = pathUrl + imageName;
-        return fileName;
-    }
+    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
 
 
     /**
      * 保存到本地
      */
-    public  String saveToSDCard(Bitmap bitmap) {
+    public String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
+        path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File file = new File(iconPath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            path = iconPath + photoName;
-            FileOutputStream outputStream = null;
             try {
-                outputStream = new FileOutputStream(path);
-
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
+                File pictureFile = new File(path);
+                //压缩图片
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                byte[] bytes = bos.toByteArray();
+                //将图片封装成File对象
+                FileOutputStream outputStream = new FileOutputStream(pictureFile);
+                outputStream.write(bytes);
+                outputStream.close();
+                bos.close();
             } catch (FileNotFoundException e) {
-
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
-            ToastUtil.shortToast(getApplicationContext(),"SD卡不存在");
+            ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
         }
 
         return photoName;
@@ -1264,10 +1213,11 @@ public class ReportActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        if (Build.VERSION.SDK_INT >= 24){
-            outState.putString("file_path",file.getAbsolutePath());
-        }else {
-            outState.putString("file_path",fileUri.getPath());
+        if (Build.VERSION.SDK_INT >= 24) {
+            outState.putString("file_path", fileResult);
+        } else {
+            outState.putString("file_path", fileResult);
+
         }
         super.onSaveInstanceState(outState, outPersistentState);
     }
@@ -1296,53 +1246,76 @@ public class ReportActivity extends AppCompatActivity {
 
 
         Bitmap bitmap = null;
-            if (resultCode == RESULT_OK) {
-                if (requestCode == 1) {
 
-                    bitmap = getBitmap(mIvphoto1, fileResult);
-
-                    mIvphoto1.setImageBitmap(bitmap);
-                    String fileName1 = saveToSDCard(bitmap);
-                    //将选择的图片设置到控件上
-                    mIvphoto1.setClickable(false);
-                    String encode1 = photo2Base64(path);
-                    fileNames.add(fileName1);
-                    imageBase64Strings.add(encode1);
-                } else if (requestCode == 2) {
-
-                    bitmap = getBitmap(mIvphoto2, fileResult);
-
-                    mIvphoto2.setImageBitmap(bitmap);
-                    String fileName2 = saveToSDCard(bitmap);
-                    //将选择的图片设置到控件上
-                    mIvphoto2.setClickable(false);
-                    String encode2 = photo2Base64(path);
-                    fileNames.add(fileName2);
-                    imageBase64Strings.add(encode2);
-
-                } else if (requestCode == 3) {
-
-                    bitmap = getBitmap(mIvphoto3, fileResult);
-
-                    mIvphoto3.setImageBitmap(bitmap);
-                    String fileName3 = saveToSDCard(bitmap);
-                    //将选择的图片设置到控件上
-                    mIvphoto3.setClickable(false);
-                    String encode3 = photo2Base64(path);
-                    fileNames.add(fileName3);
-                    imageBase64Strings.add(encode3);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                if (data != null) {
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                } else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                 }
-            }
-            //新加的
+                if (bitmap == null){
+                    return;
+                }
+                mIvphoto1.setImageBitmap(bitmap);
+                String fileName1 = saveToSDCard(bitmap);
+                //将选择的图片设置到控件上
+                mIvphoto1.setClickable(false);
+                String encode1 = photo2Base64(path);
+                fileNames.add(fileName1);
+                imageBase64Strings.add(encode1);
+            } else if (requestCode == 2) {
+                if (data != null) {
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                } else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
+//                    bitmap = getBitmap(mIvphoto2, fileResult);
+                }
+                if (bitmap == null){
+                    return;
+                }
+                    mIvphoto2.setImageBitmap(bitmap);
+                String fileName2 = saveToSDCard(bitmap);
+                //将选择的图片设置到控件上
+                mIvphoto2.setClickable(false);
+                String encode2 = photo2Base64(path);
+                fileNames.add(fileName2);
+                imageBase64Strings.add(encode2);
+
+            } else if (requestCode == 3) {
+                if (data != null) {
+                    bitmap = (Bitmap) data.getExtras().get("data");
+
+                } else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
+
+//                    bitmap = getBitmap(mIvphoto1, fileResult);
+                }
+                if (bitmap == null){
+                    return;
+                }
+                mIvphoto3.setImageBitmap(bitmap);
+                String fileName3 = saveToSDCard(bitmap);
+                //将选择的图片设置到控件上
+                mIvphoto3.setClickable(false);
+                String encode3 = photo2Base64(path);
+                fileNames.add(fileName3);
+                imageBase64Strings.add(encode3);
+
+            }
+        }
+        //新加的
+        super.onActivityResult(requestCode, resultCode, data);
     }
+
 
     protected static Bitmap getBitmap(ImageView imageView, String path) {
         Bitmap bitmap;
-        int width = imageView.getWidth();
+        int width = 200;
 
-        int height = imageView.getHeight();
+        int height = 200;
 
         BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
 
@@ -1366,8 +1339,10 @@ public class ReportActivity extends AppCompatActivity {
                 factoryOptions);
 
         int bitmapDegree = getBitmapDegree(path);
-        Bitmap rotateBitmap = rotateBitmap(bitmap, bitmapDegree);
-        return rotateBitmap;
+        if (bitmap != null) {
+            bitmap = rotateBitmap(bitmap, bitmapDegree);
+        }
+        return bitmap;
     }
 
     private static int getBitmapDegree(String path) {
@@ -1403,15 +1378,12 @@ public class ReportActivity extends AppCompatActivity {
     private static Bitmap rotateBitmap(Bitmap bm, float orientationDegree) {
         Matrix m = new Matrix();
         m.setRotate(orientationDegree, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
-
         try {
-
             Bitmap bm1 = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), m, true);
             return bm1;
         } catch (OutOfMemoryError ex) {
 
         }
-
         return null;
     }
 
@@ -1428,10 +1400,8 @@ public class ReportActivity extends AppCompatActivity {
             while ((count = fis.read(buffer)) >= 0) {
                 baos.write(buffer, 0, count);
             }
-
             byte[] encode = Base64.encode(baos.toByteArray(), Base64.DEFAULT);
             String uploadBuffer = new String(encode);
-            Log.i("upload", uploadBuffer);
             fis.close();
             return uploadBuffer;
         } catch (FileNotFoundException e) {
@@ -1454,14 +1424,14 @@ public class ReportActivity extends AppCompatActivity {
                     reportData = (ReportData) msg.obj;
                     if (reportData != null) {
                         if (reportData.getList() != null) {
-                            if (reportData.getAdministrator().equals(userName) || reportData.getChargeperson2().equals(userName)){
+                            if (reportData.getAdministrator().equals(userName) || reportData.getChargeperson2().equals(userName)) {
                                 ll_report.setVisibility(View.VISIBLE);
                                 rl_notonlie.setVisibility(View.GONE);
                                 mprogressbar.setVisibility(View.GONE);
                                 initView();
                                 initData();
-                            }else {
-                                ToastUtil.shortToast(getApplicationContext(),"此设备不属于您维护");
+                            } else {
+                                ToastUtil.shortToast(getApplicationContext(), "此设备不属于您维护");
                                 goHome();
                                 return;
                             }
@@ -1605,6 +1575,7 @@ public class ReportActivity extends AppCompatActivity {
 
     }
 
+
     private class MyListener extends BDAbstractLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -1621,7 +1592,7 @@ public class ReportActivity extends AppCompatActivity {
 
     //得到任务单号的方法
     private String getTaskNumber() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         Date date = new Date(System.currentTimeMillis());
         String str = formatter.format(date);
         return str;

@@ -111,7 +111,9 @@ public class SuperviseFragment extends BaseFragment {
                     adapter.notifyDataSetChanged();
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
-                    ToastUtil.shortToast(getContext(), "数据未加载");
+                    if(getContext() != null ) {
+                        ToastUtil.shortToast(getContext(), "数据未加载");
+                    }
                     break;
                 case GlobalContanstant.TRAINLISTSUCCESS:
                     Bundle data = msg.getData();
@@ -167,7 +169,7 @@ public class SuperviseFragment extends BaseFragment {
         titles1.add("培训考试");
         titles1.add("应急预案");
         titles1.add("未排查任务");
-        titles1.add("会议纪要");
+
 
         titles.clear();
         titles.add("早会签到");

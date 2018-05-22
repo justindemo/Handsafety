@@ -157,6 +157,8 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
 
                 //判断是否做完题，
 
+                score = 0;
+
                 for (int i = 0; i < datas.size(); i++) {
 
                     if (datas.get(i).getUserAnswer() == null) {
@@ -167,7 +169,7 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
                     score = score + datas.get(i).getScore();
 
                 }
-                //ToastUtil.shortToast(getApplicationContext(),"分数是："+score);
+
 
                 new AlertDialog.Builder(TestActivity.this).setTitle("您的分数").
                         setMessage(score +"").setPositiveButton("确定", new DialogInterface.OnClickListener() {

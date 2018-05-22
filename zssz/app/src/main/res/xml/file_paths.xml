@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <paths>
-        <external-path path="" name="Zsaj/Image/mymy" />
+        <external-path path="" name="Zsaj/Image" />
+    </paths>
+    <paths>
+        <external-path path="" name="Zssz/updateVersion" />
     </paths>
 </resources>

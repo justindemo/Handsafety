@@ -361,7 +361,7 @@
             android:layout_weight="1"
             android:background="@drawable/shape_sendroad_tv"
             android:gravity="center"
-            android:padding="3dp"
+            android:padding="6dp"
             android:text="通过"
             android:textColor="@color/cc_white"
             android:textSize="18sp" />
@@ -373,7 +373,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_sendroad_tv"
                 android:gravity="center"
-                android:padding="3dp"
+                android:padding="6dp"
                 android:text="驳回"
                 android:textColor="@color/cc_white"
                 android:textSize="18sp" />
@@ -395,7 +395,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_sendroad_tv"
                 android:gravity="center"
-                android:padding="3dp"
+                android:padding="6dp"
                 android:text="提交"
                 android:textColor="@color/cc_white"
                 android:textSize="18sp" />

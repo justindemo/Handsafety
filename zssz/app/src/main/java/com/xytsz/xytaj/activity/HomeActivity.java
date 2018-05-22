@@ -38,6 +38,7 @@ import com.xytsz.xytaj.ui.NoScrollViewpager;
 import com.xytsz.xytaj.R;
 
 import com.xytsz.xytaj.util.IntentUtil;
+import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 import com.xytsz.xytaj.util.UpdateVersionUtil;
@@ -67,6 +68,8 @@ public class HomeActivity extends AppCompatActivity {
     private ProgressBar mprogressbar;
     private int role;
     private boolean isOnCreat;
+    private boolean isFirst;
+    private VersionInfo versionInfo;
 
 
     @Override
@@ -85,10 +88,13 @@ public class HomeActivity extends AppCompatActivity {
         role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
 
         if (loginId == null || TextUtils.isEmpty(loginId)) {
+            isFirst = false;
             Intent intent = new Intent(HomeActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             HomeActivity.this.finish();
+        }else {
+            isFirst = true;
         }
 
         /**
@@ -252,45 +258,27 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        //先判断有没有现版本
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    String versionInfo = UpdateVersionUtil.getVersionInfo();
-                    Message message = Message.obtain();
-                    message.obj = versionInfo;
-                    message.what = VERSIONINFO;
-                    handler.sendMessage(message);
-                } catch (Exception e) {
-
-                }
-
-            }
-        }.start();
-
-        //判断是否是周五下午5点
-
-        isFive = isweekfive();
-
-        if (isFive){
-            String content ="主人,您已经使用一周的掌上市政了,花一分钟的时间对他评价一下吧！";
-
-            new AlertDialog.Builder(this).setTitle("掌上市政评价").setMessage(content).setNegativeButton("别烦我", new DialogInterface.OnClickListener() {
+        if (isFirst){
+            //先判断有没有现版本
+            new Thread(){
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    isFive = false;
+                public void run() {
+                    try {
+                        String versionInfo = UpdateVersionUtil.getVersionInfo();
+                        Message message = Message.obtain();
+                        message.obj = versionInfo;
+                        message.what = VERSIONINFO;
+                        handler.sendMessage(message);
+                    } catch (Exception e) {
+
+                    }
+
                 }
-            }).setPositiveButton("好的", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    IntentUtil.startActivity(HomeActivity.this,AppraiseActivity.class);
-                    dialog.dismiss();
-                    isFive = false;
-                }
-            }).create().show();
+            }.start();
+
         }
+
+
 
     }
 
@@ -357,6 +345,7 @@ public class HomeActivity extends AppCompatActivity {
                     break;
                 case VERSIONINFO:
                     String  info = (String) msg.obj;
+
                     if (info !=null){
                         //检查更新
                         UpdateVersionUtil.localCheckedVersion(getApplicationContext(),new UpdateVersionUtil.UpdateListener() {
@@ -367,7 +356,7 @@ public class HomeActivity extends AppCompatActivity {
                                 switch (updateStatus) {
                                     case UpdateStatus.YES:
                                         //弹出更新提示
-                                        UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo);
+                                        UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,false);
                                         break;
                                     case UpdateStatus.NO:
                                         //没有新版本
@@ -376,20 +365,7 @@ public class HomeActivity extends AppCompatActivity {
                                     case UpdateStatus.NOWIFI:
                                         //当前是非wifi网络
                                         //UpdateVersionUtil.showDialog(getContext(),versionInfo);
-
-                                        new AlertDialog.Builder(HomeActivity.this).setTitle("温馨提示").setMessage("当前非wifi网络,下载会消耗手机流量!").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo);
-                                            }
-                                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).create().show();
-
+                                        UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,true);
 
                                         break;
                                     case UpdateStatus.ERROR:

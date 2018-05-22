@@ -61,7 +61,9 @@ public class LoginFragment extends android.support.v4.app.Fragment {
             super.handleMessage(msg);
             switch (msg.what) {
                 case GlobalContanstant.FAIL:
-                    ToastUtil.shortToast(getActivity(),error);
+                    if (getContext() !=null) {
+                        ToastUtil.shortToast(getContext(), error);
+                    }
                     break;
                 case PERSONDATA:
                     ToastUtil.shortToast(getActivity(), checknet);

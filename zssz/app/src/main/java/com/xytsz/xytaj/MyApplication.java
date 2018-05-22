@@ -3,9 +3,12 @@ package com.xytsz.xytaj;
 
 
 
-import com.baidu.mapapi.SDKInitializer;
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
-import com.mob.MobApplication;
+import com.baidu.mapapi.SDKInitializer;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.xytsz.xytaj.net.NetUrl;
 
 
@@ -22,7 +25,7 @@ import org.ksoap2.transport.HttpTransportSE;
  * Created by admin on 2017/1/11.
  *
  */
-public class MyApplication extends MobApplication {
+public class MyApplication extends MultiDexApplication {
 
 
     @Override
@@ -33,8 +36,8 @@ public class MyApplication extends MobApplication {
          * 初始化定位sdk，建议在Application中创建
          */
         SDKInitializer.initialize(this);
-        //分享
 
+        CrashReport.initCrashReport(getApplicationContext(), "a9dcf0e7d5", false);
 
     }
 
@@ -75,4 +78,9 @@ public class MyApplication extends MobApplication {
     }
 
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 }

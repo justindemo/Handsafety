@@ -77,7 +77,7 @@ public class SystemManageListActivity extends AppCompatActivity {
                                 public void onItemClick(View view, int position) {
                                     Intent intent = new Intent(SystemManageListActivity.this, InstitutionShowActivity.class);
                                     intent.putExtra("tag",tag);
-                                    intent.putExtra("url",manageLists.get(position).getUrl());
+                                    intent.putExtra("content",manageLists.get(position).getUrl());
                                     startActivity(intent);
                                 }
 
@@ -114,7 +114,7 @@ public class SystemManageListActivity extends AppCompatActivity {
                 break;
             case 0:
                 title = "职业卫生";
-                type =1 ;
+                type =  1 ;
                 break;
             case 3:
                 title = "环境保护";

@@ -11,7 +11,7 @@ public class SytemManageList implements Serializable {
 
     private String Title;
     private String DeptName;
-    private String url;
+    private String Url;
     private int id;
     private String UpdateTime;
 
@@ -32,11 +32,11 @@ public class SytemManageList implements Serializable {
     }
 
     public String getUrl() {
-        return url;
+        return Url;
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.Url = url;
     }
 
     public int getId() {

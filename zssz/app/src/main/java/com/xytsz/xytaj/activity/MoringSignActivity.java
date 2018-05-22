@@ -44,6 +44,8 @@ import com.xytsz.xytaj.bean.Person;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.ui.SearchView;
+import com.xytsz.xytaj.util.BitmapUtil;
+import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
@@ -54,6 +56,7 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -72,7 +75,8 @@ import butterknife.OnClick;
  * Created by admin on 2018/3/2.
  * 早会签到
  */
-public class MoringSignActivity extends AppCompatActivity implements SearchView.SearchViewListener {
+public class MoringSignActivity extends AppCompatActivity implements SearchView.SearchViewListener
+{
 
     @Bind(R.id.tv_sign_team)
     TextView tvSignTeam;
@@ -240,12 +244,14 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 break;
         }
         initActionbar(title);
-
+        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
+        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
         initData();
         diseaseInformation = new DiseaseInformation();
-        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
+
 
     }
+
 
 
     private void locat() {
@@ -358,7 +364,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private final String Tag = "com.xytsz.xytaj.fileprovider";
     private static final int Take_Photo = 1;
     private String fileResult;
-    private String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
+    private String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
     private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
 
         @Override
@@ -367,26 +373,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
                 case PermissionUtils.CODE_CAMERA:
 
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        file = new File(getExternalCacheDir(), "personsign.jpg");
-                        deleteFile(file);
-                        fileUri = FileProvider.getUriForFile(MoringSignActivity.this, Tag, file);
-                        fileResult = file.getAbsolutePath();
-                    } else {
-                        File   fileUrl =new File(filepath);
-                        if (!fileUrl.exists()){
-                            fileUrl.mkdirs();
-                        }
-                        file = new File(filepath + "personsign.jpg");
-                        deleteFile(file);
-                        fileUri = Uri.fromFile(file);
-                        fileResult = fileUri.getPath();
-                    }
-
-                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent1, Take_Photo);
+                    camera(1);
                     break;
 
                 case PermissionUtils.CODE_ACCESS_COARSE_LOCATION:
@@ -398,16 +385,25 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
         }
     };
 
-    private void deleteFile(File file) {
-        try {
-            if (file.exists()) {
-                file.delete();
-            }
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void camera(int position) {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (Build.VERSION.SDK_INT >= 24) {
+            file = new File(getExternalCacheDir(), "moringsign" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = FileProvider.getUriForFile(MoringSignActivity.this, Tag, file);
+            fileResult = file.getAbsolutePath();
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            file = new File(filepath, "moringsign" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = Uri.fromFile(file);
+            fileResult = fileUri.getPath();
         }
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, position);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -418,34 +414,42 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         if (Build.VERSION.SDK_INT >= 24){
-            outState.putString("file_path",file.getAbsolutePath());
+            outState.putString("file_path",fileResult);
         }else {
-            outState.putString("file_path",fileUri.getPath());
+            outState.putString("file_path", fileResult);
+
         }
+
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Bitmap bitmap = null;
         switch (requestCode) {
             case Take_Photo:
                 if (resultCode == RESULT_OK) {
+                    if (data != null){
+                        bitmap = (Bitmap) data.getExtras().get("data");
+                    }else {
+                        bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
-                    Bitmap bitmap = null;
 
-                    bitmap = ReportActivity.getBitmap(ivSignPicture, fileResult);
-
+                    }
+                    if (bitmap ==null){
+                        return;
+                    }
                     ivSignPicture.setImageBitmap(bitmap);
                     diseaseInformation.fileName = saveToSDCard(bitmap);
                     //将选择的图片设置到控件上
                     diseaseInformation.encode = ReportActivity.photo2Base64(path);
-
 
                 }
 
                 break;
         }
 
+        super.onActivityResult(requestCode,resultCode,data);
     }
 
 
@@ -455,31 +459,28 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
+        path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File file = new File(iconPath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            path = iconPath + photoName;
-            FileOutputStream outputStream = null;
             try {
-                outputStream = new FileOutputStream(path);
-
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
+                File pictureFile = new File(path);
+                //压缩图片
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                byte[] bytes = bos.toByteArray();
+                //将图片封装成File对象
+                FileOutputStream outputStream = new FileOutputStream(pictureFile);
+                outputStream.write(bytes);
+                outputStream.close();
+                bos.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
         }
+
 
         return photoName;
 
@@ -528,17 +529,14 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 break;
             case R.id.iv_sign_picture:
                 //添加照片
-                PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
                 PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
-
+                PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
 
                 break;
             case R.id.report_sign:
                 //没有图片不能上报
                 //没有选择检查项不能上报
                 //选择正常和不正常的同时的时候 不能上报。
-
-
                     String personName = tvSignPerson.getText().toString();
                     //获取人员ID
                     for (Person pe : persons) {
@@ -764,6 +762,32 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 diseaseInformation.longitude = bdLocation.getLongitude() +"";
                 diseaseInformation.latitude = bdLocation.getLatitude() +"";
             }
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (locationClient != null){
+            locationClient.start();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (locationClient != null){
+            locationClient.stop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationClient !=null){
+            locationClient.stop();
+            locationClient.unRegisterLocationListener(myListener);
         }
     }
 }

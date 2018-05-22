@@ -8,6 +8,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
 
 
 public class ApkUtils {
@@ -67,12 +70,22 @@ public class ApkUtils {
 	 * @param apkFile
 	 * @return
 	 */
-	public static Intent getInstallIntent(File apkFile) {
+	public static Intent getInstallIntent(File apkFile,Context context) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
-		intent.setDataAndType(Uri.fromFile(new File(apkFile.getAbsolutePath())),
-				"application/vnd.android.package-archive");
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//			File file = new File(Environment.getExternalStorageDirectory(), "zssz_app.apk");
+			intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+			Uri contentUri = FileProvider.getUriForFile(context.getApplicationContext(),
+					context.getApplicationContext().getPackageName() + ".fileprovider",
+					apkFile);
+			intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+		} else {
+			intent.setDataAndType(Uri.fromFile(apkFile),
+					"application/vnd.android.package-archive");
+		}
 		return intent;
 	}
 	

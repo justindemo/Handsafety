@@ -25,6 +25,8 @@ import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.bean.DiseaseInformation;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.util.BitmapUtil;
+import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
@@ -33,10 +35,12 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +56,6 @@ import butterknife.OnClick;
  * 培训照片
  */
 public class TrainPhotoActivity extends AppCompatActivity {
-
     @Bind(R.id.iv_train_icon1)
     ImageView ivTrainIcon1;
     @Bind(R.id.iv_train_icon2)
@@ -90,6 +93,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
     private String title;
     private String method;
     private String fileResult;
+    private File fileUrl;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -133,7 +137,8 @@ public class TrainPhotoActivity extends AppCompatActivity {
     }
 
     private static final String Tag = "com.xytsz.xytaj.fileprovider";
-    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
+    private String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
+    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() +"/Zsaj/Image/mymy/";
 
 
     @OnClick({R.id.iv_train_icon1, R.id.iv_train_icon2, R.id.iv_train_icon3, R.id.train_photo_bt})
@@ -142,52 +147,14 @@ public class TrainPhotoActivity extends AppCompatActivity {
             case R.id.iv_train_icon1:
                 PermissionUtils.requestPermission(TrainPhotoActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                 PermissionUtils.requestPermission(TrainPhotoActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
+
                 break;
             case R.id.iv_train_icon2:
-                if (Build.VERSION.SDK_INT >= 24) {
-                    file = new File(getExternalCacheDir(), "trainphoto2.jpg");
-                    deletFile(file);
-                    fileUri = FileProvider.getUriForFile(TrainPhotoActivity.this, Tag, file);
-                    fileResult = file.getAbsolutePath();
-                } else {
-                    File   fileUrl =new File(pathUrl);
-                    if (!fileUrl.exists()){
-                        fileUrl.mkdirs();
-                    }
-                    file = new File(pathUrl, "trainphoto2.jpg");
-                    deletFile(file);
-                    fileUri = Uri.fromFile(file);
-                    fileResult = fileUri.getPath();
-                }
+                camera(2);
 
-
-                Intent intent2 = new Intent("android.media.action.IMAGE_CAPTURE");
-                intent2.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent2, 2);
                 break;
             case R.id.iv_train_icon3:
-                if (Build.VERSION.SDK_INT >= 24) {
-                    file = new File(getExternalCacheDir(), "trainphoto3.jpg");
-                    deletFile(file);
-                    fileUri = FileProvider.getUriForFile(TrainPhotoActivity.this, Tag, file);
-                    fileResult = file.getAbsolutePath();
-
-                } else {
-                    File   fileUrl =new File(pathUrl);
-                    if (!fileUrl.exists()){
-                        fileUrl.mkdirs();
-                    }
-                    file = new File(pathUrl, "trainphoto3.jpg");
-                    deletFile(file);
-                    fileUri = Uri.fromFile(file);
-                    fileResult = fileUri.getPath();
-                }
-
-                Intent intent3 = new Intent("android.media.action.IMAGE_CAPTURE");
-                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent3.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent3, 3);
+                camera(3);
                 break;
             case R.id.train_photo_bt:
                 trainphotoProgressbar.setVisibility(View.VISIBLE);
@@ -257,47 +224,39 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
                 case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
                     File filePath = new File(pathUrl);
-                    filePath.mkdirs();
+                    if (!filePath.exists()){
+                        filePath.mkdirs();
+                    }
                     break;
 
                 case PermissionUtils.CODE_CAMERA:
 
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        file = new File(getExternalCacheDir(), "trainphoto.jpg");
-                        deletFile(file);
-                        fileUri = FileProvider.getUriForFile(TrainPhotoActivity.this, Tag, file);
-                        fileResult= file.getAbsolutePath();
-                    } else {
-                        File  fileUrl =new File(pathUrl);
-                        if (!fileUrl.exists()){
-                            fileUrl.mkdirs();
-                        }
-                        file = new File(pathUrl, "trainphoto.jpg");
-                        deletFile(file);
-                        fileUri = Uri.fromFile(file);
-                        fileResult = fileUri.getPath();
-                    }
-
-                    Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent1, 1);
-
+                    camera(1);
+                    break;
 
             }
         }
     };
 
-    private void deletFile(File file) {
-        try {
-            if (file.exists()) {
-                file.delete();
-            }
-            file.createNewFile();
-        } catch (IOException e) {
-
+    private void camera(int position) {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (Build.VERSION.SDK_INT >= 24) {
+            file = new File(getExternalCacheDir(), "trainphoto" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = FileProvider.getUriForFile(TrainPhotoActivity.this, Tag, file);
+            fileResult = file.getAbsolutePath();
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            file = new File(pathUrl, "trainphoto" + position + ".jpg");
+            FileUtils.deletFile(file);
+            fileUri = Uri.fromFile(file);
+            fileResult = fileUri.getPath();
         }
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, position);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -311,9 +270,9 @@ public class TrainPhotoActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         if (Build.VERSION.SDK_INT >= 24){
-            outState.putString("file_path",file.getAbsolutePath());
+            outState.putString("file_path",fileResult);
         }else {
-            outState.putString("file_path",fileUri.getPath());
+            outState.putString("file_path",fileResult);
         }
         super.onSaveInstanceState(outState, outPersistentState);
     }
@@ -332,9 +291,15 @@ public class TrainPhotoActivity extends AppCompatActivity {
         //当data为空的时候，不做任何处理
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
+                if (data != null){
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                }else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
-                bitmap = ReportActivity.getBitmap(ivTrainIcon1, fileResult);
-
+                }
+                if (bitmap == null){
+                    return;
+                }
                 ivTrainIcon1.setImageBitmap(bitmap);
                 String fileName1 = saveToSDCard(bitmap);
                 //将选择的图片设置到控件上
@@ -343,8 +308,16 @@ public class TrainPhotoActivity extends AppCompatActivity {
                 fileNames.add(fileName1);
                 imageBase64Strings.add(encode1);
             } else if (requestCode == 2) {
+                if (data != null){
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                }else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
-                bitmap = ReportActivity.getBitmap(ivTrainIcon2, fileResult);
+
+                }
+                if (bitmap == null){
+                    return;
+                }
 
                 ivTrainIcon2.setImageBitmap(bitmap);
                 String fileName2 = saveToSDCard(bitmap);
@@ -355,9 +328,16 @@ public class TrainPhotoActivity extends AppCompatActivity {
                 imageBase64Strings.add(encode2);
 
             } else if (requestCode == 3) {
+                if (data != null){
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                }else {
+                    bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
-                bitmap = ReportActivity.getBitmap(ivTrainIcon3, fileResult);
 
+                }
+                if (bitmap == null){
+                    return;
+                }
                 ivTrainIcon3.setImageBitmap(bitmap);
                 String fileName3 = saveToSDCard(bitmap);
                 //将选择的图片设置到控件上
@@ -369,6 +349,8 @@ public class TrainPhotoActivity extends AppCompatActivity {
             }
         }
         //新加的
+
+        super.onActivityResult(requestCode,resultCode,data);
 
     }
 
@@ -386,27 +368,23 @@ public class TrainPhotoActivity extends AppCompatActivity {
     private String saveToSDCard(Bitmap bitmap) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName();
+        path = filePath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File file = new File(pathUrl);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            path = pathUrl + photoName;
-            FileOutputStream outputStream = null;
             try {
-                outputStream = new FileOutputStream(path);
-
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);//把图片数据写入文件
+                File pictureFile = new File(path);
+                //压缩图片
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                byte[] bytes = bos.toByteArray();
+                //将图片封装成File对象
+                FileOutputStream outputStream = new FileOutputStream(pictureFile);
+                outputStream.write(bytes);
+                outputStream.close();
+                bos.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             ToastUtil.shortToast(getApplicationContext(), "SD卡不存在");
@@ -420,5 +398,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
+
+
 
 }

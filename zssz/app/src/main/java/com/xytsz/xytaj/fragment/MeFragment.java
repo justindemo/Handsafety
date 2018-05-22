@@ -626,7 +626,7 @@ public class MeFragment extends BaseFragment {
                                 switch (updateStatus) {
                                     case UpdateStatus.YES:
                                         //弹出更新提示
-                                        UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo);
+                                        UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,false);
                                         break;
                                     case UpdateStatus.NO:
                                         //没有新版本
@@ -635,19 +635,8 @@ public class MeFragment extends BaseFragment {
                                     case UpdateStatus.NOWIFI:
                                         //当前是非wifi网络
                                         //UpdateVersionUtil.showDialog(getContext(),versionInfo);
+                                        UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,true);
 
-                                        new AlertDialog.Builder(MeFragment.this.getActivity()).setTitle("温馨提示").setMessage("当前非wifi网络,下载会消耗手机流量!").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                UpdateVersionUtil.showDialog(MeFragment.this.getActivity().getApplicationContext(), versionInfo);
-                                            }
-                                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).create().show();
 
 
                                         break;

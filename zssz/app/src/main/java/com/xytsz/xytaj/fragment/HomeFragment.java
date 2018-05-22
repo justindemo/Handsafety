@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.fragment;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,10 +20,11 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.TextureMapView;
-import com.baidu.mapapi.model.LatLng;
-import com.dalong.marqueeview.MarqueeView;
+import com.baidu.mapapi.model.LatLng;import com.dalong.marqueeview.MarqueeView;
+
 import com.google.zxing.activity.CaptureActivity;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.CheckRoadActivity;
@@ -66,7 +68,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     private static final int SIMPLER = 111122;
     private static final int REQUEST_CODE = 0x01;
     private int RESULT_OK = 0xA1;
-    private TextureMapView mapview;
+    private MapView mapview;
     private BaiduMap map;
     private View mllReport;
     private View mllReview;
@@ -117,7 +119,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         View view = View.inflate(getActivity(), R.layout.fragment_home, null);
         mActionbartext = (TextView) view.findViewById(R.id.actionbar_text);
 
-        mapview = (TextureMapView) view.findViewById(R.id.home_mv);
+        mapview = (MapView) view.findViewById(R.id.home_mv);
         mllReport = view.findViewById(R.id.ll_home_report);
         mllReview = view.findViewById(R.id.ll_home_review);
         mllDeal = view.findViewById(R.id.ll_home_deal);
@@ -364,7 +366,9 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
                     break;
                 case FAIL:
-                    ToastUtil.shortToast(HomeFragment.this.getActivity(), noData);
+                    if (HomeFragment.this.getActivity() != null){
+                        ToastUtil.shortToast(HomeFragment.this.getActivity(), noData);
+                    }
                     break;
                 case ISLOAD:
                     String isload = (String) msg.obj;
