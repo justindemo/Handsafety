@@ -99,4 +99,9 @@ public class GlobalContanstant {
     public static final int REVIEWSTATEFAIL = 301;
     public static final int TRAINLISTSUCCESS = 30001;
     public static final int TRAINLISTFAIL = 30000;
+    public static final String DOWNLOADID = "DOWNLOADID";
+    public static final String BOOM = "boom";
+    public static final String FIRE = "fire";
+    public static final String HEALTH = "health";
+    public static final String ENVIR = "envir";
 }

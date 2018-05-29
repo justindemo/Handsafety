@@ -75,7 +75,7 @@ import butterknife.OnClick;
  * Created by admin on 2018/3/2.
  * 早会签到
  */
-public class MoringSignActivity extends AppCompatActivity implements SearchView.SearchViewListener
+public class MoringSignActivity extends AppCompatActivity
 {
 
     @Bind(R.id.tv_sign_team)
@@ -208,7 +208,6 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     private String userName;
     private LocationClient locationClient;
     public BDAbstractLocationListener myListener = new MyListener();
-    private int meetingId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -238,10 +237,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                 method = NetUrl.TrainSignmethod;
                 title = getResources().getString(R.string.trainsign);
                 break;
-            case "meetingsign":
-                method = NetUrl.MeetingSignmethod;
-                title = getResources().getString(R.string.meetingsign);
-                break;
+
         }
         initActionbar(title);
         PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
@@ -256,7 +252,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
 
     private void locat() {
         //进入上报页面的 时候 开始定位
-        locationClient = new LocationClient(this);
+        locationClient = new LocationClient(getApplicationContext());
         locationClient.registerLocationListener(myListener);
 
         LocationClientOption option = new LocationClientOption();
@@ -339,8 +335,6 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
                     soapObject.addProperty("Type", 2);
                 } else if (this.tag.equals("moringsign")){
                     soapObject.addProperty("Type", 1);
-                }else {
-                    soapObject.addProperty("Type", 3);
                 }
 
                 break;
@@ -497,33 +491,6 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_sign_person:
-                autoCompleteData = null;
-                autoCompleteAdapter = null;
-                resultAdapter = null;
-                resultData = null;
-                dialog = new AlertDialog.Builder(MoringSignActivity.this).create();
-                dialog.setCancelable(true);// 可以用“返回键”取消
-                dialog.setCanceledOnTouchOutside(true);//
-                dialog.show();
-                dialog.setContentView(R.layout.sendroad_choicecheckperson);
-                lv = (ListView) dialog.findViewById(R.id.lv_sendroad_list);
-                SearchView searchView = (SearchView) dialog.findViewById(R.id.search_layout);
-                searchView.setSearchViewListener(MoringSignActivity.this);
-                searchView.setAutoCompleteAdapter(autoCompleteAdapter);
-                initPersonData();
-                if (lv != null) {
-                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            //得到人名，显示
-                            tvSignPerson.setText(resultData.get(position));
-                            dialog.dismiss();
-
-                        }
-
-                    });
-                }
-                dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
 
                 break;
@@ -577,70 +544,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
     }
 
 
-    private void initPersonData() {
 
-        //从数据库获取数据
-        getDbData();
-        //初始化热搜版数据
-        //getHintData();
-        //初始化自动补全数据
-        getAutoCompleteData(null);
-        //初始化搜索结果数据
-        getResultData(null);
-    }
-
-
-    private void getDbData() {
-
-        dbData.clear();
-        for (int i = 0; i < personlist.length; i++) {
-            dbData.add(personlist[i]);
-        }
-
-    }
-
-    private void getAutoCompleteData(String text) {
-
-        if (autoCompleteData == null) {
-            //初始化
-            autoCompleteData = new ArrayList<>(hintSize);
-        } else {
-            // 根据text 获取auto data
-            autoCompleteData.clear();
-            for (int i = 0, count = 0; i < dbData.size()
-                    && count < hintSize; i++) {
-                if (dbData.get(i).contains(text.trim())) {
-                    autoCompleteData.add(dbData.get(i));
-                    count++;
-                }
-            }
-        }
-        if (autoCompleteAdapter == null) {
-            autoCompleteAdapter = new ArrayAdapter<>(MoringSignActivity.this, android.R.layout.simple_list_item_1, autoCompleteData);
-        } else {
-            autoCompleteAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private void getResultData(String text) {
-
-        if (resultData == null) {
-            // 初始化
-            resultData = new ArrayList<>();
-        } else {
-            resultData.clear();
-            for (int i = 0; i < dbData.size(); i++) {
-                if (dbData.get(i).contains(text.trim())) {
-                    resultData.add(dbData.get(i));
-                }
-            }
-        }
-        if (resultAdapter == null) {
-            resultAdapter = new SearchAdapter(MoringSignActivity.this, resultData);
-        } else {
-            resultAdapter.notifyDataSetChanged();
-        }
-    }
 
 
     private void upData() {
@@ -701,58 +605,7 @@ public class MoringSignActivity extends AppCompatActivity implements SearchView.
         return result;
     }
 
-    @Override
-    public void onRefreshAutoComplete(String text) {
-        getAutoCompleteData(text);
-    }
 
-    @Override
-    public void onSearch(String text) {
-        //更新result数据
-        getResultData(text);
-        lv.setVisibility(View.VISIBLE);
-        //第一次获取结果 还未配置适配器
-        if (lv.getAdapter() == null) {
-            //获取搜索数据 设置适配器
-            lv.setAdapter(resultAdapter);
-        } else {
-            //更新搜索数据
-            resultAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onClear(SearchView.EditChangedListener editChangedListener) {
-        editChangedListener = null;
-    }
-
-
-    private ArrayAdapter<String> autoCompleteAdapter;
-    /**
-     * 搜索结果列表adapter
-     */
-    private SearchAdapter resultAdapter;
-    /**
-     * 搜索过程中自动补全数据
-     */
-    private List<String> autoCompleteData;
-
-    /**
-     * 搜索结果的数据
-     */
-    private List<String> resultData;
-
-    /**
-     * 默认提示框显示项的个数
-     */
-    private static int DEFAULT_HINT_SIZE = 9;
-
-    /**
-     * 提示框显示项的个数
-     */
-    private static int hintSize = DEFAULT_HINT_SIZE;
-
-    private List<String> dbData = new ArrayList<>();
 
     private class MyListener extends BDAbstractLocationListener {
 

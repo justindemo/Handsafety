@@ -615,7 +615,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void locat() {
         //进入上报页面的 时候 开始定位
-        locationClient = new LocationClient(this);
+        locationClient = new LocationClient(getApplicationContext());
         locationClient.registerLocationListener(myListener);
 
         LocationClientOption option = new LocationClientOption();

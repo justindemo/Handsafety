@@ -17,11 +17,13 @@ public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
     R.mipmap.sup_meeting};
     private int number;
     private int nocheckNumber;
+    private int meetingNumber;
 
-    public SuperviseSecondAdapter( List<String> data,int role,int number,int nocheckNumber) {
+    public SuperviseSecondAdapter( List<String> data,int number,int nocheckNumber,int meetingNumber) {
         super(R.layout.item_more, data);
         this.number = number;
         this.nocheckNumber = nocheckNumber;
+        this.meetingNumber= meetingNumber;
     }
 
     @Override
@@ -39,6 +41,12 @@ public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
             if (nocheckNumber != 0){
                 helper.setVisible(R.id.tv_mytask_number,true);
                 helper.setText(R.id.tv_mytask_number,nocheckNumber+"");
+            }
+        }
+        if (layoutPosition == 3){
+            if (meetingNumber != 0){
+                helper.setVisible(R.id.tv_mytask_number,true);
+                helper.setText(R.id.tv_mytask_number,meetingNumber+"");
             }
         }
         helper.setImageResource(R.id.more_icon,mIcons[layoutPosition]);

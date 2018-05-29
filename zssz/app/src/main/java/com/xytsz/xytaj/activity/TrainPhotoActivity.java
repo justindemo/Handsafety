@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.bean.DiseaseInformation;
@@ -40,7 +41,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,6 +66,8 @@ public class TrainPhotoActivity extends AppCompatActivity {
     Button trainPhotoBt;
     @Bind(R.id.trainphoto_progressbar)
     LinearLayout trainphotoProgressbar;
+    @Bind(R.id.tv_trainphoto_title)
+    TextView tvTrainphotoTitle;
     private int trainId;
     private DiseaseInformation diseaseInformation;
     private Handler handler = new Handler() {
@@ -94,10 +96,11 @@ public class TrainPhotoActivity extends AppCompatActivity {
     private String method;
     private String fileResult;
     private File fileUrl;
+    private String params;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             fileResult = savedInstanceState.getString("file_path");
         }
         super.onCreate(savedInstanceState);
@@ -107,17 +110,20 @@ public class TrainPhotoActivity extends AppCompatActivity {
             tag = getIntent().getStringExtra("tag");
             trainId = getIntent().getIntExtra("trainId", -1);
         }
-        switch (tag){
+        switch (tag) {
             case "trainsign":
                 title = "培训照片";
                 method = NetUrl.TrainphotomethodName;
+                params = "TrainID";
                 break;
             case "meetingsign":
                 title = "会议照片";
                 method = NetUrl.MeetingPhotoMethodName;
+                params = "meetId";
                 break;
         }
         initActionBar(title);
+        tvTrainphotoTitle.setText(title);
         diseaseInformation = new DiseaseInformation();
     }
 
@@ -138,7 +144,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
     private static final String Tag = "com.xytsz.xytaj.fileprovider";
     private String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
-    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() +"/Zsaj/Image/mymy/";
+    private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
 
 
     @OnClick({R.id.iv_train_icon1, R.id.iv_train_icon2, R.id.iv_train_icon3, R.id.train_photo_bt})
@@ -193,10 +199,10 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
         //传递的参数
-        soapObject.addProperty("TrainID", trainId);
+
+        soapObject.addProperty(params, trainId);
         soapObject.addProperty("FileName", diseaseInformation.photoName);  //文件类型
         soapObject.addProperty("ImgBase64String", diseaseInformation.encode);   //参数2  图片字符串
-        ///
 
         //设置访问地址 和 超时时间
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -224,13 +230,12 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
                 case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
                     File filePath = new File(pathUrl);
-                    if (!filePath.exists()){
+                    if (!filePath.exists()) {
                         filePath.mkdirs();
                     }
                     break;
 
                 case PermissionUtils.CODE_CAMERA:
-
                     camera(1);
                     break;
 
@@ -269,10 +274,10 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        if (Build.VERSION.SDK_INT >= 24){
-            outState.putString("file_path",fileResult);
-        }else {
-            outState.putString("file_path",fileResult);
+        if (Build.VERSION.SDK_INT >= 24) {
+            outState.putString("file_path", fileResult);
+        } else {
+            outState.putString("file_path", fileResult);
         }
         super.onSaveInstanceState(outState, outPersistentState);
     }
@@ -291,13 +296,13 @@ public class TrainPhotoActivity extends AppCompatActivity {
         //当data为空的时候，不做任何处理
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
-                if (data != null){
+                if (data != null) {
                     bitmap = (Bitmap) data.getExtras().get("data");
-                }else {
+                } else {
                     bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
                 ivTrainIcon1.setImageBitmap(bitmap);
@@ -308,14 +313,14 @@ public class TrainPhotoActivity extends AppCompatActivity {
                 fileNames.add(fileName1);
                 imageBase64Strings.add(encode1);
             } else if (requestCode == 2) {
-                if (data != null){
+                if (data != null) {
                     bitmap = (Bitmap) data.getExtras().get("data");
-                }else {
+                } else {
                     bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
 
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
 
@@ -328,14 +333,14 @@ public class TrainPhotoActivity extends AppCompatActivity {
                 imageBase64Strings.add(encode2);
 
             } else if (requestCode == 3) {
-                if (data != null){
+                if (data != null) {
                     bitmap = (Bitmap) data.getExtras().get("data");
-                }else {
+                } else {
                     bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
 
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
                 ivTrainIcon3.setImageBitmap(bitmap);
@@ -350,7 +355,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
         }
         //新加的
 
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
 
@@ -398,7 +403,6 @@ public class TrainPhotoActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
-
 
 
 }

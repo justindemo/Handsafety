@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="text_nomal">15sp</dimen>
+    <dimen name="nomal_corners">5dp</dimen>
+    <dimen name="map_height">260dp</dimen>
+    <dimen name="my_height">170dp</dimen>
+    <dimen name="supply_height">175dp</dimen>
+    <dimen name="supply_bg_height">230dp</dimen>
+    <dimen name="facility_bg_height">90dp</dimen>
+
+
+</resources>

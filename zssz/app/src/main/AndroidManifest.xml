@@ -116,7 +116,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <activity android:name="com.xytsz.xytaj.activity.RoadActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MemberLocationActivity" />
+
         <activity android:name="com.xytsz.xytaj.activity.DealActivity" />
         <activity
             android:screenOrientation="portrait"
@@ -134,36 +134,25 @@
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <activity android:name="com.xytsz.xytaj.activity.AppraiseActivity" />
-        <activity
-            android:name="com.xytsz.xytaj.activity.MakerProblemActivty"
-            android:screenOrientation="portrait" />
+
         <activity android:name="com.xytsz.xytaj.activity.DiseaseDetailActivity" />
         <activity
             android:name="com.xytsz.xytaj.activity.PhotoShowActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name="com.xytsz.xytaj.activity.CheckDetailActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MyReporteActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MyDealedActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MyReviewedActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MyReporteDetailActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MyDealedDetailActivity" />
         <activity
             android:screenOrientation="portrait"
             android:name="com.xytsz.xytaj.activity.SendRoadDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name="com.xytsz.xytaj.activity.PatrolListActivity" />
 
-        <activity android:name="com.xytsz.xytaj.activity.BridgeNumberActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.RoadMapActivity" />
+
         <activity android:name="com.xytsz.xytaj.activity.MyInformationActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.ReportPhotoShowActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MemberMapActivity" />
+
         <activity android:name="com.xytsz.xytaj.activity.ForUsActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TestActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TrainTestActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ModificationActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MySendDetailActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.MySendActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MarkPositionActivity" />
         <activity android:name="com.xytsz.xytaj.activity.InputNumberActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TrainTestShowActivity" />
@@ -184,6 +173,9 @@
         <activity android:name="com.xytsz.xytaj.activity.SupMeetingContentActivity" />
         <activity android:name="com.xytsz.xytaj.activity.SystemManageListActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MeetingSignActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.MemberCompanyShowActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.FacilityCategoryActivity" />
 
 
         <activity
@@ -218,20 +210,9 @@
         <activity
             android:name="com.xytsz.xytaj.activity.CheckReportBigPhotoActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name="com.xytsz.xytaj.activity.ProcessDetailActivity" />
-        <activity
-            android:name="com.xytsz.xytaj.activity.MarkerReportPhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <activity
-            android:name="com.xytsz.xytaj.activity.PrePhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
-            android:name="com.xytsz.xytaj.activity.PostPhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
-            android:name="com.xytsz.xytaj.activity.IngPhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
 
 
         <!-- alipay sdk begin -->

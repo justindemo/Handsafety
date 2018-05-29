@@ -27,6 +27,7 @@ import com.xytsz.xytaj.adapter.SuperviseAdapter;
 import com.xytsz.xytaj.adapter.SuperviseSecondAdapter;
 import com.xytsz.xytaj.base.BaseFragment;
 import com.xytsz.xytaj.bean.PatrolListBean;
+import com.xytsz.xytaj.bean.SupMeeting;
 import com.xytsz.xytaj.bean.TrainContent;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
@@ -65,6 +66,7 @@ public class SuperviseFragment extends BaseFragment {
     private SuperviseSecondAdapter secondAdapter;
     private List<TrainContent> trainContents;
     private int nocheckNumber;
+    private int meetingnumber;
 
 
     @Override
@@ -119,6 +121,7 @@ public class SuperviseFragment extends BaseFragment {
                     Bundle data = msg.getData();
                     String trainList = data.getString("trainlist");
                     String nocheckData = data.getString("nocheckData");
+                    String meetinglist = data.getString("meetinglist");
                     if (!trainList.equals("[]")) {
                         trainContents = JsonUtil.jsonToBean(trainList, new TypeToken<List<TrainContent>>() {
                         }.getType());
@@ -151,7 +154,24 @@ public class SuperviseFragment extends BaseFragment {
                     } else {
                         nocheckNumber = 0;
                     }
-                    secondAdapter = new SuperviseSecondAdapter(titles1, role, listnumber, nocheckNumber);
+                    if (!meetinglist.equals("[]")) {
+                        List<SupMeeting>  supMeetings = JsonUtil.jsonToBean(meetinglist, new TypeToken<List<SupMeeting>>() {
+                        }.getType());
+
+                        if (supMeetings != null) {
+                            if (supMeetings.size() != 0) {
+                                //展示
+                                meetingnumber = supMeetings.size();
+
+                            }
+
+                        }
+                    } else {
+                        meetingnumber = 0;
+                    }
+
+                    secondAdapter = new SuperviseSecondAdapter(titles1, listnumber, nocheckNumber
+                    ,meetingnumber);
                     secondAdapter.notifyDataSetChanged();
                     break;
 
@@ -169,12 +189,13 @@ public class SuperviseFragment extends BaseFragment {
         titles1.add("培训考试");
         titles1.add("应急预案");
         titles1.add("未排查任务");
-
+        titles1.add("会议纪要");
 
         titles.clear();
         titles.add("早会签到");
         titles.add("我的任务");
         titles.add("制度管理");
+
         personId = SpUtils.getInt(getContext(), GlobalContanstant.PERSONID);
         role = SpUtils.getInt(getContext(), GlobalContanstant.ROLE);
         getData();
@@ -251,6 +272,7 @@ public class SuperviseFragment extends BaseFragment {
                     String jsonData = downData(personId);
                     String trainList = getTrainList();
                     String nocheckData = getUncheck();
+                    String meetinglist = getMeetingList();
                     if (jsonData != null) {
                         Message message1 = Message.obtain();
                         message1.what = GlobalContanstant.PATROLLISTSUCCESS;
@@ -262,6 +284,7 @@ public class SuperviseFragment extends BaseFragment {
                         Bundle bundle = new Bundle();
                         bundle.putString("trainlist",trainList);
                         bundle.putString("nocheckData",nocheckData);
+                        bundle.putString("meetinglist",meetinglist);
                         message2.what = GlobalContanstant.TRAINLISTSUCCESS;
                         message2.setData(bundle);
                         handler.sendMessage(message2);
@@ -275,6 +298,23 @@ public class SuperviseFragment extends BaseFragment {
                 }
             }
         }.start();
+    }
+
+    private String getMeetingList() throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getsupMeetingList);
+        soapObject.addProperty("personId", personId);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(null, envelope);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        String result = object.getProperty(0).toString();
+        return result;
+
     }
 
     private String getUncheck() throws Exception {

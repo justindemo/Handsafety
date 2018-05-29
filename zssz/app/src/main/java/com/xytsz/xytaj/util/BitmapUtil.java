@@ -62,10 +62,11 @@ public class BitmapUtil {
         Bitmap bitmap;
         if (fileResult == null){
             return null;
+        }else {
+            bitmap = BitmapFactory.decodeFile(fileResult);
+            bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+            return bitmap;
         }
-        bitmap = BitmapFactory.decodeFile(fileResult);
-        bitmap = Bitmap.createScaledBitmap(bitmap,300,300,true);
-        return bitmap;
     }
 
 }

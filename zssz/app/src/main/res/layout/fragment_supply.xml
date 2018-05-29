@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent">
+<FrameLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<!--图层-->
+    <LinearLayout
+        android:background="@color/cc_supervise"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/supply_bg_height">
+    </LinearLayout>
+    <!--内容-->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_margin="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/search_tv_supply"
+                android:layout_gravity="center_vertical"
+                android:drawableRight="@mipmap/iv_supply_search"
+                android:drawablePadding="5dp"
+                android:padding="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/tv_supply_bg"
+                android:textSize="16sp"
+                android:textColorHint="@color/white"
+                android:hint=" 请输入您要搜索的产品名称"/>
+
+        </LinearLayout>
+
+    <!--分类-->
+        <LinearLayout
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/rl_supply_boom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/iv_boom"
+                    android:src="@mipmap/iv_sup_boom"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <TextView
+                    android:text="粉尘防爆"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_below="@+id/iv_boom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_supply_fire"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/iv_fire"
+                    android:src="@mipmap/iv_sup_fire"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <TextView
+                    android:text="消防安全"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/iv_fire"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_supply_envir"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/iv_envir"
+                    android:src="@mipmap/iv_sup_envir"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <TextView
+                    android:text="粉尘防爆"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/iv_envir"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_supply_health"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/iv_health"
+                    android:src="@mipmap/iv_sup_health"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <TextView
+                    android:text="职业卫生"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/iv_health"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
+        <!--轮播图-->
+        <RelativeLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/supply_height">
+
+            <LinearLayout
+                android:id="@+id/supply_head_vp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/supply_height"
+                android:orientation="horizontal" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_alignBottom="@+id/supply_head_vp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+
+
+
+        <!--联系我们-->
+
+        <LinearLayout
+            android:layout_margin="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/iv_sup_phone"
+                android:src="@mipmap/iv_sup_phone"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/iv_sup_wechat"
+                android:src="@mipmap/iv_sup_wechat"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/iv_sup_qq"
+                android:src="@mipmap/iv_sup_qq"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+
+            <ImageView
+                android:id="@+id/iv_sup_address"
+                android:src="@mipmap/iv_sup_address"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+        <!--公司企业-->
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="#efefef"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="6dp"
+                android:padding="6dp"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/member_left"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/cc_text_blank"
+                    android:text="@string/memeber_mid_title"
+                    android:textSize="17sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_supply_company"
+                    android:text="200家"
+                    android:drawablePadding="6dp"
+                    android:textColor="@color/cc_dark_fade"
+                    android:drawableRight="@mipmap/iv_back_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/graybackground"/>
+            <android.support.v7.widget.RecyclerView
+                android:padding="8dp"
+                android:layout_marginLeft="6dp"
+                android:id="@+id/supply_company_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="6dp"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="#efefef"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="6dp"
+                android:padding="6dp"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/member_left"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/cc_text_blank"
+                    android:text="@string/memeber_bottom_title"
+                    android:textSize="17sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_supply_third"
+                    android:text="200家"
+                    android:drawablePadding="6dp"
+                    android:textColor="@color/cc_dark_fade"
+                    android:drawableRight="@mipmap/iv_back_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/graybackground"/>
+            <android.support.v7.widget.RecyclerView
+                android:padding="8dp"
+                android:layout_marginLeft="6dp"
+                android:id="@+id/supply_thrid_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+
+
+</FrameLayout>
+    </ScrollView>

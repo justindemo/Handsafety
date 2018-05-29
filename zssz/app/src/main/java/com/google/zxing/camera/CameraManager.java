@@ -107,6 +107,11 @@ public final class CameraManager {
 
     this.context = context;
     this.configManager = new CameraConfigurationManager(context);
+    MIN_FRAME_WIDTH = DensityUtil.dip2px(context,180);
+    MIN_FRAME_HEIGHT = DensityUtil.dip2px(context,180);
+    MAX_FRAME_WIDTH = DensityUtil.dip2px(context,240);
+    MAX_FRAME_HEIGHT= DensityUtil.dip2px(context,240);
+
 
     // Camera.setOneShotPreviewCallback() has a race condition in Cupcake, so we use the older
     // Camera.setPreviewCallback() on 1.5 and earlier. For Donut and later, we need to use
@@ -117,10 +122,7 @@ public final class CameraManager {
 
     previewCallback = new PreviewCallback(configManager, useOneShotPreviewCallback);
     autoFocusCallback = new AutoFocusCallback();
-    MIN_FRAME_WIDTH = DensityUtil.dip2px(context,180);
-    MIN_FRAME_HEIGHT = DensityUtil.dip2px(context,180);
-    MAX_FRAME_WIDTH = DensityUtil.dip2px(context,240);
-    MAX_FRAME_HEIGHT= DensityUtil.dip2px(context,240);
+
 
   }
 

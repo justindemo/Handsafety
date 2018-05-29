@@ -17,9 +17,9 @@ android {
     defaultConfig {
         applicationId "com.xytsz.xytaj"
         minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 16
-        versionName "掌上安监1.4.9"
+        targetSdkVersion 23
+        versionCode 17
+        versionName "掌上安监1.5.0"
         multiDexEnabled true
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'

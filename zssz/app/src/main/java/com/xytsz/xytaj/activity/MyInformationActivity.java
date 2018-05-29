@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.xytsz.xytaj.R;
-import com.xytsz.xytaj.global.Data;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.SpUtils;

@@ -6,6 +6,9 @@
     <dimen name="nomal_corners">5dp</dimen>
     <dimen name="map_height">260dp</dimen>
     <dimen name="my_height">170dp</dimen>
+    <dimen name="supply_height">175dp</dimen>
+    <dimen name="supply_bg_height">230dp</dimen>
+    <dimen name="facility_bg_height">80dp</dimen>
 
 
 </resources>

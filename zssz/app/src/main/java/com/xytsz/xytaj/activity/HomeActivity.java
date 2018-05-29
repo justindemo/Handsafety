@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -27,6 +28,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.xytsz.xytaj.bean.UpdateStatus;
 import com.xytsz.xytaj.bean.VersionInfo;
 import com.xytsz.xytaj.fragment.SuperviseFragment;
+import com.xytsz.xytaj.fragment.SupplyFragment;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.base.BaseFragment;
 import com.xytsz.xytaj.fragment.HomeFragment;
@@ -39,6 +41,7 @@ import com.xytsz.xytaj.R;
 
 import com.xytsz.xytaj.util.IntentUtil;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 import com.xytsz.xytaj.util.UpdateVersionUtil;
@@ -105,8 +108,6 @@ public class HomeActivity extends AppCompatActivity {
         initView();
 
         if (isNetworkAvailable(getApplicationContext())) {
-//            mprogressbar.setVisibility(View.VISIBLE);
-//            mViewpager.setVisibility(View.GONE);
             isOnCreat = true;
             getData();
 
@@ -123,11 +124,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isNetworkAvailable(getApplicationContext())){
-//                    mViewpager.setVisibility(View.GONE);
-                  getData();
-//                    rl_notonlie.setVisibility(View.GONE);
-//                    mprogressbar.setVisibility(View.VISIBLE);
-
+                    getData();
                     //修改
                     mViewpager.setVisibility(View.VISIBLE);
                     rl_notonlie.setVisibility(View.GONE);
@@ -196,6 +193,7 @@ public class HomeActivity extends AppCompatActivity {
         fragments.add(new HomeFragment());
         fragments.add(new SuperviseFragment());
         fragments.add(new MeFragment());
+        fragments.add(new SupplyFragment());
         //把fragment填充到viewpager
 
         MainAdapter adapter = new MainAdapter(getSupportFragmentManager(), fragments);
@@ -223,6 +221,8 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
+
+
         mRadiogroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -243,6 +243,9 @@ public class HomeActivity extends AppCompatActivity {
                         mViewpager.setCurrentItem(2, false);
                         break;
 
+                    case R.id.homeactivity_rbtn_supply:
+                        mViewpager.setCurrentItem(3,false);
+                        break;
 
                 }
             }
@@ -333,6 +336,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final int DATA_SUCCESS = 1166666;
     private static final int VERSIONINFO = 144211;
     private static final int DATA_REPORT = 155552;
+
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -516,9 +520,5 @@ public class HomeActivity extends AppCompatActivity {
         super.onDestroy();
         finish();
     }
-
-
-
-
 
 }

@@ -90,7 +90,6 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     private Camera m_Camera;
     private boolean isLight;
     private Camera.Parameters parameters;
-    private android.hardware.camera2.CameraManager manager;
 
 
     /**
@@ -105,7 +104,6 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
         back = (ImageView) findViewById(R.id.scanner_toolbar_back);
         //新添加的
-        manager = (android.hardware.camera2.CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         inputNumber = (LinearLayout) findViewById(R.id.ll_input_number);
         openLight = (LinearLayout) findViewById(R.id.ll_open_light);

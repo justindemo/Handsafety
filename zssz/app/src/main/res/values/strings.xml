@@ -55,7 +55,7 @@
 
 
     <string name="bottom_first">首页</string>
-    <string name="bottom_second">会员</string>
+    <string name="bottom_second">供应链</string>
     <string name="bottom_thrid">监管</string>
     <string name="bottom_fifth">我的</string>
 
@@ -97,8 +97,8 @@
     <string name="memeber_assiation">市政协会</string>
     <string name="memeber_bussiness">市政企业</string>
     <string name="memeber_company">集采企业</string>
-    <string name="memeber_mid_title">掌上市政会员服务</string>
-    <string name="memeber_bottom_title">推荐会员</string>
+    <string name="memeber_mid_title">企业会员</string>
+    <string name="memeber_bottom_title">第三方服务</string>
 
     <string name="table_top">掌上市政用户统计表</string>
     <string name="table_mid">掌上市政使用者数据</string>

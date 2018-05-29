@@ -68,18 +68,31 @@
         <!-- checked : 是否选中RadioButton true:选中,false:不选中
              button : 设置单选按钮的样式,@null : 不使用样式
              drawableTop : 在文本的顶部设置图片
-        -->
-        <RadioButton
-            android:id="@+id/homeactivity_rbtn_more"
-            style="@style/HomeActivityRadioButtonStyle"
-            android:drawableTop="@drawable/selector_supervise"
-            android:text="@string/bottom_thrid" />
+
+       -->
+
+
+
 
         <RadioButton
             android:id="@+id/homeactivity_rbtn_home"
             style="@style/HomeActivityRadioButtonStyle"
             android:drawableTop="@drawable/selector_home"
             android:text="@string/bottom_first" />
+
+        <RadioButton
+            android:id="@+id/homeactivity_rbtn_more"
+            style="@style/HomeActivityRadioButtonStyle"
+            android:drawableTop="@drawable/selector_supervise"
+            android:text="@string/bottom_thrid" />
+
+
+
+        <RadioButton
+            android:id="@+id/homeactivity_rbtn_supply"
+            style="@style/HomeActivityRadioButtonStyle"
+            android:drawableTop="@drawable/selector_supply"
+            android:text="@string/bottom_second" />
 
 
         <RadioButton

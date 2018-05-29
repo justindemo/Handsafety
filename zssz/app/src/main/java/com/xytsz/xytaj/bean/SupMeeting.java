@@ -10,67 +10,58 @@ import java.io.Serializable;
  */
 public class SupMeeting implements Serializable {
 
-    private int id;
-    private String MeetingNum;
-    private String BeginTime;
+
+    /**
+     * MeetId : 1
+     * Title : 仓储队全体安全会议
+     * AddressInfo : 会议室
+     * BeginTime : 2018-05-24 09:00:000
+     * Url : http://aj.xytgps.com/EN/AJMeetingMobile.aspx
+     */
+
+    private int MeetId;
     private String Title;
-    private String Address;
-    private String DeptName;
-    private String AJMeetingContentUrl;
+    private String AddressInfo;
+    private String BeginTime;
+    private String Url;
 
-    public int getId() {
-        return id;
+    public int getMeetId() {
+        return MeetId;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getMeetingNum() {
-        return MeetingNum;
-    }
-
-    public void setMeetingNum(String meetingNum) {
-        MeetingNum = meetingNum;
-    }
-
-    public String getBeginTime() {
-        return BeginTime;
-    }
-
-    public void setBeginTime(String beginTime) {
-        BeginTime = beginTime;
+    public void setMeetId(int MeetId) {
+        this.MeetId = MeetId;
     }
 
     public String getTitle() {
         return Title;
     }
 
-    public void setTitle(String title) {
-        Title = title;
+    public void setTitle(String Title) {
+        this.Title = Title;
     }
 
-    public String getAddress() {
-        return Address;
+    public String getAddressInfo() {
+        return AddressInfo;
     }
 
-    public void setAddress(String address) {
-        Address = address;
+    public void setAddressInfo(String AddressInfo) {
+        this.AddressInfo = AddressInfo;
     }
 
-    public String getDeptName() {
-        return DeptName;
+    public String getBeginTime() {
+        return BeginTime;
     }
 
-    public void setDeptName(String deptName) {
-        DeptName = deptName;
+    public void setBeginTime(String BeginTime) {
+        this.BeginTime = BeginTime;
     }
 
-    public String getAJMeetingContentUrl() {
-        return AJMeetingContentUrl;
+    public String getUrl() {
+        return Url;
     }
 
-    public void setAJMeetingContentUrl(String AJMeetingContentUrl) {
-        this.AJMeetingContentUrl = AJMeetingContentUrl;
+    public void setUrl(String Url) {
+        this.Url = Url;
     }
 }

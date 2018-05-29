@@ -189,11 +189,15 @@ public class NetUrl {
     public static final String getnoTaskByPersonID ="GetTodayNotCheck";
 
 
-    public static final String MeetingPhotoMethodName= "ToUploadMeetingImg";
+    public static final String MeetingPhotoMethodName= "ToUploadImgOfMeeting";
     public static final String getSystemmanagelist ="GetSystemManagement";
     public static final String getcontingencylist ="GetEmergencyPlan";
     public static final String getExerciselist = "GetExercise";
-    public static final String getsupMeetingList ="GetALLMeeting";
-    public static final String MeetingSignmethod ="ToMeetingSign";
+    public static final String getsupMeetingList ="GetMeetingByPersonId";
     public static final String getnoPersonList = "GetPersonNameByNotSign";
+    public static final String getALLPersonList = "GetALLPerson";
+    public static final String uploadMeeting ="ToSignOfMeeting";
+    public static final String getScrollerData = "";
+    public static final String getCompanyData ="";
+    public static final String getthirdData ="";
 }

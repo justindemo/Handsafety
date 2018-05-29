@@ -1,16 +1,23 @@
 package com.xytsz.xytaj.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.xytsz.xytaj.R;
+import com.xytsz.xytaj.activity.MemberCompanyShowActivity;
+import com.xytsz.xytaj.bean.Scroller;
+import com.xytsz.xytaj.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +28,9 @@ import java.util.List;
  */
 public class ScrollViewPager extends ViewPager {
 
-    private List<String> mImageUrls = new ArrayList<>();
+    private List<Scroller> scrollers = new ArrayList<>();
 
+    private Context context;
     private List<View> mllDots = new ArrayList<>();
     private MyAdapter myAdapter;
     private int currentPosition = 0;
@@ -39,10 +47,16 @@ public class ScrollViewPager extends ViewPager {
             roll();
         };
     };
+    private List<String> imageUrls;
+    private int mTouchSlop;
 
     public ScrollViewPager(Context context, List<View> llDots) {
         super(context);
+        this.context = context;
         this.mllDots = llDots;
+
+        ViewConfiguration configuration = ViewConfiguration.get(context);
+        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
 
         runnableTask = new RunnableTask();
 
@@ -80,7 +94,8 @@ public class ScrollViewPager extends ViewPager {
     }
 
     public void initImage(List<String> imageUrls){
-        this.mImageUrls = imageUrls;
+//        this.scrollers = imageUrls;
+        this.imageUrls = imageUrls;
     }
 
     public void roll(){
@@ -96,11 +111,13 @@ public class ScrollViewPager extends ViewPager {
     }
 
 
+
+
     class MyAdapter extends PagerAdapter{
 
         @Override
         public int getCount() {
-            return mImageUrls.size();
+            return imageUrls.size();
         }
 
         @Override
@@ -115,11 +132,13 @@ public class ScrollViewPager extends ViewPager {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(final ViewGroup container, final int position) {
             View view = View.inflate(getContext(), R.layout.viewpager_imageview,null);
             ImageView imageview = (ImageView) view.findViewById(R.id.imageview);
-            //Glide.with(getContext()).load(mImageUrls.get(position)).into(imageview);
-            imageview.setImageResource(R.mipmap.picture);
+            Glide.with(getContext()).load(imageUrls.get(position)).into(imageview);
+
+
+
 
             container.addView(view);
 
@@ -134,7 +153,6 @@ public class ScrollViewPager extends ViewPager {
                             handler.removeCallbacksAndMessages(null);
                             break;
                         case MotionEvent.ACTION_UP:
-
                             //可以重新滚动
                             roll();
                             break;
@@ -168,7 +186,7 @@ public class ScrollViewPager extends ViewPager {
         @Override
         public void run() {
             //设置无线滚动
-            currentPosition = (currentPosition + 1) % mImageUrls.size();
+            currentPosition = (currentPosition + 1) % imageUrls.size();
             // 进行滚动操作
             handler.obtainMessage().sendToTarget();// 将延迟消息转发到handler中
         }
@@ -177,12 +195,15 @@ public class ScrollViewPager extends ViewPager {
     // 从右往左:如果是最后一个界面父控件viewpager切换界面,如果不是最后一个界面当前的viewpager切换图片
     // 从左往右:如果是第一个界面父控件viewpager打开侧拉菜单,如果不是第一个界面当前的viewpager切换到上一个界面
 
+    int touchFlag = 0;
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         // 1.判断是横向滑动还是竖向滑动
         switch (ev.getAction()) {
+
             case MotionEvent.ACTION_DOWN:
 
+                touchFlag = 0;
                 // getParent : 获取父控件
                 getParent().requestDisallowInterceptTouchEvent(true);// 请求父控件是否传递事件,true:不拦截,false:拦截事件,这里的事件指的是下一个事件
 
@@ -192,6 +213,10 @@ public class ScrollViewPager extends ViewPager {
             case MotionEvent.ACTION_MOVE:
                 int moveX = (int) ev.getX();
                 int moveY = (int) ev.getY();
+
+
+
+
                 // 判断是横向滑动还是竖向滑动
                 if (Math.abs(moveX - downX) > Math.abs(moveY - downY)) {
                     // 横向滑动
@@ -212,6 +237,13 @@ public class ScrollViewPager extends ViewPager {
                         // 当前的viewpager切换到上一个界面
                         getParent().requestDisallowInterceptTouchEvent(true);
                     }
+
+                    if (Math.abs(moveX - downX) <mTouchSlop){
+                        touchFlag= 0;
+                    }else {
+                        touchFlag =-1;
+                    }
+
                 } else {
                     // 竖向滑动处理的时候listview
                     getParent().requestDisallowInterceptTouchEvent(false);
@@ -219,6 +251,13 @@ public class ScrollViewPager extends ViewPager {
                 break;
             case MotionEvent.ACTION_UP:
 
+                if (touchFlag == 0){
+                    int currentItem = getCurrentItem();
+                    ToastUtil.shortToast(context,"点击了");
+                    Intent intent = new Intent(context,MemberCompanyShowActivity.class);
+//                    intent.putExtra("tag", scrollers.get(currentItem).getID());
+                    context.startActivity(intent);
+                }
                 break;
         }
         return super.dispatchTouchEvent(ev);

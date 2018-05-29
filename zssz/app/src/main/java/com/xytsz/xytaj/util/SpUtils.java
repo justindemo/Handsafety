@@ -16,7 +16,6 @@ public class SpUtils {
     private static final String CONFIG = "config";
     private static SharedPreferences sp;
 
-
     /**
      *
      * @param context :上下文
@@ -47,6 +46,17 @@ public class SpUtils {
         SharedPreferences preferences = context.getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
         int value = preferences.getInt(key, 0);
         return value;
+    }
+    public static long getLong(Context context, String key) {
+        // 获取参数
+        SharedPreferences preferences = context.getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
+        long value = preferences.getLong(key, -1L);
+        return value;
+    }
+    public static void saveLong(Context context, String key, long value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(CONFIG, Context.MODE_PRIVATE).edit();
+        editor.putLong(key, value);
+        editor.commit();// 保存参数
     }
 
     public static void saveString(Context context, String key, String value) {

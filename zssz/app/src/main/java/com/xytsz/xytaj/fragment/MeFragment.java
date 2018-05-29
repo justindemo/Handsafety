@@ -1,6 +1,5 @@
 package com.xytsz.xytaj.fragment;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,7 +11,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -24,15 +22,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.zxing.activity.CaptureActivity;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.AppraiseActivity;
 import com.xytsz.xytaj.activity.ForUsActivity;
 import com.xytsz.xytaj.activity.MainActivity;
-import com.xytsz.xytaj.activity.MyDealedActivity;
 import com.xytsz.xytaj.activity.MyInformationActivity;
-import com.xytsz.xytaj.activity.MyReporteActivity;
-import com.xytsz.xytaj.activity.MyReviewedActivity;
-import com.xytsz.xytaj.activity.MySendActivity;
 import com.xytsz.xytaj.base.BaseFragment;
 import com.xytsz.xytaj.bean.UpdateStatus;
 import com.xytsz.xytaj.bean.VersionInfo;
@@ -187,66 +182,6 @@ public class MeFragment extends BaseFragment {
     }
 
 
-    private String getTaskCountOfReport(int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskCountOfReport);
-        soapObject.addProperty("personId", personID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.dotNet = true;
-        envelope.bodyOut = soapObject;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTaskCountOfReport_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String number = object.getProperty(0).toString();
-
-
-        return number;
-    }
-
-    private String getTaskCountOfReview(int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskCountOfReview);
-        soapObject.addProperty("personId", personID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.dotNet = true;
-        envelope.bodyOut = soapObject;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTaskCountOfReview_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String number = object.getProperty(0).toString();
-
-
-        return number;
-    }
-
-    private String getTaskCountOfDeal(int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskCountOfDeal);
-        soapObject.addProperty("personId", personID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.dotNet = true;
-        envelope.bodyOut = soapObject;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTaskCountOfDeal_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String number = object.getProperty(0).toString();
-
-        return number;
-
-
-    }
 
     private Bitmap getdiskbitmap(String pathString) {
 
@@ -275,19 +210,17 @@ public class MeFragment extends BaseFragment {
 
                 case R.id.ll_my_reporte:
                     //点击跳转到自己上报的数据界面
-                    IntentUtil.startActivity(v.getContext(), MyReporteActivity.class);
+
                     break;
 
                 case R.id.ll_my_deal:
                     //点击显示自己处置界面
-                    IntentUtil.startActivity(v.getContext(), MyDealedActivity.class);
+
                     break;
 
                 case R.id.ll_my_review:
-                    IntentUtil.startActivity(v.getContext(), MyReviewedActivity.class);
+
                     break;
-
-
 
                 case R.id.for_us:
                     IntentUtil.startActivity(getContext(), ForUsActivity.class);
@@ -298,19 +231,6 @@ public class MeFragment extends BaseFragment {
     };
 
 
-    private void startCrop(Uri uri) {
-        Intent intent = new Intent("com.android.camera.action.CROP");//调用Android系统自带的一个图片剪裁页面,
-        intent.setDataAndType(uri, "image/*");
-        intent.putExtra("crop", "true");//进行修剪
-        // aspectX aspectY 是宽高的比例
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        // outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 300);
-        intent.putExtra("outputY", 500);
-        intent.putExtra("return-data", true);
-        startActivityForResult(intent, 2);
-    }
 
 
     @Override
@@ -515,56 +435,8 @@ public class MeFragment extends BaseFragment {
 
     }
 
-    private void getNumber() {
-        new Thread() {
-            @Override
-            public void run() {
-
-                try {
-                    String taskCountOfDealNumber = getTaskCountOfDeal(personID);
-                    String taskCountOfReportNumber = getTaskCountOfReport(personID);
-                    String taskCountOfReviewNumber = getTaskCountOfReview(personID);
-                    String taskCountOfSendNumber = getTaskCountOfSend(personID);
-
-                    numbers.clear();
-
-                    numbers.add(taskCountOfDealNumber);
-                    numbers.add(taskCountOfReportNumber);
-                    numbers.add(taskCountOfReviewNumber);
-                    numbers.add(taskCountOfSendNumber);
 
 
-                    Message message = Message.obtain();
-                    message.what = ISNUMBER;
-                    message.obj = numbers;
-                    handler.sendMessage(message);
-
-                } catch (Exception e) {
-
-                }
-            }
-        }.start();
-    }
-
-    private String getTaskCountOfSend(int personID) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskCountOfSend);
-        soapObject.addProperty("personId", personID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.dotNet = true;
-        envelope.bodyOut = soapObject;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTaskCountOfReview_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String number = object.getProperty(0).toString();
-
-
-        return number;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -589,14 +461,6 @@ public class MeFragment extends BaseFragment {
 
                 case ISNUMBER:
 
-                    numberlist = (List<String>) msg.obj;
-                    if (tvReportNume != null && tvDealNumber != null) {
-                        tvDealNumber.setText(numberlist.get(0));
-                        tvReportNume.setText(numberlist.get(1));
-                        tvReviewNum.setText(numberlist.get(2));
-                        tvSendNume.setText(numberlist.get(3));
-
-                    }
                     break;
 
                 case RESULT:
@@ -638,7 +502,6 @@ public class MeFragment extends BaseFragment {
                                         UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,true);
 
 
-
                                         break;
                                     case UpdateStatus.ERROR:
                                         //检测失败
@@ -665,14 +528,12 @@ public class MeFragment extends BaseFragment {
         personID = SpUtils.getInt(getContext(), GlobalContanstant.PERSONID);
         //getNumber();
         //是否签到
-        issign = SpUtils.getBoolean(getContext(), GlobalContanstant.SIGN, false);
-        if (issign) {
-            mine_tv_sign.setText(signed);
-        }
+
 
     }
 
     private static final int VERSIONINFO = 100211;
+
 
     @OnClick({R.id.me_information, R.id.me_update, R.id.me_share, R.id.me_exit, R.id.me_appraise,R.id.ll_my_send})
     public void onViewClicked(View view) {
@@ -701,7 +562,6 @@ public class MeFragment extends BaseFragment {
 
                     }
                 }.start();
-
                 break;
             //分享
             case R.id.me_share:
@@ -723,10 +583,13 @@ public class MeFragment extends BaseFragment {
                 break;
 
             case R.id.ll_my_send:
-                IntentUtil.startActivity(view.getContext(), MySendActivity.class);
+
                 break;
         }
     }
+
+
+
 
     private void showShare() {
 

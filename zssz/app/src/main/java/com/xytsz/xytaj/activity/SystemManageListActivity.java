@@ -106,15 +106,15 @@ public class SystemManageListActivity extends AppCompatActivity {
         switch (tag) {
             case 1:
                 title = "粉尘防爆";
-                type = 2;
+                type = 1;
                 break;
             case 2:
                 title = "消防安全";
-                type = 3;
+                type = 2;
                 break;
             case 0:
                 title = "职业卫生";
-                type =  1 ;
+                type =  3 ;
                 break;
             case 3:
                 title = "环境保护";

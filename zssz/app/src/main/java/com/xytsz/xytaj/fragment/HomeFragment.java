@@ -235,7 +235,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     }
 
     private void locat() {
-        locationClient = new LocationClient(getContext());
+        locationClient = new LocationClient(HomeFragment.this.getActivity().getApplicationContext());
         locationClient.registerLocationListener(myListener);
 
         LocationClientOption option = new LocationClientOption();
@@ -290,6 +290,8 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
         getData();
 
+        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_READ_EXTERNAL_STORAGE, mPermissionGrant);
+        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
         PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
         PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
 

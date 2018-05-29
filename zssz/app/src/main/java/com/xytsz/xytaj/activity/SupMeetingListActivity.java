@@ -74,15 +74,13 @@ public class SupMeetingListActivity extends AppCompatActivity {
                                         //传递哪一场培训，
                                         //传递环节
                                         //跳转到指定界面
-
                                         case 0:
                                             intent2show(position, supMeetings,SupMeetingContentActivity.class,false);
 
                                             break;
                                         case 1:
 //                                             培训签到
-
-                                            intent2show(position, supMeetings,MoringSignActivity.class,true);
+                                            intent2show(position, supMeetings,MeetingSignActivity.class,true);
                                             break;
                                         case 2:
 //                                            培训照片
@@ -116,9 +114,9 @@ public class SupMeetingListActivity extends AppCompatActivity {
         if (b){
             intent.putExtra("tag", "meetingsign");
             //传递哪一场培训
-            intent.putExtra("trainId",supMeetings.get(position).getId());
+            intent.putExtra("trainId",supMeetings.get(position).getMeetId());
         }else {
-            intent.putExtra("url",supMeetings.get(position).getAJMeetingContentUrl());
+            intent.putExtra("url",supMeetings.get(position).getUrl());
         }
 
         startActivity(intent);

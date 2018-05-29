@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -16,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.lidroid.xutils.HttpUtils;
@@ -26,8 +30,8 @@ import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.HomeActivity;
 import com.xytsz.xytaj.bean.UpdateStatus;
 import com.xytsz.xytaj.bean.VersionInfo;
+import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
-import com.xytsz.xytaj.receive.DownCompleteReceiver;
 
 
 import org.ksoap2.SoapEnvelope;
@@ -42,12 +46,12 @@ import java.io.IOException;
 /**
  * Created by admin on 2017/4/6.
  *
+ *
  */
 public class UpdateVersionUtil {
 
 
     private static String versionInfo;
-    private static String target;
     private static File updateFile;
 
     public static String getVersionInfo() throws Exception {
@@ -82,7 +86,7 @@ public class UpdateVersionUtil {
     /**
      * 检测版本测试
      */
-    public static void localCheckedVersion(final Context context, final UpdateListener updateListener,String versionInfo) {
+    public static void localCheckedVersion(final Context context, final UpdateListener updateListener, String versionInfo) {
 
         VersionInfo mVersionInfo = JsonUtil.jsonToBean(versionInfo, VersionInfo.class);
         int clientVersionCode = ApkUtils.getVersionCode(context);
@@ -122,7 +126,7 @@ public class UpdateVersionUtil {
         Button btnCancel = (Button) view.findViewById(R.id.btn_update_id_cancel);
         TextView tvContent = (TextView) view.findViewById(R.id.tv_update_content);
         TextView tvUpdateTile = (TextView) view.findViewById(R.id.tv_update_title);
-        tvContent.setText("更新内容："+ versionInfo.getMessage());
+        tvContent.setText("更新内容：" + versionInfo.getMessage());
         tvUpdateTile.setText("最新版本：" + versionInfo.getVersionName());
 
 
@@ -131,7 +135,7 @@ public class UpdateVersionUtil {
             public void onClick(View v) {
                 dialog.dismiss();
 
-                if (isshow){
+                if (isshow) {
                     new AlertDialog.Builder(context).setTitle("温馨提示").setMessage("当前非wifi网络,下载会消耗手机流量!").setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -144,12 +148,12 @@ public class UpdateVersionUtil {
                             dialog.dismiss();
                         }
                     }).create().show();
-                }else {
+                } else {
                     showDownloadDialog(context, versionInfo);
                 }
 
 
-                }
+            }
 
         });
 
@@ -160,12 +164,27 @@ public class UpdateVersionUtil {
             }
         });
     }
+
     private static long initTotal = 0;
-    private static String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Zsaj/UpdateVersion/";
+    private static String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/UpdateVersion/";
     private static File downloadFile;
 
     private static void showDownloadDialog(final Context context, VersionInfo versionInfo) {
-        /*final ProgressDialog dialog = new ProgressDialog(context);
+
+        //新加的
+
+        downloadFile = new File(filePath, "zsaj.apk");
+        FileUtils.deletFile(downloadFile);
+
+        if (downloadFile.exists()) {
+            downloadFile.delete();
+        }
+
+
+        String url = versionInfo.getDownloadUrl();
+
+
+        final ProgressDialog dialog = new ProgressDialog(context);
         //下载对话框.
         dialog.setTitle("下载进度");
         dialog.setMax(100);
@@ -173,44 +192,19 @@ public class UpdateVersionUtil {
         dialog.setProgress(0);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//有一个进度可以展示
         dialog.show();
-*/
-        //新加的
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(versionInfo.getDownloadUrl()));
-        request.setMimeType("application/vnd.android.package-archive");
 
-        downloadFile = new File(filePath, "zsaj.apk");
-
-        request.setDestinationUri(Uri.fromFile(downloadFile));
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setTitle("掌上安监");
-        request.setVisibleInDownloadsUi(true);
-
-        long downloadId = downloadManager.enqueue(request);
-        DownCompleteReceiver downCompleteReceiver = new DownCompleteReceiver(downloadId,downloadFile);
-        context.registerReceiver(downCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-
-
-        /*HttpUtils httpUtils = new HttpUtils(5000);
+        HttpUtils httpUtils = new HttpUtils(5000);
         //url :地址
-        String url = versionInfo.getDownloadUrl();
-
-
-            updateFile = new File(filePath,"zsaj_app.apk");
-            deleteFile(updateFile);
-            target = updateFile.getAbsolutePath();
-
         RequestCallBack<File> callback = new RequestCallBack<File>() {
 
             @Override
             public void onLoading(long total, long current, boolean isUploading) {
-                if (initTotal == 0){
+                if (initTotal == 0) {
                     //第一次下载
                     initTotal = total;
                 }
 
-                if (initTotal != total){
+                if (initTotal != total) {
                     //下载暂停
                     total = initTotal;
 
@@ -227,7 +221,7 @@ public class UpdateVersionUtil {
 
                 File result = responseInfo.result;
 
-                Intent installIntent = ApkUtils.getInstallIntent(result,context);
+                Intent installIntent = ApkUtils.getInstallIntent(result, context);
                 context.startActivity(installIntent);
                 dialog.dismiss();
             }
@@ -235,29 +229,12 @@ public class UpdateVersionUtil {
             @Override
             public void onFailure(HttpException error, String msg) {
                 dialog.dismiss();
-                error.printStackTrace();
 
                 ToastUtil.shortToast(context, "下载出现错误!");
             }
         };
-        httpUtils.download(url, target, false, callback);
-*/
+        httpUtils.download(url, downloadFile.getAbsolutePath(), false, callback);
 
-
-    }
-
-    private static void deleteFile(File file) {
-        try {
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-
-                file.createNewFile();
-            } else {
-                file.createNewFile();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 

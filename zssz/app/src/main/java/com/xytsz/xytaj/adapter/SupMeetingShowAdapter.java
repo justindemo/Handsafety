@@ -20,8 +20,7 @@ public class SupMeetingShowAdapter extends BaseQuickAdapter<SupMeeting>{
     @Override
     protected void convert(BaseViewHolder helper, SupMeeting item) {
         helper.setText(R.id.tv_meeting_title,item.getTitle());
-        helper.setText(R.id.tv_meeting_adress,item.getAddress());
-        helper.setText(R.id.tv_meeting_team,item.getDeptName());
+        helper.setText(R.id.tv_meeting_adress,item.getAddressInfo());
         helper.setText(R.id.tv_meeting_stime,item.getBeginTime());
     }
 }
