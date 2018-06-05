@@ -186,7 +186,7 @@ public class NetUrl {
     public static final String TrainphotomethodName ="ToUploadTrainImg";
     public static final String gettestmethod = "GetExamByTrainId";
     public static final String uploadtestmethod ="ToAddExam";
-    public static final String getnoTaskByPersonID ="GetTodayNotCheck";
+    public static final String getnoPatrolTaskByPersonID ="GetTodayNotCheck";
 
 
     public static final String MeetingPhotoMethodName= "ToUploadImgOfMeeting";
@@ -200,4 +200,7 @@ public class NetUrl {
     public static final String getScrollerData = "";
     public static final String getCompanyData ="";
     public static final String getthirdData ="";
+    public static final String getCompanyDetailData ="";
+    public static final String getConpanyList ="";
+    public static final String getnoCheckTaskByPersonID ="";
 }

@@ -42,22 +42,23 @@ public class FacilityCategoryActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_facilitycategroy);
         ButterKnife.bind(this);
-        switch (categroy) {
-            case GlobalContanstant.BOOM:
-                title = "粉尘防爆";
-                break;
-            case GlobalContanstant.FIRE:
-                title = "消防安全";
-                break;
-            case GlobalContanstant.HEALTH:
-                title = "职业卫生";
-                break;
-            case GlobalContanstant.ENVIR:
-                title = "环境保护";
-                break;
+        if (categroy != null) {
+            switch (categroy) {
+                case GlobalContanstant.BOOM:
+                    title = "粉尘防爆";
+                    break;
+                case GlobalContanstant.FIRE:
+                    title = "消防安全";
+                    break;
+                case GlobalContanstant.HEALTH:
+                    title = "职业卫生";
+                    break;
+                case GlobalContanstant.ENVIR:
+                    title = "环境保护";
+                    break;
+            }
+            initActionbar(title);
         }
-        initActionbar(title);
-
         initData();
 
     }

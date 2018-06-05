@@ -64,7 +64,7 @@ public class PatrolListActivity extends AppCompatActivity {
                                 //展示
                                 LinearLayoutManager manager = new LinearLayoutManager(PatrolListActivity.this);
                                 patrolrecycle.setLayoutManager(manager);
-                                PatrolListAdapter patrolListAdapter = new PatrolListAdapter(patrolListBeens);
+                                PatrolListAdapter patrolListAdapter = new PatrolListAdapter(patrolListBeens,false);
                                 patrolrecycle.setAdapter(patrolListAdapter);
 
                             } else {

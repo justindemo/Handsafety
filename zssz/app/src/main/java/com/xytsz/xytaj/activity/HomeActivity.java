@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
@@ -47,6 +48,7 @@ import com.xytsz.xytaj.util.ToastUtil;
 import com.xytsz.xytaj.util.UpdateVersionUtil;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalDate;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
@@ -73,6 +75,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean isOnCreat;
     private boolean isFirst;
     private VersionInfo versionInfo;
+    private RadioButton mRadiosupply;
 
 
     @Override
@@ -177,6 +180,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initView() {
         mRadiogroup = (RadioGroup) findViewById(R.id.homeactivity_rg_radiogroup);
+        mRadiosupply = (RadioButton) findViewById(R.id.homeactivity_rbtn_supply);
         mViewpager = (NoScrollViewpager) findViewById(R.id.homeactivity_vp);
 
         rl_notonlie = (RelativeLayout)findViewById(R.id.rl_notonline);
@@ -184,6 +188,18 @@ public class HomeActivity extends AppCompatActivity {
         mbtrefresh = (Button) findViewById(R.id.btn_refresh);
         //默认显示home界面
         mRadiogroup.check(R.id.homeactivity_rbtn_home);
+        switch (role){
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                mRadiosupply.setVisibility(View.GONE);
+                break;
+            case 5:
+            case 6:
+                mRadiosupply.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     private void initData() {
@@ -194,6 +210,9 @@ public class HomeActivity extends AppCompatActivity {
         fragments.add(new SuperviseFragment());
         fragments.add(new MeFragment());
         fragments.add(new SupplyFragment());
+
+
+
         //把fragment填充到viewpager
 
         MainAdapter adapter = new MainAdapter(getSupportFragmentManager(), fragments);

@@ -486,7 +486,7 @@ public class UnCheckActivity extends AppCompatActivity {
         //以系统的当前时间给图片命名
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String fileName = format.format(date) + ".jpg";
+        String fileName = format.format(date)  + ".jpg";
         return fileName;
     }
 

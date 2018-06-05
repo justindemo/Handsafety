@@ -1,5 +1,7 @@
 package com.xytsz.xytaj.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +38,7 @@ import butterknife.ButterKnife;
  * <p/>
  * 未排查
  */
-public class NoCheckActivity extends AppCompatActivity {
+public class NoPatrolActivity extends AppCompatActivity {
 
     @Bind(R.id.nocheck_rv)
     RecyclerView nocheckRv;
@@ -45,6 +47,7 @@ public class NoCheckActivity extends AppCompatActivity {
     private int personId;
     private List<PatrolListBean> patrolListBeens;
     private int position;
+    private boolean isVisiable;
     private Handler handler = new Handler() {
 
         @Override
@@ -61,9 +64,10 @@ public class NoCheckActivity extends AppCompatActivity {
                         if (patrolListBeens != null) {
                             if (patrolListBeens.size() != 0) {
                                 //展示
-                                LinearLayoutManager manager = new LinearLayoutManager(NoCheckActivity.this);
+                                LinearLayoutManager manager = new LinearLayoutManager(NoPatrolActivity.this);
                                 nocheckRv.setLayoutManager(manager);
-                                PatrolListAdapter patrolListAdapter = new PatrolListAdapter(patrolListBeens);
+
+                                PatrolListAdapter patrolListAdapter = new PatrolListAdapter(patrolListBeens,isVisiable);
                                 nocheckRv.setAdapter(patrolListAdapter);
 
                             } else {
@@ -82,12 +86,36 @@ public class NoCheckActivity extends AppCompatActivity {
             }
         }
     };
+    private String title;
+    private String tag;
+    private String method;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent() != null){
+            title = getIntent().getStringExtra("title");
+            tag = getIntent().getStringExtra("tag");
+
+        }
         setContentView(R.layout.activity_nocheck);
         ButterKnife.bind(this);
-        initActionbar();
+        if (title != null){
+            initActionbar(title);
+        }
+        if (tag != null){
+            switch (tag){
+                case GlobalContanstant.NOCHECK:
+                    method= NetUrl.getnoCheckTaskByPersonID;
+                    isVisiable = true;
+                    break;
+                case GlobalContanstant.NOPATROL:
+                    method= NetUrl.getnoPatrolTaskByPersonID;
+                    isVisiable = false;
+                    break;
+            }
+        }
+
         initData();
 
     }
@@ -117,7 +145,7 @@ public class NoCheckActivity extends AppCompatActivity {
 
     private String downData(int personId) throws Exception {
 
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getnoTaskByPersonID);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -132,12 +160,19 @@ public class NoCheckActivity extends AppCompatActivity {
         return result;
     }
 
-    private void initActionbar() {
+    public static void intent2Activity(Context context,Bundle bundle){
+        Intent intent = new Intent(context, NoPatrolActivity.class);
+        intent.putExtra("title",bundle.getString("title"));
+        intent.putExtra("tag",bundle.getString("tag"));
+        context.startActivity(intent);
+    }
+
+    private void initActionbar(String title) {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle("未排查任务");
+            actionBar.setTitle(title);
         }
     }
 

@@ -167,7 +167,7 @@
         <activity android:name="com.xytsz.xytaj.activity.ContingencyPlanShowActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MoringSignListActivity" />
         <activity android:name="com.xytsz.xytaj.activity.TrainTestDetailActivity" />
-        <activity android:name="com.xytsz.xytaj.activity.NoCheckActivity" />
+        <activity android:name=".activity.NoPatrolActivity" />
         <activity android:name="com.xytsz.xytaj.activity.SupMeetingActivity" />
         <activity android:name="com.xytsz.xytaj.activity.SupMeetingListActivity" />
         <activity android:name="com.xytsz.xytaj.activity.SupMeetingContentActivity" />
@@ -176,6 +176,10 @@
         <activity android:name="com.xytsz.xytaj.activity.MeetingSignActivity" />
         <activity android:name="com.xytsz.xytaj.activity.MemberCompanyShowActivity" />
         <activity android:name="com.xytsz.xytaj.activity.FacilityCategoryActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.CompanyListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ProduceDetailActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.ProduceListActivity" />
+
 
 
         <activity

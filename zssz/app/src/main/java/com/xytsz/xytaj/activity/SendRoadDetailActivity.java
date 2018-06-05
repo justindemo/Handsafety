@@ -771,7 +771,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private String createPhotoName() {
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String fileName = format.format(date) + ".jpg";
+        String fileName = format.format(date)  +".jpg";
         return fileName;
 
     }

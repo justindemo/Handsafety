@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xytsz.xytaj.R;
+import com.xytsz.xytaj.activity.MemberCompanyShowActivity;
+import com.xytsz.xytaj.adapter.FacilityCategroyAdapter;
 import com.xytsz.xytaj.base.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -59,6 +66,8 @@ public class FacilityCategroyFragment extends BaseFragment {
         return view;
     }
 
+    private List<String> contents = new ArrayList<>();
+
     @Override
     public void initData() {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
@@ -66,6 +75,27 @@ public class FacilityCategroyFragment extends BaseFragment {
         getData();
 
 
+        contents.clear();
+        contents.add("北京向阳天科技有限公司");
+        contents.add("重庆品智家居有限公司");
+        contents.add("科能文化有限公司");
+
+        FacilityCategroyAdapter facilityCategroyAdapter = new FacilityCategroyAdapter(contents);
+        facilityCategroyRv.setAdapter(facilityCategroyAdapter);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View headView = inflater.inflate(R.layout.pop_tv, facilityCategroyRv,false);
+        facilityCategroyAdapter.addHeaderView(headView);
+
+        facilityCategroyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(getContext(), MemberCompanyShowActivity.class);
+                intent.putExtra("companyName",contents.get(position));
+                intent.putExtra("Id",position);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -76,7 +106,7 @@ public class FacilityCategroyFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: inflate a fragment view
+
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         ButterKnife.bind(this, rootView);
         return rootView;

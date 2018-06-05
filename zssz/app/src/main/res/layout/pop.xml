@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:gravity="center"
+    android:background="@drawable/popupmap"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:padding="6dp"
+        android:id="@+id/tv_pop_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/popupmap"
-        android:orientation="horizontal"
         android:gravity="center"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="标题"
+        android:textSize="15sp" />
+    <Button
+        android:layout_margin="10dp"
+        android:id="@+id/bt_navi"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:background="@drawable/shape_btn_uncheck_press"
+        android:text="@string/deal_navi"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
 
-        >
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:text="标题"
-            android:textSize="20sp" />
 
-    </LinearLayout>
 </LinearLayout>

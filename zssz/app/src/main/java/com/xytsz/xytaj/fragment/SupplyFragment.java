@@ -1,9 +1,16 @@
 package com.xytsz.xytaj.fragment;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,7 +24,9 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.R;
+import com.xytsz.xytaj.activity.CompanyListActivity;
 import com.xytsz.xytaj.activity.FacilityCategoryActivity;
+import com.xytsz.xytaj.activity.MarkPositionActivity;
 import com.xytsz.xytaj.activity.MemberCompanyShowActivity;
 import com.xytsz.xytaj.adapter.SupplyCompanyAdapter;
 import com.xytsz.xytaj.base.BaseFragment;
@@ -25,8 +34,11 @@ import com.xytsz.xytaj.bean.Company;
 import com.xytsz.xytaj.bean.Scroller;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.ui.CustomDialog;
 import com.xytsz.xytaj.ui.ScrollViewPager;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.PermissionUtils;
+import com.xytsz.xytaj.util.ToastUtil;
 
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -79,6 +91,26 @@ public class SupplyFragment extends BaseFragment {
     private MyListener listener = new MyListener();
     private List<Scroller> scrollers;
     private List<Company> companies = new ArrayList<>();
+    private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
+        @Override
+        public void onPermissionGranted(int requestCode) {
+            switch (requestCode) {
+                case PermissionUtils.CODE_CALL_PHONE:
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:" + "4008652007"));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    break;
+
+            }
+        }
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionUtils.requestPermissionsResult(getActivity(),requestCode,permissions,grantResults,mPermissionGrant);
+    }
 
     @Override
     public View initView() {
@@ -92,7 +124,6 @@ public class SupplyFragment extends BaseFragment {
         mrlHealth.setOnClickListener(listener);
         mrlFire.setOnClickListener(listener);
         mrlEnvir.setOnClickListener(listener);
-
 
 
         return view;
@@ -127,11 +158,11 @@ public class SupplyFragment extends BaseFragment {
 
 
         mTitles.clear();
-        mTitles.add("向阳天");
-        mTitles.add("品质");
-        mTitles.add("分公司");
+        mTitles.add("北京向阳天科技有限公司");
+        mTitles.add("重庆巴南区品智家居");
+        mTitles.add("重庆卡尔玛商学院");
 
-        SupplyCompanyAdapter supplyCompanyAdapter = new SupplyCompanyAdapter(mTitles,getContext());
+        SupplyCompanyAdapter supplyCompanyAdapter = new SupplyCompanyAdapter(mTitles, getContext());
         supplyCompanyRv.setAdapter(supplyCompanyAdapter);
 //        supplyThridRv.setAdapter(supplyCompanyAdapter);
         mTitles.add("科能文化");
@@ -144,25 +175,28 @@ public class SupplyFragment extends BaseFragment {
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(getContext(), MemberCompanyShowActivity.class);
                 //传递Id；
+                intent.putExtra("companyName", mTitles.get(position));
+                intent.putExtra("Id", position);
                 startActivity(intent);
             }
         });
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case GlobalContanstant.MYSENDSUCCESS:
                     Bundle data = msg.getData();
                     String scroller = data.getString("scroller");
                     String company = data.getString("company");
                     String third = data.getString("third");
-                    if (scroller != null && company != null && third != null){
-                        if (!scroller.equals("[]")){
+                    if (scroller != null && company != null && third != null) {
+                        if (!scroller.equals("[]")) {
                             scrollers = JsonUtil.jsonToBean(scroller,
-                                    new TypeToken<List<Scroller>>() {}.getType());
+                                    new TypeToken<List<Scroller>>() {
+                                    }.getType());
                             initDot();
                             ScrollViewPager scrollViewPager = new ScrollViewPager(getActivity(), mllDots);
 //                            scrollViewPager.initImage(scrollers);
@@ -171,23 +205,25 @@ public class SupplyFragment extends BaseFragment {
                             supplyHeadVp.removeAllViews();
                             supplyHeadVp.addView(scrollViewPager);
                         }
-                        if (!company.equals("[]")){
+                        if (!company.equals("[]")) {
                             companies.clear();
                             companies = JsonUtil.jsonToBean(company,
-                                    new TypeToken<List<Company>>() {}.getType());
+                                    new TypeToken<List<Company>>() {
+                                    }.getType());
                             //bean 需要修改
-                            tvSupplyCompany.setText(10+"家");
+                            tvSupplyCompany.setText(10 + "家");
 //                            SupplyCompanyAdapter supplyCompanyAdapter = new SupplyCompanyAdapter(companies,getContext());
 
 //                            supplyCompanyRv.setAdapter(supplyCompanyAdapter);
                         }
 
-                        if (!third.equals("[]")){
+                        if (!third.equals("[]")) {
                             companies.clear();
                             companies = JsonUtil.jsonToBean(third,
-                                    new TypeToken<List<Company>>() {}.getType() );
+                                    new TypeToken<List<Company>>() {
+                                    }.getType());
 
-                            tvSupplyThird.setText(30+"家");
+                            tvSupplyThird.setText(30 + "家");
 //                            SupplyCompanyAdapter supplyCompanyAdapter = new SupplyCompanyAdapter(companies,getContext());
 
 //                            supplyThridRv.setAdapter(supplyCompanyAdapter);
@@ -201,20 +237,20 @@ public class SupplyFragment extends BaseFragment {
 
 
     private void getData() {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
                     String scrollerData = getServiceData(SCROLLER);
                     String companyData = getServiceData(COMPANY);
                     String thridData = getServiceData(THIRD);
-                    if (scrollerData != null && companyData != null && thridData != null){
+                    if (scrollerData != null && companyData != null && thridData != null) {
                         Message message = Message.obtain();
                         message.what = GlobalContanstant.MYSENDSUCCESS;
                         Bundle bundle = new Bundle();
-                        bundle.putString("scroller",scrollerData);
-                        bundle.putString("company",companyData);
-                        bundle.putString("third",thridData);
+                        bundle.putString("scroller", scrollerData);
+                        bundle.putString("company", companyData);
+                        bundle.putString("third", thridData);
                         message.setData(bundle);
                         handler.sendMessage(message);
                     }
@@ -225,9 +261,9 @@ public class SupplyFragment extends BaseFragment {
         }.start();
     }
 
-    private String getServiceData(int type) throws Exception{
-        String methodName ="";
-        switch (type){
+    private String getServiceData(int type) throws Exception {
+        String methodName = "";
+        switch (type) {
             case SCROLLER:
                 methodName = NetUrl.getScrollerData;
                 break;
@@ -280,7 +316,7 @@ public class SupplyFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: inflate a fragment view
+
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         ButterKnife.bind(this, rootView);
         return rootView;
@@ -292,31 +328,92 @@ public class SupplyFragment extends BaseFragment {
         ButterKnife.unbind(this);
     }
 
+    private CustomDialog customDialog = null;
+
     @OnClick({R.id.search_tv_supply, R.id.iv_sup_phone, R.id.iv_sup_wechat, R.id.iv_sup_qq,
-            R.id.iv_sup_address,R.id.tv_supply_company, R.id.tv_supply_third})
+            R.id.iv_sup_address, R.id.tv_supply_company, R.id.tv_supply_third})
     public void onViewClicked(View view) {
+
         switch (view.getId()) {
             case R.id.search_tv_supply:
                 //搜索界面
                 break;
             case R.id.iv_sup_phone:
                 //打电话
+                PermissionUtils.requestPermission(SupplyFragment.this.getActivity(), PermissionUtils.CODE_CALL_PHONE, mPermissionGrant);
+
                 break;
             case R.id.iv_sup_wechat:
                 //微信
+                customDialog = new CustomDialog(getActivity());
+                customDialog.setContentIcon(R.mipmap.iv_sup_wechat);
+                customDialog.setDetial("zzmxyt20070628");
+                customDialog.setLeftOnClick(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        customDialog.dismiss();
+                    }
+                }, "取消");
+                customDialog.setRightOnClick(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //复制
+                        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clipData = ClipData.newPlainText("wechat", "zzmxyt20070628");
+                        cm.setPrimaryClip(clipData);
+                        ToastUtil.shortToast(getContext(),"复制成功");
+                        customDialog.dismiss();
+                    }
+                }, "复制");
+                customDialog.show();
+
                 break;
             case R.id.iv_sup_qq:
                 //qq
+                customDialog = new CustomDialog(getActivity());
+                customDialog.setContentIcon(R.mipmap.iv_sup_qq);
+                customDialog.setDetial("772546099");
+                customDialog.setLeftOnClick(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        customDialog.dismiss();
+                    }
+                }, "取消");
+                customDialog.setRightOnClick(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //复制
+                        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clipData = ClipData.newPlainText("qq", "772546099");
+                        cm.setPrimaryClip(clipData);
+                        ToastUtil.shortToast(getContext(),"复制成功");
+                        customDialog.dismiss();
+                    }
+                }, "复制");
+                customDialog.show();
+
                 break;
             case R.id.iv_sup_address:
                 //地址
+                Bundle bundle = new Bundle();
+                bundle.putDouble("longitude",116.35607);
+                bundle.putDouble("latitude",39.768245);
+                bundle.putString("company","北京向阳天科技有限公司");
+
+                MarkPositionActivity.intent2MarkPosition(getActivity(),bundle);
+
                 break;
             case R.id.tv_supply_company:
                 //公司企业  200家
-
+                Intent intent = new Intent(getActivity(),CompanyListActivity.class);
+                intent.putExtra("tag","company");
+                startActivity(intent);
                 break;
             case R.id.tv_supply_third:
                 // 第三方
+                Intent intent1 = new Intent(getContext(),CompanyListActivity.class);
+                intent1.putExtra("tag","thrid");
+                startActivity(intent1);
                 break;
         }
     }
@@ -326,22 +423,22 @@ public class SupplyFragment extends BaseFragment {
         public void onClick(View v) {
 
             Intent intent = new Intent(getContext(), FacilityCategoryActivity.class);
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.rl_supply_boom:
                     //粉尘防爆
 
-                    intent.putExtra("category",GlobalContanstant.BOOM);
+                    intent.putExtra("category", GlobalContanstant.BOOM);
                     break;
                 case R.id.rl_supply_envir:
-                    intent.putExtra("category",GlobalContanstant.ENVIR);
+                    intent.putExtra("category", GlobalContanstant.ENVIR);
 //                    环境保护
                     break;
                 case R.id.rl_supply_fire:
-                    intent.putExtra("category",GlobalContanstant.FIRE);
+                    intent.putExtra("category", GlobalContanstant.FIRE);
 //                    消防安全
                     break;
                 case R.id.rl_supply_health:
-                    intent.putExtra("category",GlobalContanstant.HEALTH);
+                    intent.putExtra("category", GlobalContanstant.HEALTH);
 //                    职业卫生
                     break;
 

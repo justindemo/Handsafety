@@ -75,12 +75,13 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/lv_patrol_title"
             android:layout_marginTop="3dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="检查人一："
+                android:text="排查人一："
                 android:textSize="16sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -93,7 +94,7 @@
                 android:background="@drawable/shape_uncheck_information"
                 android:layout_height="wrap_content" />
             <TextView
-                android:text="检查人二："
+                android:text="排查人二："
                 android:textSize="16sp"
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="3dp"
@@ -107,7 +108,40 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-
+        <LinearLayout
+            android:id="@+id/lv_check_title"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="检查人一："
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_facility_checkperson1"
+                android:textSize="16sp"
+                android:layout_marginLeft="3dp"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_uncheck_information"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="检查人二："
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_facility_checkperson2"
+                android:textSize="16sp"
+                android:layout_marginLeft="3dp"
+                android:background="@drawable/shape_uncheck_information"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
 
     <View

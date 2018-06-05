@@ -7,6 +7,7 @@
     <color name="allbule">#72bcdf</color>
     <color name="textred">#e23751</color>
     <color name="white">#FFFFFF</color>
+    <color name="cc_offwhite">#f7eeee</color>
     <color name="graybackground">#e7e7e7</color>
     <color name="grayground">#f1eeee</color>
     <color name="gray">#464646</color>
@@ -36,6 +37,7 @@
     <color name="cc_text_blank">#ff4b4b4b</color>
     <color name="cc_text_dark">#414840</color>
     <color name="cc_text_darklight">#7b7b7b</color>
+    <color name="cc_company_bg">#BFBFBF</color>
 
     <!-- QRCode scanner color begin -->
     <color name="viewfinder_mask">#60000000</color>

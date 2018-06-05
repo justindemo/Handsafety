@@ -104,4 +104,6 @@ public class GlobalContanstant {
     public static final String FIRE = "fire";
     public static final String HEALTH = "health";
     public static final String ENVIR = "envir";
+    public static final String NOPATROL ="nopatrol";
+    public static final String NOCHECK = "nocheck";
 }

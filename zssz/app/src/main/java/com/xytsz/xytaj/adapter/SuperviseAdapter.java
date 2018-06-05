@@ -16,11 +16,14 @@ public class SuperviseAdapter extends BaseQuickAdapter<String> {
     private int[] mIcons = {R.mipmap.sup_moring,R.mipmap.sup_mytask,R.mipmap.train_insitution};
 
     private int number;
-    public SuperviseAdapter(List<String> data , int role,int number) {
+    public SuperviseAdapter(List<String> data ) {
         super(R.layout.item_more, data);
-        this.number = number;
+
     }
 
+    public void setNumber(int number){
+        this.number = number;
+    }
 
 
     @Override

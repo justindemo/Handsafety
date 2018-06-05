@@ -71,9 +71,6 @@
 
        -->
 
-
-
-
         <RadioButton
             android:id="@+id/homeactivity_rbtn_home"
             style="@style/HomeActivityRadioButtonStyle"

@@ -20,7 +20,7 @@ import java.util.List;
 public class SupplyCompanyAdapter extends BaseQuickAdapter<String> {
     private Context context;
 
-    private int[] mIcons = {R.mipmap.test1,R.mipmap.test2,R.mipmap.test3,R.mipmap.test1
+    private int[] mIcons = {R.mipmap.test1,R.mipmap.test2,R.mipmap.test2,R.mipmap.test1
             ,R.mipmap.test2,R.mipmap.test3};
 
 

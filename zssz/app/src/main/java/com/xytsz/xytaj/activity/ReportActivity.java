@@ -1515,7 +1515,8 @@ public class ReportActivity extends AppCompatActivity {
                     ToastUtil.shortToast(getApplicationContext(), imageerror);
                     mbtReport.setVisibility(View.VISIBLE);
                     mprogressbar.setVisibility(View.GONE);
-                    break;
+                    return;
+
 
                 case AUDIO_FAIL:
                     mbtReport.setVisibility(View.VISIBLE);

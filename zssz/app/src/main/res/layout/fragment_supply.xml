@@ -101,7 +101,7 @@
                     android:layout_height="30dp" />
 
                 <TextView
-                    android:text="粉尘防爆"
+                    android:text="环境保护"
                     android:textColor="@color/white"
                     android:layout_marginTop="10dp"
                     android:layout_below="@+id/iv_envir"
@@ -174,22 +174,25 @@
         <!--联系我们-->
 
         <LinearLayout
-            android:layout_margin="15dp"
+            android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
+                android:padding="6dp"
                 android:id="@+id/iv_sup_phone"
                 android:src="@mipmap/iv_sup_phone"
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content" />
             <ImageView
+                android:padding="6dp"
                 android:id="@+id/iv_sup_wechat"
                 android:src="@mipmap/iv_sup_wechat"
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content" />
             <ImageView
+                android:padding="6dp"
                 android:id="@+id/iv_sup_qq"
                 android:src="@mipmap/iv_sup_qq"
                 android:layout_width="wrap_content"
@@ -198,6 +201,7 @@
 
 
             <ImageView
+                android:padding="6dp"
                 android:id="@+id/iv_sup_address"
                 android:src="@mipmap/iv_sup_address"
                 android:layout_width="wrap_content"
@@ -247,7 +251,6 @@
                 android:layout_height="1dp"
                 android:background="@color/graybackground"/>
             <android.support.v7.widget.RecyclerView
-                android:padding="8dp"
                 android:layout_marginLeft="6dp"
                 android:id="@+id/supply_company_rv"
                 android:layout_width="match_parent"
@@ -298,7 +301,6 @@
                 android:layout_height="1dp"
                 android:background="@color/graybackground"/>
             <android.support.v7.widget.RecyclerView
-                android:padding="8dp"
                 android:layout_marginLeft="6dp"
                 android:id="@+id/supply_thrid_rv"
                 android:layout_width="match_parent"

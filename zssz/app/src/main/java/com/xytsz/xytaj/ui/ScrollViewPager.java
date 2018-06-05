@@ -253,9 +253,9 @@ public class ScrollViewPager extends ViewPager {
 
                 if (touchFlag == 0){
                     int currentItem = getCurrentItem();
-                    ToastUtil.shortToast(context,"点击了");
                     Intent intent = new Intent(context,MemberCompanyShowActivity.class);
-//                    intent.putExtra("tag", scrollers.get(currentItem).getID());
+                    intent.putExtra("id", currentItem);
+                    intent.putExtra("companyName", "公司名称");
                     context.startActivity(intent);
                 }
                 break;
