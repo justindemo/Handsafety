@@ -22,11 +22,13 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -108,14 +110,18 @@ public class PatrolListActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     /**
      * 初始化数据
      */
     private void initData() {
         //获取人员Id
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
 
+        headerList.add(headerPropertyObj);
         getData();
     }
 
@@ -156,7 +162,7 @@ public class PatrolListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

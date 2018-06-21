@@ -25,11 +25,13 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -37,8 +39,8 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/5/9.
- * <p>
- * <p>
+ * <p/>
+ * <p/>
  * 列表
  */
 public class SupMeetingListActivity extends AppCompatActivity {
@@ -50,19 +52,21 @@ public class SupMeetingListActivity extends AppCompatActivity {
     private int tag;
     private int personId;
     private String title;
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
+
+
                 case GlobalContanstant.MYSENDSUCCESS:
                     supmeetingProgressbar.setVisibility(View.GONE);
                     String json = (String) msg.obj;
-                    if (json != null && !json.equals("[]")){
+                    if (json != null && !json.equals("[]")) {
                         supMeetings = JsonUtil.jsonToBean(json, new TypeToken<List<SupMeeting>>() {
-                           }.getType());
+                        }.getType());
 
-                        if (supMeetings.size()!= 0){
+                        if (supMeetings.size() != 0) {
                             LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
                             supmeetingRv.setLayoutManager(manager);
                             SupMeetingShowAdapter supMeetingShowAdapter = new SupMeetingShowAdapter(supMeetings);
@@ -70,21 +74,22 @@ public class SupMeetingListActivity extends AppCompatActivity {
                             supMeetingShowAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                                 @Override
                                 public void onItemClick(View view, int position) {
-                                    switch (tag){
+                                    switch (tag) {
                                         //传递哪一场培训，
                                         //传递环节
                                         //跳转到指定界面
                                         case 0:
-                                            intent2show(position, supMeetings,SupMeetingContentActivity.class,false);
+                                            intent2show(position, supMeetings, SupMeetingContentActivity.class, false);
 
                                             break;
                                         case 1:
-//                                             培训签到
-                                            intent2show(position, supMeetings,MeetingSignActivity.class,true);
+//                                             签到
+                                            intent2show(position, supMeetings, MeetingSignActivity.class, true);
+
                                             break;
                                         case 2:
 //                                            培训照片
-                                            intent2show(position, supMeetings,TrainPhotoActivity.class,true);
+                                            intent2show(position, supMeetings, TrainPhotoActivity.class, true);
                                             break;
 
                                     }
@@ -92,31 +97,32 @@ public class SupMeetingListActivity extends AppCompatActivity {
 
 
                             });
-                        }else {
-                            ToastUtil.shortToast(getApplicationContext(),"当前没有会议");
+                        } else {
+                            ToastUtil.shortToast(getApplicationContext(), "当前没有会议");
                         }
-                    }else {
-                        ToastUtil.shortToast(getApplicationContext(),"当前没有会议");
+                    } else {
+                        ToastUtil.shortToast(getApplicationContext(), "当前没有会议");
                     }
 
                     break;
                 case GlobalContanstant.FAIL:
                     supmeetingProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"数据未获取");
+                    ToastUtil.shortToast(getApplicationContext(), "数据未获取");
                     break;
             }
         }
     };
 
-    private void intent2show(int position, List<SupMeeting> supMeetings, Class<?> activity,boolean b) {
 
-        Intent intent = new Intent(SupMeetingListActivity.this,activity);
-        if (b){
+    private void intent2show(int position, List<SupMeeting> supMeetings, Class<?> activity, boolean b) {
+
+        Intent intent = new Intent(SupMeetingListActivity.this, activity);
+        if (b) {
             intent.putExtra("tag", "meetingsign");
             //传递哪一场培训
-            intent.putExtra("trainId",supMeetings.get(position).getMeetId());
-        }else {
-            intent.putExtra("url",supMeetings.get(position).getUrl());
+            intent.putExtra("trainId", supMeetings.get(position).getMeetId());
+        } else {
+            intent.putExtra("url", supMeetings.get(position).getUrl());
         }
 
         startActivity(intent);
@@ -171,11 +177,15 @@ public class SupMeetingListActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private void initData() {
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
 
+        headerList.add(headerPropertyObj);
         supmeetingProgressbar.setVisibility(View.VISIBLE);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -195,7 +205,7 @@ public class SupMeetingListActivity extends AppCompatActivity {
 
     }
 
-    private String getData()throws Exception{
+    private String getData() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getsupMeetingList);
         soapObject.addProperty("personId", personId);
 
@@ -205,7 +215,7 @@ public class SupMeetingListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

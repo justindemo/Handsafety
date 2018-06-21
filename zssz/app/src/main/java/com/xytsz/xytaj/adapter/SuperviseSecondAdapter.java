@@ -20,19 +20,21 @@ public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
     private int nopatorlNumber;
     private int meetingNumber;
     private List<String> data;
+    private int role;
 
-    public SuperviseSecondAdapter( List<String> data) {
+    public SuperviseSecondAdapter( List<String> data,int role) {
         super(R.layout.item_more, data);
 
         this.data = data;
+        this.role = role;
     }
 
     public void setNumber(List<Integer> numbers){
-        if (numbers != null&& numbers.size() != 0 && numbers.size() ==3){
+        if (numbers != null&& numbers.size() != 0 && numbers.size() ==4){
             this.number = numbers.get(0);
             this.nopatorlNumber = numbers.get(1);
             this.meetingNumber= numbers.get(2);
-//            this.nocheckNumber= numbers.get(3);
+            this.nocheckNumber= numbers.get(3);
         }
 
     }
@@ -41,29 +43,34 @@ public class SuperviseSecondAdapter extends BaseQuickAdapter<String> {
     protected void convert(BaseViewHolder helper, String item) {
         helper.setText(R.id.more_tv,item);
         int layoutPosition = helper.getLayoutPosition();
-        if (layoutPosition == 0){
-            if (number != 0){
-                helper.setVisible(R.id.tv_mytask_number,true);
-                helper.setText(R.id.tv_mytask_number,number+"");
+        if (layoutPosition == 0) {
+            if (number != 0) {
+                helper.setVisible(R.id.tv_mytask_number, true);
+                helper.setText(R.id.tv_mytask_number, number + "");
             }
 
         }
-        if (layoutPosition == 2){
-            if (nopatorlNumber != 0){
-                helper.setVisible(R.id.tv_mytask_number,true);
-                helper.setText(R.id.tv_mytask_number,nopatorlNumber+"");
+
+        if (layoutPosition == 3) {
+            if (meetingNumber != 0) {
+                helper.setVisible(R.id.tv_mytask_number, true);
+                helper.setText(R.id.tv_mytask_number, meetingNumber + "");
             }
         }
-        if (layoutPosition == 3){
-            if (meetingNumber != 0){
-                helper.setVisible(R.id.tv_mytask_number,true);
-                helper.setText(R.id.tv_mytask_number,meetingNumber+"");
+        if (role != 1) {
+
+            if (layoutPosition == 2) {
+                if (nopatorlNumber != 0) {
+                    helper.setVisible(R.id.tv_mytask_number, true);
+                    helper.setText(R.id.tv_mytask_number, nopatorlNumber + "");
+                }
             }
-        }
-        if (layoutPosition == 4){
-            if (nocheckNumber != 0){
-                helper.setVisible(R.id.tv_mytask_number,true);
-                helper.setText(R.id.tv_mytask_number,nocheckNumber+"");
+
+            if (layoutPosition == 4) {
+                if (nocheckNumber != 0) {
+                    helper.setVisible(R.id.tv_mytask_number, true);
+                    helper.setText(R.id.tv_mytask_number, nocheckNumber + "");
+                }
             }
         }
         helper.setImageResource(R.id.more_icon,mIcons[layoutPosition]);

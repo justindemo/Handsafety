@@ -186,16 +186,6 @@
             android:name="com.google.zxing.activity.CaptureActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
-        <activity
-            android:name="com.xytsz.xytaj.activity.RecordVideoActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name="com.xytsz.xytaj.activity.PlayVideoActivity" />
-
-
-        <activity
-            android:name="com.xytsz.xytaj.activity.SearchRoadActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
 
         <activity
             android:name="com.xytsz.xytaj.activity.GuideActivity"
@@ -206,7 +196,6 @@
         <activity
             android:name="com.xytsz.xytaj.activity.SendBigPhotoActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name="com.xytsz.xytaj.activity.PostBigPhotoActivity" />
 
         <activity
             android:name="com.xytsz.xytaj.activity.CheckPostBigPhotoActivity"
@@ -215,18 +204,6 @@
             android:name="com.xytsz.xytaj.activity.CheckReportBigPhotoActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-
-
-
-
-        <!-- alipay sdk begin -->
-        <activity
-            android:name="com.alipay.sdk.app.H5PayActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
-            android:exported="false"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
-        <!-- alipay sdk end -->
 
 
         <!--配置shareSDk 需要的activity-->
@@ -253,13 +230,13 @@
             </intent-filter>
 
             <!--集成line客户端登录授权，需要添如下格式的过滤器-->
-            <intent-filter>
+           <!-- <intent-filter>
                 <data android:scheme="line.1477692153" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            </intent-filter>-->
 
         </activity>
 

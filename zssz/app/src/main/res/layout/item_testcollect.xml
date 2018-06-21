@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tv_testcollect_name"
-        android:text="唐浩"
+        android:text=""
         android:background="@drawable/shape_interval"
         android:padding="6dp"
         android:gravity="center"

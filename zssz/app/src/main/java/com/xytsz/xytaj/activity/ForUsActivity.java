@@ -14,11 +14,16 @@ import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.ApkUtils;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -84,6 +89,7 @@ public class ForUsActivity extends AppCompatActivity {
         }.start();
     }
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private String getCodeUrl() throws Exception{
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getImageCode);
 
@@ -93,7 +99,14 @@ public class ForUsActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        //添加cookie
+//
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String json = object.getProperty(0).toString();

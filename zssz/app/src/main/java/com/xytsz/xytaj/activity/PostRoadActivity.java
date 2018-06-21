@@ -24,6 +24,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
@@ -55,6 +56,7 @@ public class PostRoadActivity extends AppCompatActivity {
         }
     };
     private List<Review> list;
+    public static HeaderProperty headerPropertyObj;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +77,9 @@ public class PostRoadActivity extends AppCompatActivity {
     private List<AudioUrl> audioUrls = new ArrayList<>();
 
     private void initData() {
-
+        headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+        headerList.clear();
+        headerList.add(headerPropertyObj);
         mProgressBar.setVisibility(View.VISIBLE);
 
         new Thread() {
@@ -98,7 +102,7 @@ public class PostRoadActivity extends AppCompatActivity {
                             /**
                              * 获取到图片的URl
                              */
-                            String json = MyApplication.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW);
+                            String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
 
                             if (json != null) {
 
@@ -108,7 +112,7 @@ public class PostRoadActivity extends AppCompatActivity {
                                 imageUrlLists.add(imageUrlList);
                             }
 
-                            String audioUrljson = RoadActivity.getAudio(taskNumber);
+                            String audioUrljson = RoadActivity.getAudio(taskNumber,headerList);
 
                             if (audioUrljson != null) {
                                 AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
@@ -137,8 +141,11 @@ public class PostRoadActivity extends AppCompatActivity {
 
     }
 
+    public static List<HeaderProperty> headerList = new ArrayList<>();
+
 
     public static String getDealData(String methodName, int personID) throws Exception {
+
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, methodName);
         soapObject.addProperty("personId", personID);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
@@ -147,7 +154,9 @@ public class PostRoadActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getManagementList_SOAP_ACTION, envelope);
+        //添加cookie
+
+        httpTransportSE.call(NetUrl.getManagementList_SOAP_ACTION, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String json = object.getProperty(0).toString();

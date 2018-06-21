@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="6dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:src="@mipmap/test7"
+    <com.xytsz.xytaj.ui.RoundImageView
+        app:type="round"
         android:scaleType="fitXY"
         android:id="@+id/iv_producedetail"
-        android:layout_width="wrap_content"
-        android:layout_height="260dp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:padding="10dp"
-        android:text="描述描述描述"
-        android:gravity="center"
+        android:gravity="center_vertical"
+        android:lineSpacingMultiplier="1.5"
         android:id="@+id/tv_producedetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

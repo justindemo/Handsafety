@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
  * Created by admin on 2018/4/23.
  * <p>
  * <p>
- * 网页端的展示 培训环节
+ * 网页端的展示
  */
 public class TrainTestDetailActivity extends AppCompatActivity {
 

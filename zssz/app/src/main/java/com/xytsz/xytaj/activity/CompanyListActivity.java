@@ -2,8 +2,6 @@ package com.xytsz.xytaj.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,30 +9,30 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.xytsz.xytaj.R;
-import com.xytsz.xytaj.adapter.CompanyListAdapter;
 import com.xytsz.xytaj.adapter.FacilityCategroyAdapter;
-import com.xytsz.xytaj.bean.Company;
 import com.xytsz.xytaj.bean.CompanyList;
+import com.xytsz.xytaj.bean.CompanyListCallback;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
-import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.net.UrlUtils;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
-
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
+import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import okhttp3.Call;
 
 /**
  * Created by admin on 2018/5/30.
@@ -44,34 +42,15 @@ public class CompanyListActivity extends AppCompatActivity {
 
     @Bind(R.id.companylist_rv)
     RecyclerView companylistRv;
-    @Bind(R.id.companylist_progressbar)
-    LinearLayout companylistProgressbar;
+    @Bind(R.id.refreshLayout)
+    SmartRefreshLayout refreshLayout;
+
     private String tag;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case GlobalContanstant.FAIL:
-                    ToastUtil.shortToast(getApplicationContext(), "数据未加载");
-                    break;
-                case GlobalContanstant.MYSENDSUCCESS:
-                    String result = (String) msg.obj;
-                    if (result != null && !result.equals("[]")) {
-                        List<CompanyList> companyLists = JsonUtil.jsonToBean(result,
-                                new TypeToken<List<CompanyList>>() {
-                                }.getType());
 
-                        CompanyListAdapter companyListAdapter = new CompanyListAdapter(companyLists);
-                        companylistRv.setAdapter(companyListAdapter);
-
-
-                    }
-                    break;
-
-            }
-        }
-    };
+    private int companycategroy;
+    private List<CompanyList.DataBean> data;
+    private List<CompanyList.DataBean> allData = new ArrayList<>();
+    private int personId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,86 +60,107 @@ public class CompanyListActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_companylist);
         ButterKnife.bind(this);
+        personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         if (tag != null) {
             switch (tag) {
                 case "company":
                     title = "企业会员";
+                    companycategroy = 1;
                     break;
                 case "thrid":
                     title = "第三方服务";
+                    companycategroy = 2;
                     break;
             }
         }
         initActionBar();
         initView();
-        //initData();
+
     }
 
-    private List<String> contents = new ArrayList<>();
 
     private void initView() {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         companylistRv.setLayoutManager(manager);
-        contents.clear();
-        contents.add("北京向阳天科技有限公司");
-        contents.add("重庆品智家居有限公司");
-        contents.add("科能文化有限公司");
+        getCompanyList();
 
-        FacilityCategroyAdapter facilityCategroyAdapter = new FacilityCategroyAdapter(contents);
-        companylistRv.setAdapter(facilityCategroyAdapter);
-
-        LayoutInflater inflater = CompanyListActivity.this.getLayoutInflater();
-        View headView = inflater.inflate(R.layout.pop_tv, companylistRv,false);
-        facilityCategroyAdapter.addHeaderView(headView);
-
-        facilityCategroyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                Intent intent = new Intent(CompanyListActivity.this, MemberCompanyShowActivity.class);
-                intent.putExtra("companyName",contents.get(position));
-                intent.putExtra("Id",position);
-                startActivity(intent);
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                ++pageNo ;
+               getCompanyList();
+
             }
         });
+
     }
 
-    private void initData() {
-        companylistProgressbar.setVisibility(View.VISIBLE);
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String data = getData();
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.MYSENDSUCCESS;
-                    message.obj = data;
-                    handler.sendMessage(message);
-                } catch (Exception e) {
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.FAIL;
-                    handler.sendMessage(message);
-                }
+    private Map<String, Integer> params = new HashMap<>();
+    private int pageNo = 1;
 
-            }
-        }.start();
-    }
-
-    private String getData() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getConpanyList);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        String result = object.getProperty(0).toString();
+    private FacilityCategroyAdapter facilityCategroyAdapter;
 
 
-        return result;
+    private void getCompanyList() {
+        String url = NetUrl.SERVERURL2 + NetUrl.getCompanyData;
+        params.clear();
+        params.put("pageSize",6);
+        params.put("pageNo", pageNo);
+        params.put("companyClass", companycategroy);
+        params.put("topIndex", -1);
+
+        params.put("AJPersonID", personId);
+        String spliceGetUrl = UrlUtils.spliceGetUrl(url, params);
+        OkHttpUtils
+                .get()
+                .url(spliceGetUrl)
+                .build()
+                .execute(new CompanyListCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        refreshLayout.finishLoadMore(false);
+                        ToastUtil.shortToast(getApplicationContext(), "未加载");
+                    }
+
+                    @Override
+                    public void onResponse(CompanyList response, int id) {
+                        refreshLayout.finishLoadMore(2000);
+                        if (response != null) {
+                            data = response.getData();
+                            if (data.size() == 0 && pageNo == 1){
+                                ToastUtil.shortToast(getApplicationContext(),"没有入驻");
+                            }else {
+                                allData.addAll(data);
+                                if (pageNo == 1) {
+                                    facilityCategroyAdapter = new FacilityCategroyAdapter(allData, CompanyListActivity.this);
+                                    companylistRv.setAdapter(facilityCategroyAdapter);
+                                    LayoutInflater inflater = CompanyListActivity.this.getLayoutInflater();
+                                    View headView = inflater.inflate(R.layout.pop_tv, companylistRv, false);
+                                    facilityCategroyAdapter.addHeaderView(headView);
+
+
+                                }else {
+                                    facilityCategroyAdapter.addData(data);
+                                }
+
+                                facilityCategroyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                                    @Override
+                                    public void onItemClick(View view, int position) {
+                                        Intent intent = new Intent(CompanyListActivity.this, MemberCompanyShowActivity.class);
+                                        //传递Id；
+                                        intent.putExtra("companyName", allData.get(position).getCompanyName());
+                                        intent.putExtra("companyDetail", allData.get(position));
+                                        intent.putExtra("companyID", allData.get(position).getID());
+                                        startActivity(intent);
+                                    }
+                                });
+                            }
+                        }else {
+                            ToastUtil.shortToast(getApplicationContext(),"response =null");
+                        }
+                    }
+                });
     }
 
     private String title;

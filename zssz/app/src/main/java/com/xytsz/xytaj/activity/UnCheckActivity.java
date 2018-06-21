@@ -20,6 +20,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -43,6 +44,7 @@ import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
 import org.kobjects.base64.Base64;
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -113,6 +115,115 @@ public class UnCheckActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
+
+                case GlobalContanstant.UnImg:
+                    Bundle data = msg.getData();
+                    String predealJson = data.getString("predealJson");
+                    String dealingJson = data.getString("dealingJson");
+                    //如果有值 先赋值  不能点击
+                    if (predealJson != null && !TextUtils.equals(dealingJson,GlobalContanstant.NoLogin)) {
+                        List<ImageUrl> imageUrlList = JsonUtil.jsonToBean(predealJson,
+                                new TypeToken<List<ImageUrl>>() {}.getType());
+
+                        switch (imageUrlList.size()) {
+                            //如果没有处置前的图片 都不能点击
+                            case 0:
+                                btUncheckDealing.setEnabled(false);
+                                btUncheckPredeal.setEnabled(false);
+                                btUncheckDealed.setEnabled(false);
+                                break;
+                            //有图片的的时候  处置中和处置后的不能点
+                            case 1:
+                                isPostFirst = true;
+                                btUncheckDealed.setEnabled(false);
+                                btUncheckPredeal.setVisibility(View.INVISIBLE);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
+                                ivPredealIcon1.setEnabled(false);
+                                ivPredealIcon2.setVisibility(View.INVISIBLE);
+                                ivPredealIcon3.setVisibility(View.INVISIBLE);
+                                break;
+                            case 2:
+                                isPostFirst = true;
+                                btUncheckDealed.setFocusable(false);
+                                btUncheckPredeal.setVisibility(View.INVISIBLE);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(1).getImgurl()).into(ivPredealIcon2);
+                                ivPredealIcon1.setEnabled(false);
+                                ivPredealIcon2.setEnabled(false);
+                                ivPredealIcon3.setEnabled(false);
+                                ivPredealIcon3.setVisibility(View.INVISIBLE);
+                                break;
+                            case 3:
+                                isPostFirst = true;
+                                btUncheckDealed.setEnabled(false);
+                                btUncheckPredeal.setVisibility(View.INVISIBLE);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(1).getImgurl()).into(ivPredealIcon2);
+                                Glide.with(getApplicationContext()).load(imageUrlList.get(2).getImgurl()).into(ivPredealIcon3);
+                                ivPredealIcon1.setEnabled(false);
+                                ivPredealIcon2.setEnabled(false);
+                                ivPredealIcon3.setEnabled(false);
+                                break;
+                        }
+
+
+                    }
+
+                    //如果有值 先赋值  不能点击
+                    if (dealingJson != null && !TextUtils.equals(dealingJson,GlobalContanstant.NoLogin)) {
+                        List<ImageUrl> imageIngUrlList = JsonUtil.jsonToBean(dealingJson,
+                                new TypeToken<List<ImageUrl>>() {}.getType());
+                        switch (imageIngUrlList.size()) {
+                            case 0:
+                                btUncheckDealing.setEnabled(false);
+                                btUncheckDealed.setEnabled(false);
+                                break;
+                            case 1:
+                                btUncheckDealing.setVisibility(View.INVISIBLE);
+                                btUncheckDealed.setEnabled(false);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
+                                ivDealingIcon1.setEnabled(false);
+                                ivDealingIcon2.setVisibility(View.INVISIBLE);
+                                ivDealingIcon2.setEnabled(false);
+                                ivDealingIcon3.setVisibility(View.INVISIBLE);
+                                ivDealingIcon3.setEnabled(false);
+                                isPostFirst = true;
+                                isPostSecond = true;
+                                break;
+                            case 2:
+                                isPostFirst = true;
+                                isPostSecond = true;
+                                btUncheckDealing.setVisibility(View.INVISIBLE);
+                                btUncheckDealed.setEnabled(false);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(1).getImgurl()).into(ivDealingIcon2);
+                                ivDealingIcon1.setEnabled(false);
+                                ivDealingIcon2.setEnabled(false);
+                                ivDealingIcon3.setVisibility(View.INVISIBLE);
+                                ivDealingIcon3.setEnabled(false);
+
+                                break;
+                            case 3:
+                                isPostFirst = true;
+                                isPostSecond = true;
+                                btUncheckDealing.setVisibility(View.INVISIBLE);
+                                btUncheckDealed.setEnabled(false);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(1).getImgurl()).into(ivDealingIcon2);
+                                Glide.with(getApplicationContext()).load(imageIngUrlList.get(2).getImgurl()).into(ivDealingIcon3);
+                                ivDealingIcon1.setEnabled(false);
+                                ivDealingIcon2.setEnabled(false);
+                                ivDealingIcon3.setEnabled(false);
+                                break;
+                        }
+
+
+                    }
+
+
+                    break;
+
+
                 case GlobalContanstant.CHECKFAIL:
                     ToastUtil.shortToast(getApplicationContext(), "上传失败");
                     uncheckProgressbar.setVisibility(View.GONE);
@@ -255,15 +366,28 @@ public class UnCheckActivity extends AppCompatActivity {
         initData();
     }
 
-    private String[] items = new String[]{"拍照", "照片"};
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     private void initData() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
 
         diseaseInformation = new DiseaseInformation();
         //进入页面 开启线程 去请求网络是否有处置前 和处置中照片
         taskNumber = reviewRoadDetail.getDeciceCheckNum();
 
 
+        getInitData();
+
+
+    }
+
+    private void getInitData() {
         new Thread() {
             @Override
             public void run() {
@@ -272,126 +396,17 @@ public class UnCheckActivity extends AppCompatActivity {
                 try {
                     //根据taskNumber 获取url
                     String preDealJson = getPreImgUrl(taskNumber);
-
-                    //如果有值 先赋值  不能点击
-                    if (preDealJson != null) {
-                        final List<ImageUrl> imageUrlList = JsonUtil.jsonToBean(preDealJson,
-                                new TypeToken<List<ImageUrl>>() {
-                                }.getType());
-
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                switch (imageUrlList.size()) {
-                                    //如果没有处置前的图片 都不能点击
-
-                                    case 0:
-                                        btUncheckDealing.setEnabled(false);
-                                        btUncheckPredeal.setEnabled(false);
-                                        btUncheckDealed.setEnabled(false);
-                                        break;
-                                    //有图片的的时候  处置中和处置后的不能点
-                                    case 1:
-                                        isPostFirst = true;
-                                        btUncheckDealed.setEnabled(false);
-                                        btUncheckPredeal.setVisibility(View.INVISIBLE);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
-                                        ivPredealIcon1.setEnabled(false);
-                                        ivPredealIcon2.setVisibility(View.INVISIBLE);
-                                        ivPredealIcon3.setVisibility(View.INVISIBLE);
-                                        break;
-                                    case 2:
-                                        isPostFirst = true;
-                                        btUncheckDealed.setFocusable(false);
-                                        btUncheckPredeal.setVisibility(View.INVISIBLE);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(1).getImgurl()).into(ivPredealIcon2);
-                                        ivPredealIcon1.setEnabled(false);
-                                        ivPredealIcon2.setEnabled(false);
-                                        ivPredealIcon3.setEnabled(false);
-                                        ivPredealIcon3.setVisibility(View.INVISIBLE);
-                                        break;
-                                    case 3:
-                                        isPostFirst = true;
-                                        btUncheckDealed.setEnabled(false);
-                                        btUncheckPredeal.setVisibility(View.INVISIBLE);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(0).getImgurl()).into(ivPredealIcon1);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(1).getImgurl()).into(ivPredealIcon2);
-                                        Glide.with(getApplicationContext()).load(imageUrlList.get(2).getImgurl()).into(ivPredealIcon3);
-                                        ivPredealIcon1.setEnabled(false);
-                                        ivPredealIcon2.setEnabled(false);
-                                        ivPredealIcon3.setEnabled(false);
-                                        break;
-                                }
-
-
-                            }
-                        });
-
-
-                    }
-
-
                     //处置中
-                    final String dealingJson = getRngImgUrl(taskNumber);
-                    //如果有值 先赋值  不能点击
-                    if (dealingJson != null) {
-                        final List<ImageUrl> imageIngUrlList = JsonUtil.jsonToBean(dealingJson, new TypeToken<List<ImageUrl>>() {
-                        }.getType());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
+                    String dealingJson = getRngImgUrl(taskNumber);
 
-                                switch (imageIngUrlList.size()) {
-                                    case 0:
-                                        btUncheckDealing.setEnabled(false);
-                                        btUncheckDealed.setEnabled(false);
-                                        break;
-                                    case 1:
-                                        btUncheckDealing.setVisibility(View.INVISIBLE);
-                                        btUncheckDealed.setEnabled(false);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
-                                        ivDealingIcon1.setEnabled(false);
-                                        ivDealingIcon2.setVisibility(View.INVISIBLE);
-                                        ivDealingIcon2.setEnabled(false);
-                                        ivDealingIcon3.setVisibility(View.INVISIBLE);
-                                        ivDealingIcon3.setEnabled(false);
-                                        isPostFirst = true;
-                                        isPostSecond = true;
-                                        break;
-                                    case 2:
-                                        isPostFirst = true;
-                                        isPostSecond = true;
-                                        btUncheckDealing.setVisibility(View.INVISIBLE);
-                                        btUncheckDealed.setEnabled(false);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(1).getImgurl()).into(ivDealingIcon2);
-                                        ivDealingIcon1.setEnabled(false);
-                                        ivDealingIcon2.setEnabled(false);
-                                        ivDealingIcon3.setVisibility(View.INVISIBLE);
-                                        ivDealingIcon3.setEnabled(false);
-
-                                        break;
-                                    case 3:
-                                        isPostFirst = true;
-                                        isPostSecond = true;
-                                        btUncheckDealing.setVisibility(View.INVISIBLE);
-                                        btUncheckDealed.setEnabled(false);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(0).getImgurl()).into(ivDealingIcon1);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(1).getImgurl()).into(ivDealingIcon2);
-                                        Glide.with(getApplicationContext()).load(imageIngUrlList.get(2).getImgurl()).into(ivDealingIcon3);
-                                        ivDealingIcon1.setEnabled(false);
-                                        ivDealingIcon2.setEnabled(false);
-                                        ivDealingIcon3.setEnabled(false);
-                                        break;
-                                }
-
-                            }
-                        });
-
-
+                    if (preDealJson != null || dealingJson != null) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("predealJson", preDealJson);
+                        bundle.putString("dealingJson", dealingJson);
+                        Message message = Message.obtain();
+                        message.what = GlobalContanstant.UnImg;
+                        message.setData(bundle);
+                        handler.sendMessage(message);
                     }
                 } catch (Exception e) {
                     Message message = Message.obtain();
@@ -402,8 +417,6 @@ public class UnCheckActivity extends AppCompatActivity {
 
             }
         }.start();
-
-
     }
 
     /**
@@ -421,7 +434,7 @@ public class UnCheckActivity extends AppCompatActivity {
         envelope.bodyOut = soapobject;
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getPreImageURLSoap_Action, envelope);
+        httpTransportSE.call(NetUrl.getPreImageURLSoap_Action, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
@@ -445,7 +458,7 @@ public class UnCheckActivity extends AppCompatActivity {
         envelope.bodyOut = soapobject;
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getRngImageURLSoap_Action, envelope);
+        httpTransportSE.call(NetUrl.getRngImageURLSoap_Action, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
@@ -472,7 +485,7 @@ public class UnCheckActivity extends AppCompatActivity {
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String isphotoSuccess = object.getProperty(0).toString();
@@ -482,12 +495,11 @@ public class UnCheckActivity extends AppCompatActivity {
     /**
      * 给拍的照片命名
      */
-    public String createPhotoName() {
+    public String createPhotoName(int position) {
         //以系统的当前时间给图片命名
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String fileName = format.format(date)  + ".jpg";
-        return fileName;
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA);
+        return format.format(date) + "_" + position + "_" + personID + ".jpg";
     }
 
 
@@ -507,7 +519,7 @@ public class UnCheckActivity extends AppCompatActivity {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -518,9 +530,9 @@ public class UnCheckActivity extends AppCompatActivity {
     private DiseaseInformation diseaseInformation;
     private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/UncheckImage/";//图片的存储目录
 
-    public String saveToSDCard(Bitmap bitmap) {
+    public String saveToSDCard(Bitmap bitmap, int position) {
         //先要判断SD卡是否存在并且挂载
-        String photoName = createPhotoName();
+        String photoName = createPhotoName(position);
         path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             try {
@@ -618,7 +630,6 @@ public class UnCheckActivity extends AppCompatActivity {
     };
 
 
-
     @OnClick({R.id.iv_predeal_icon1, R.id.iv_predeal_icon2, R.id.iv_predeal_icon3, R.id.bt_uncheck_predeal, R.id.iv_dealing_icon1, R.id.iv_dealing_icon2, R.id.iv_dealing_icon3, R.id.bt_uncheck_dealing, R.id.iv_dealed_icon1, R.id.iv_dealed_icon2, R.id.iv_dealed_icon3, R.id.bt_uncheck_dealed})
     public void onClick(View view) {
 
@@ -631,9 +642,9 @@ public class UnCheckActivity extends AppCompatActivity {
                 intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent1, 9001);*/
 
-                PermissionUtils.requestPermission(UnCheckActivity.this,PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE,
+                PermissionUtils.requestPermission(UnCheckActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE,
                         mPermissionGrant);
-                PermissionUtils.requestPermission(UnCheckActivity.this,PermissionUtils.CODE_CAMERA,
+                PermissionUtils.requestPermission(UnCheckActivity.this, PermissionUtils.CODE_CAMERA,
                         mPermissionGrant);
                 break;
             case R.id.iv_predeal_icon2:
@@ -821,7 +832,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivPredealIcon1.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 1);
                     //将选择的图片设置到控件上
                     ivPredealIcon1.setClickable(false);
                     encode = photo2Base64(path);
@@ -842,7 +853,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivPredealIcon2.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 2);
                     //将选择的图片设置到控件上
                     ivPredealIcon2.setClickable(false);
                     encode = photo2Base64(path);
@@ -862,7 +873,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivPredealIcon3.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 3);
                     //将选择的图片设置到控件上
                     ivPredealIcon3.setClickable(false);
                     encode = photo2Base64(path);
@@ -883,7 +894,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealingIcon1.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 4);
                     //将选择的图片设置到控件上
                     ivDealingIcon1.setClickable(false);
                     encode = photo2Base64(path);
@@ -904,7 +915,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealingIcon2.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 5);
                     //将选择的图片设置到控件上
                     ivDealingIcon2.setClickable(false);
                     encode = photo2Base64(path);
@@ -926,7 +937,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealingIcon3.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 6);
                     //将选择的图片设置到控件上
                     ivDealingIcon3.setClickable(false);
                     encode = photo2Base64(path);
@@ -946,7 +957,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealedIcon1.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 7);
                     //将选择的图片设置到控件上
                     ivDealedIcon1.setClickable(false);
                     encode = photo2Base64(path);
@@ -968,7 +979,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealedIcon2.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 8);
                     //将选择的图片设置到控件上
                     ivDealedIcon2.setClickable(false);
                     encode = photo2Base64(path);
@@ -990,7 +1001,7 @@ public class UnCheckActivity extends AppCompatActivity {
                         return;
                     }
                     ivDealedIcon3.setImageBitmap(bitmap);
-                    fileName = saveToSDCard(bitmap);
+                    fileName = saveToSDCard(bitmap, 9);
                     //将选择的图片设置到控件上
                     ivDealedIcon3.setClickable(false);
                     encode = photo2Base64(path);
@@ -1042,7 +1053,7 @@ public class UnCheckActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        PermissionUtils.requestPermissionsResult(UnCheckActivity.this,requestCode,permissions,grantResults,mPermissionGrant);
+        PermissionUtils.requestPermissionsResult(UnCheckActivity.this, requestCode, permissions, grantResults, mPermissionGrant);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 

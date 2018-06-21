@@ -138,8 +138,8 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
 
     @Override
     protected void onResume() {
-        markBaidumap.onResume();
         super.onResume();
+        markBaidumap.onResume();
         if (locationClient != null){
             locationClient.start();
         }
@@ -147,8 +147,8 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
 
     @Override
     protected void onPause() {
-        markBaidumap.onPause();
         super.onPause();
+        markBaidumap.onPause();
 
     }
 
@@ -183,8 +183,8 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
 
     @Override
     protected void onDestroy() {
-        markBaidumap.onDestroy();
         super.onDestroy();
+        markBaidumap.onDestroy();
         if (locationClient !=null){
             locationClient.stop();
             locationClient.registerLocationListener(myListener);

@@ -32,6 +32,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -111,7 +112,7 @@ public class SuperviseFragment extends BaseFragment {
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
                     if (getContext() != null) {
-                        ToastUtil.shortToast(getContext(), "数据未加载");
+//                        ToastUtil.shortToast(getContext(), "");
                     }
                     break;
                 case GlobalContanstant.TRAINLISTSUCCESS:
@@ -235,6 +236,7 @@ public class SuperviseFragment extends BaseFragment {
             public void onItemClick(View view, int position) {
                 switch (position) {
                     case SIGN:
+                        //早会签到
                         IntentUtil.startActivity(SuperviseFragment.this.getActivity(), MoringSignListActivity.class);
                         break;
 
@@ -250,7 +252,7 @@ public class SuperviseFragment extends BaseFragment {
         });
 
 
-        secondAdapter = new SuperviseSecondAdapter(titles1);
+        secondAdapter = new SuperviseSecondAdapter(titles1,role);
         recycleViewSecond.setAdapter(secondAdapter);
         secondAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
 
@@ -302,10 +304,21 @@ public class SuperviseFragment extends BaseFragment {
 
     }
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
+
     /**
      * 获取显示的数据
      */
     private void getData() {
+
+        headerList.clear();
+        if (SuperviseFragment.this.getActivity() != null) {
+            HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                    SpUtils.getString(SuperviseFragment.this.getActivity(), GlobalContanstant.CookieHeader));
+
+            headerList.add(headerPropertyObj);
+        }
+
 
         new Thread() {
             @Override
@@ -355,7 +368,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -371,7 +384,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -389,7 +402,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -405,7 +418,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -423,7 +436,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

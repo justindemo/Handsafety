@@ -1,7 +1,7 @@
 package com.google.zxing.activity;
 
 import android.app.ProgressDialog;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
@@ -10,12 +10,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Build;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -55,7 +54,7 @@ import com.xytsz.xytaj.util.IntentUtil;
 
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.List;
+
 import java.util.Vector;
 
 

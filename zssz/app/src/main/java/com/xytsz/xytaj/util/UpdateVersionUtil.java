@@ -34,6 +34,7 @@ import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -41,6 +42,8 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -51,10 +54,7 @@ import java.io.IOException;
 public class UpdateVersionUtil {
 
 
-    private static String versionInfo;
-    private static File updateFile;
-
-    public static String getVersionInfo() throws Exception {
+    public static String getVersionInfo(List<HeaderProperty> headerList) throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getVersionInfoMethodName);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -62,7 +62,9 @@ public class UpdateVersionUtil {
         envelope.bodyOut = soapObject;
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getVersionInfo_SOAP_ACTION, envelope);
+
+
+        httpTransportSE.call(NetUrl.getVersionInfo_SOAP_ACTION, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
@@ -108,6 +110,7 @@ public class UpdateVersionUtil {
         }
     }
 
+    private static boolean isUpdata;
 
     /**
      * 弹出新版本提示
@@ -115,7 +118,7 @@ public class UpdateVersionUtil {
      * @param context     上下文
      * @param versionInfo 更新内容
      */
-    public static void showDialog(final Context context, final VersionInfo versionInfo, final boolean isshow) {
+    public static Boolean showDialog(final Context context, final VersionInfo versionInfo, final boolean isshow) {
         final Dialog dialog = new AlertDialog.Builder(context).create();
         dialog.setCanceledOnTouchOutside(false);//
         dialog.show();
@@ -145,6 +148,7 @@ public class UpdateVersionUtil {
                     }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            isUpdata = true;
                             dialog.dismiss();
                         }
                     }).create().show();
@@ -163,6 +167,8 @@ public class UpdateVersionUtil {
                 dialog.dismiss();
             }
         });
+
+        return isUpdata;
     }
 
     private static long initTotal = 0;

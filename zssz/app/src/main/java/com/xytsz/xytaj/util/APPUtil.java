@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * Created by admin on 2017/2/14.
+ *
  */
 public class APPUtil {
     public static String paks = new String("com.baidu.BaiduMap");
@@ -35,7 +36,7 @@ public class APPUtil {
                         "destination=latlng:"+loc2.latitude+","+loc2.longitude+"|name:我的目的地"+        //终点
                         "&mode=driving&" +          //导航路线方式
                         "region=北京" +           //
-                        "&src=掌上市政#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end");
+                        "&src=掌上安监#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end");
                 context.startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,7 +64,7 @@ public class APPUtil {
 
         packageManager.getInstalledApplications(packageManager.GET_META_DATA);
         // 用于存储所有已安装程序的包名
-        List<String> packageNames = new ArrayList<String>();
+        List<String> packageNames = new ArrayList<>();
         // 从pinfo中将包名字逐一取出，压入pName list中
         if (packageInfos != null) {
             for (int i = 0; i < packageInfos.size(); i++) {
@@ -104,7 +105,7 @@ public class APPUtil {
      * @return
      */
     public static List<AppInfo> getMapApps(Context context) {
-        LinkedList<AppInfo> apps = new LinkedList<AppInfo>();
+        LinkedList<AppInfo> apps = new LinkedList<>();
             AppInfo appinfo = getAppInfoByPak(context,paks);
             if (appinfo!=null) {
                 apps.add(appinfo);
@@ -119,7 +120,7 @@ public class APPUtil {
      * @return
      */
     public static List<AppInfo> getWebApps(Context context){
-        LinkedList<AppInfo> apps = new LinkedList<AppInfo>();
+        LinkedList<AppInfo> apps = new LinkedList<>();
 
         String default_browser = "android.intent.category.DEFAULT";
         String browsable = "android.intent.category.BROWSABLE";

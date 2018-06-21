@@ -1,18 +1,16 @@
 package com.xytsz.xytaj.activity;
 
-import android.Manifest;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
+
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,24 +23,34 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xytsz.xytaj.R;
-import com.xytsz.xytaj.adapter.SupplyCompanyAdapter;
+import com.xytsz.xytaj.adapter.CompanyCaseAdapter;
+import com.xytsz.xytaj.adapter.CompanyProduceAdapter;
+import com.xytsz.xytaj.bean.Company;
+import com.xytsz.xytaj.bean.CompanyCase;
+import com.xytsz.xytaj.bean.CompanyCaseCallback;
+import com.xytsz.xytaj.bean.CompanyDetailCallback;
+import com.xytsz.xytaj.bean.CompanyList;
+import com.xytsz.xytaj.bean.CompanyProduce;
+import com.xytsz.xytaj.bean.CompanyProduceCallback;
+
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.net.UrlUtils;
 import com.xytsz.xytaj.ui.CustomDialog;
 import com.xytsz.xytaj.util.PermissionUtils;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
 
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
-import java.lang.reflect.Member;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 /**
  * Created by admin on 2018/5/25.
@@ -76,7 +84,6 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
     @Bind(R.id.companydetail_progressbar)
     LinearLayout companydetailProgressbar;
     private String companyName;
-    private int id;
 
 
     private PermissionUtils.PermissionGrant mPermissionGrant = new PermissionUtils.PermissionGrant() {
@@ -85,7 +92,7 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
             switch (requestCode) {
                 case PermissionUtils.CODE_CALL_PHONE:
                     Intent intent = new Intent(Intent.ACTION_DIAL);
-                    intent.setData(Uri.parse("tel:" + "4008652007"));
+                    intent.setData(Uri.parse("tel:" + iphone));
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     break;
@@ -94,18 +101,62 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
         }
     };
     private Bundle bundle;
+    private CompanyList.DataBean companyDetail;
+    private String iphone = "";
+    private String qq = "";
+    private String wechat = "";
+    private double latitude;
+    private double longitude;
+    private int companyID;
+    private int fromID;
+    private int personId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             companyName = getIntent().getStringExtra("companyName");
-            id = getIntent().getIntExtra("Id", -1);
+            companyDetail = (CompanyList.DataBean) getIntent().
+                    getSerializableExtra("companyDetail");
+            companyID = getIntent().getIntExtra("companyID", -1);
+            fromID = getIntent().getIntExtra("fromID", 0);
+
         }
         setContentView(R.layout.activity_membershow);
         ButterKnife.bind(this);
+
+
+        personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         if (companyName != null) {
             initActionbar(companyName);
+        }
+        if (companyDetail != null) {
+            companyID =companyDetail.getID();
+            iphone = companyDetail.getCompanyTel();
+            qq = companyDetail.getCompanyQQ();
+            wechat = companyDetail.getCompanyWeixin();
+            latitude = companyDetail.getCompanyLatitude();
+            longitude = companyDetail.getCompanyLongitude();
+            Glide.with(getApplicationContext()).load(NetUrl.AllURL+companyDetail.getCompanyPicBack()).
+                    placeholder(R.mipmap.holder_big)
+                    .error(R.mipmap.holder_big)
+                    .into(memberIvBg);
+            String string = companyDetail.getCompanyDesc();
+            string = string.replace("[br][br]", "\n");
+            tvCompanyIntro.setText("\u3000\u3000"+ string);
+        } else {
+            if (companyID == -1){
+                ToastUtil.shortToast(getApplicationContext(), "数据未加载");
+                Glide.with(getApplicationContext()).load(R.mipmap.holder_big)
+                        .into(memberIvBg);
+                companydetailProgressbar.setVisibility(View.GONE);
+                return;
+            }else {
+                //获取这个公司的详细信息。
+                getCompanyDetail();
+
+            }
+
         }
 
         initData();
@@ -113,38 +164,51 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
 
     }
 
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case GlobalContanstant.FAIL:
-                    //取消loading
-                    //展示没有加载的页面
-                    break;
-                case GlobalContanstant.MYSENDSUCCESS:
-                    //取消loading
-                    //展示内容
-                    break;
-            }
-        }
-    };
 
-    private List<String> mTitles = new ArrayList<>();
+
+    private void getCompanyDetail( ) {
+        String url = NetUrl.SERVERURL2 + NetUrl.getCompanyDetailData + companyID
+                +"?f=" +fromID +"&AJPersonID="+personId;
+        OkHttpUtils
+                .get()
+                .url(url)
+                .build()
+                .execute(new CompanyDetailCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Company response, int id) {
+                        companyName = response.getData().getCompanyName();
+                        qq = response.getData().getCompanyQQ();
+                        wechat = response.getData().getCompanyWeixin();
+                        iphone = response.getData().getCompanyTel();
+                        latitude = response.getData().getCompanyLatitude();
+                        longitude = response.getData().getCompanyLongitude();
+                        Glide.with(getApplicationContext())
+                                .load(NetUrl.AllURL+response.getData().getCompanyPicBack())
+                                .placeholder(R.mipmap.holder_big)
+                                .error(R.mipmap.holder_big)
+                                .into(memberIvBg);
+                        String string = response.getData().getCompanyDesc();
+                        string = string.replace("[br][br]", "\n");
+                        tvCompanyIntro.setText("\u3000\u3000"+ string);
+                        initActionbar(companyName);
+                    }
+                });
+    }
+
+    private CompanyProduceAdapter companyProduceAdapter;
+    private CompanyCaseAdapter companyCaseAdapter;
+    private List<CompanyProduce.Produce> produces;
+    private List<CompanyCase.DataBean> cases;
 
     private void initData() {
-        //展示 loading
-//        getData();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                companydetailProgressbar.setVisibility(View.GONE);
-                companyLv.setVisibility(View.VISIBLE);
-            }
-        }, 1000);
-
-        Glide.with(this).load("http://123.126.40.12:8081/AppPath/AJ/2(2).png").into(memberIvBg);
-
+        companydetailProgressbar.setVisibility(View.VISIBLE);
+        companyLv.setVisibility(View.VISIBLE);
         LinearLayoutManager man = new LinearLayoutManager(this);
         man.setOrientation(LinearLayoutManager.HORIZONTAL);
         companyProduceRv.setLayoutManager(man);
@@ -153,64 +217,94 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         companyCaseRv.setLayoutManager(manager);
 
-        mTitles.clear();
-        mTitles.add("产品");
-        mTitles.add("掌上市政");
-        mTitles.add("掌上安监");
+        getProduceList(NetUrl.SERVERURL2 + NetUrl.getProduceList);
+        getcaseList(NetUrl.SERVERURL2 + NetUrl.getCaseList);
 
-        SupplyCompanyAdapter supplyCompanyAdapter = new SupplyCompanyAdapter(mTitles, this);
-        companyProduceRv.setAdapter(supplyCompanyAdapter);
-        companyCaseRv.setAdapter(supplyCompanyAdapter);
-        supplyCompanyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+
+    }
+
+    private Map<String, Integer> params = new HashMap<>();
+
+    private void getProduceList(String url) {
+        params.clear();
+        params.put("pageSize", 5);
+        params.put("pageNo", 1);
+        params.put("companyID", companyID);
+        params.put("topIndex", 1);
+
+        params.put("AJPersonID", personId);
+        String spliceGetUrl = UrlUtils.spliceGetUrl(url, params);
+        OkHttpUtils.get().url(spliceGetUrl)
+                .build().execute(new CompanyProduceCallback() {
             @Override
-            public void onItemClick(View view, int position) {
-                Bundle bundle = new Bundle();
-                bundle.putString("title", mTitles.get(position));
-                ProduceDetailActivity.intent2Produce(MemberCompanyShowActivity.this, bundle);
+            public void onError(Call call, Exception e, int id) {
+                companydetailProgressbar.setVisibility(View.GONE);
+                ToastUtil.shortToast(getApplicationContext(), "数据未加载");
+            }
+
+            @Override
+            public void onResponse(CompanyProduce response, int id) {
+                companydetailProgressbar.setVisibility(View.GONE);
+                if (response != null) {
+                    produces = response.getData();
+                    companyProduceAdapter = new CompanyProduceAdapter(produces, MemberCompanyShowActivity.this);
+                    companyProduceRv.setAdapter(companyProduceAdapter);
+                    companyProduceAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.
+                            OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("Desc", produces.get(position).getProductDesc());
+                            bundle.putString("title", produces.get(position).getProductName());
+                            ProduceDetailActivity.intent2Produce(MemberCompanyShowActivity.this, bundle);
+                        }
+                    });
+                }
             }
         });
 
-
     }
 
-    private void getData() {
-        new Thread() {
+    private void getcaseList(String url) {
+        params.clear();
+        params.put("pageSize", 5);
+        params.put("pageNo", 1);
+        params.put("companyID", companyID);
+        params.put("topIndex", 1);
+        // TODO: 2018/6/20 新加的
+        params.put("AJPersonID", personId);
+        String spliceGetUrl = UrlUtils.spliceGetUrl(url, params);
+        OkHttpUtils.get().url(spliceGetUrl)
+                .build().execute(new CompanyCaseCallback() {
             @Override
-            public void run() {
-
-                try {
-                    String serviceData = getServiceData();
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.MYSENDSUCCESS;
-                    message.obj = serviceData;
-                    handler.sendMessage(message);
-                } catch (Exception e) {
-                    Message message = Message.obtain();
-                    message.what = GlobalContanstant.FAIL;
-                    handler.sendMessage(message);
-                }
+            public void onError(Call call, Exception e, int id) {
+                companydetailProgressbar.setVisibility(View.GONE);
+                ToastUtil.shortToast(getApplicationContext(), "数据未加载");
             }
-        }.start();
+
+            @Override
+            public void onResponse(CompanyCase response, int id) {
+                companydetailProgressbar.setVisibility(View.GONE);
+                if (response != null) {
+                    cases = response.getData();
+                    companyCaseAdapter = new CompanyCaseAdapter(cases, MemberCompanyShowActivity.this);
+                    companyCaseRv.setAdapter(companyCaseAdapter);
+                    companyCaseAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.
+                            OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("Desc", cases.get(position).getCaseDesc());
+                            bundle.putString("title", cases.get(position).getCaseTitle());
+                            ProduceDetailActivity.intent2Produce(MemberCompanyShowActivity.this, bundle);
+                        }
+                    });
+                }
+
+            }
+        });
     }
 
-    private String getServiceData() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getCompanyDetailData);
-        soapObject.addProperty("ID", id);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
-        envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        String json = object.getProperty(0).toString();
-
-        return json;
-
-    }
 
     private void initActionbar(String title) {
 
@@ -235,7 +329,7 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        PermissionUtils.requestPermissionsResult(this,requestCode,permissions,grantResults,mPermissionGrant);
+        PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
     }
 
     @OnClick({R.id.iv_company_phone, R.id.iv_company_wechat, R.id.iv_company_qq, R.id.iv_company_address, R.id.tv_produce_company, R.id.tv_case})
@@ -248,7 +342,7 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
             case R.id.iv_company_wechat:
                 customDialog = new CustomDialog(MemberCompanyShowActivity.this);
                 customDialog.setContentIcon(R.mipmap.iv_sup_wechat);
-                customDialog.setDetial("zzmxyt20070628");
+                customDialog.setDetial(wechat);
                 customDialog.setLeftOnClick(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -260,9 +354,9 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         //复制
                         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clipData = ClipData.newPlainText("wechat", "772546099");
+                        ClipData clipData = ClipData.newPlainText("wechat", wechat);
                         cm.setPrimaryClip(clipData);
-                        ToastUtil.shortToast(getApplicationContext(),"复制成功");
+                        ToastUtil.shortToast(getApplicationContext(), "复制成功");
                         customDialog.dismiss();
                     }
                 }, "复制");
@@ -272,7 +366,7 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
             case R.id.iv_company_qq:
                 customDialog = new CustomDialog(MemberCompanyShowActivity.this);
                 customDialog.setContentIcon(R.mipmap.iv_sup_qq);
-                customDialog.setDetial("772546099");
+                customDialog.setDetial(qq);
                 customDialog.setLeftOnClick(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -284,9 +378,9 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         //复制
                         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clipData = ClipData.newPlainText("qq", "772546099");
+                        ClipData clipData = ClipData.newPlainText("qq", qq);
                         cm.setPrimaryClip(clipData);
-                        ToastUtil.shortToast(getApplicationContext(),"复制成功");
+                        ToastUtil.shortToast(getApplicationContext(), "复制成功");
                         customDialog.dismiss();
                     }
                 }, "复制");
@@ -294,23 +388,25 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
                 break;
             case R.id.iv_company_address:
                 bundle = new Bundle();
-                bundle.putDouble("longitude",116.35607);
-                bundle.putDouble("latitude",39.768245);
-                bundle.putString("company","北京向阳天科技有限公司");
+                bundle.putDouble("longitude", longitude);
+                bundle.putDouble("latitude", latitude);
+                bundle.putString("company", companyName);
 
                 MarkPositionActivity.intent2MarkPosition(MemberCompanyShowActivity.this, bundle);
                 break;
             case R.id.tv_produce_company:
                 bundle = null;
                 bundle = new Bundle();
-                bundle.putString("tag","服务硬件");
-                ProduceListActivity.intent2Activity(MemberCompanyShowActivity.this,bundle);
+                bundle.putString("tag", "产品服务");
+                bundle.putInt("ID", companyID);
+                ProduceListActivity.intent2Activity(MemberCompanyShowActivity.this, bundle);
                 break;
             case R.id.tv_case:
                 bundle = null;
                 bundle = new Bundle();
-                bundle.putString("tag","成功案例");
-                ProduceListActivity.intent2Activity(MemberCompanyShowActivity.this,bundle);
+                bundle.putString("tag", "成功案例");
+                bundle.putInt("ID", companyID);
+                ProduceListActivity.intent2Activity(MemberCompanyShowActivity.this, bundle);
                 break;
         }
     }

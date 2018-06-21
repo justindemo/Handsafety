@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<com.scwang.smartrefresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/refreshLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
@@ -8,20 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:id="@+id/companylist_progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/shape_modification_pb"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateDrawable="@drawable/progress_loading" />
-    </LinearLayout>
 
 
-</FrameLayout>
+
+</com.scwang.smartrefresh.layout.SmartRefreshLayout>

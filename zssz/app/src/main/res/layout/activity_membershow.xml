@@ -11,7 +11,7 @@
 
 
         <LinearLayout
-            android:visibility="invisible"
+            android:visibility="visible"
             android:id="@+id/company_lv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="170dp"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/companydetail" />
+                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -57,7 +57,7 @@
                         android:lineSpacingMultiplier="1.5"
                         android:maxLines="4"
                         android:padding="8dp"
-                        android:text="&#160;&#160;&#160;&#160;北京向阳天科技有限公司成立于2007年,专注搭建智慧“家”管理平台。向阳天以“七剑创客”团队文化，七剑暗合北斗七星推动我司整体经营理念。"
+                        android:text=""
                         android:textColor="@color/white" />
                 </LinearLayout>
 

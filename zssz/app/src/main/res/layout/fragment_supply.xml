@@ -7,7 +7,7 @@
 <FrameLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 <!--图层-->
     <LinearLayout
         android:background="@color/cc_supervise"
@@ -238,7 +238,6 @@
                     />
                 <TextView
                     android:id="@+id/tv_supply_company"
-                    android:text="200家"
                     android:drawablePadding="6dp"
                     android:textColor="@color/cc_dark_fade"
                     android:drawableRight="@mipmap/iv_back_right"
@@ -287,7 +286,6 @@
                     />
                 <TextView
                     android:id="@+id/tv_supply_third"
-                    android:text="200家"
                     android:drawablePadding="6dp"
                     android:textColor="@color/cc_dark_fade"
                     android:drawableRight="@mipmap/iv_back_right"

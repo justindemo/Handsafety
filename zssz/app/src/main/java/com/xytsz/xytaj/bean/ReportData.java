@@ -95,6 +95,9 @@ public class ReportData implements Serializable{
         this.List = List;
     }
 
+    /**
+     * 检查项
+     */
     public static class Problem {
         /**
          * CheckDic_ID : 1

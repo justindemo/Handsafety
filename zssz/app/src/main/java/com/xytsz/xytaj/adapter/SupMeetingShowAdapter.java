@@ -22,5 +22,6 @@ public class SupMeetingShowAdapter extends BaseQuickAdapter<SupMeeting>{
         helper.setText(R.id.tv_meeting_title,item.getTitle());
         helper.setText(R.id.tv_meeting_adress,item.getAddressInfo());
         helper.setText(R.id.tv_meeting_stime,item.getBeginTime());
+        helper.setText(R.id.tv_meeting_dept,item.getDeptName());
     }
 }

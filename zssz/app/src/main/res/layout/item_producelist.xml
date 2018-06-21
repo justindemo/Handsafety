@@ -10,7 +10,6 @@
         android:padding="6dp"
         android:scaleType="fitXY"
         android:id="@+id/iv_producelist"
-        android:src="@mipmap/test6"
         android:layout_width="140dp"
         android:layout_height="120dp" />
 
@@ -28,11 +27,14 @@
         <TextView
             android:text="产品描述内容"
             android:textSize="14sp"
-            android:layout_marginLeft="8dp"
+            android:id="@+id/tv_produce_companyname"
+            android:padding="8dp"
+            android:maxLines="1"
+            android:layout_alignParentBottom="true"
+            android:ellipsize="end"
             android:textColor="@color/cc_dark_fade"
             android:layout_toRightOf="@+id/iv_producelist"
-            android:layout_centerInParent="true"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
     <View

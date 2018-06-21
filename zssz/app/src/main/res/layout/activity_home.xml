@@ -86,6 +86,7 @@
 
 
         <RadioButton
+            android:visibility="gone"
             android:id="@+id/homeactivity_rbtn_supply"
             style="@style/HomeActivityRadioButtonStyle"
             android:drawableTop="@drawable/selector_supply"

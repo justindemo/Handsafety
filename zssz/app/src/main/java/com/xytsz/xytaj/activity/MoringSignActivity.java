@@ -51,6 +51,7 @@ import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -217,8 +218,10 @@ public class MoringSignActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             tag = getIntent().getStringExtra("tag");
+            //早会ID
             signId = getIntent().getIntExtra("singnid", -1);
             totalcount = getIntent().getIntExtra("count", -1);
+            //培训ID
             trainId = getIntent().getIntExtra("trainId", -1);
 
         }
@@ -291,6 +294,13 @@ public class MoringSignActivity extends AppCompatActivity
         tvSignTeam.setText(department);
         tvSignPerson.setText(userName);
         tvSignPerson.setClickable(false);
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
         new Thread() {
             @Override
             public void run() {
@@ -321,8 +331,9 @@ public class MoringSignActivity extends AppCompatActivity
     }
 
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
+
     private String getData(String tag) throws Exception {
-        String method = null;
 
         switch (tag) {
             case "person":
@@ -347,7 +358,10 @@ public class MoringSignActivity extends AppCompatActivity
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+
+        //添加cookie
+//
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -492,7 +506,6 @@ public class MoringSignActivity extends AppCompatActivity
         switch (view.getId()) {
             case R.id.tv_sign_person:
 
-
                 break;
             case R.id.iv_sign_picture:
                 //添加照片
@@ -599,7 +612,7 @@ public class MoringSignActivity extends AppCompatActivity
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

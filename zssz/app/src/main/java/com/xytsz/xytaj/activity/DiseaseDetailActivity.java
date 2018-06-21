@@ -24,11 +24,13 @@ import com.xytsz.xytaj.util.SoundUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -159,8 +161,7 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
 
         mtvProblemLoca = (TextView) findViewById(R.id.tv_detail_problem_loca);
         mtvProblemAudio = (TextView) findViewById(R.id.tv_detail_problem_audio);
-        mllVideo = (LinearLayout) findViewById(R.id.ll_video);
-        mivPlay = (ImageView) findViewById(R.id.iv_play_video);
+
 
 
     }
@@ -272,14 +273,6 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
             mtvProblemAudio.setVisibility(View.GONE);
         }
 
-        mivPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(DiseaseDetailActivity.this, PlayVideoActivity.class);
-                intent1.putExtra("videoPath", videopath);
-                startActivity(intent1);
-            }
-        });
 
 
     }
@@ -344,6 +337,7 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         }.start();
     }
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private String toNet() throws Exception {
         //发通知节点//哪个单子，状态，通知人是谁，意见是什么,时间是否需要。
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reviewmethodName);
@@ -358,7 +352,14 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+
+        //添加cookie
+//        private List<HeaderProperty> headerList = new ArrayList<>();
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+        httpTransportSE.call(null, envelope/*,headerList*/);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String data = object.getProperty(0).toString();

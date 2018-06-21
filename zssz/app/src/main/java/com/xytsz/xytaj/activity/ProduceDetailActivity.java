@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/5/31.
- *
+ * <p/>
  * 产品详情页
  */
 public class ProduceDetailActivity extends AppCompatActivity {
@@ -31,12 +31,14 @@ public class ProduceDetailActivity extends AppCompatActivity {
     @Bind(R.id.producedeatil_progressbar)
     LinearLayout producedeatilProgressbar;
     private String title;
+    private String desc;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             title = getIntent().getStringExtra("title");
+            desc = getIntent().getStringExtra("Desc");
         }
         setContentView(R.layout.activity_producedetail);
         ButterKnife.bind(this);
@@ -48,19 +50,64 @@ public class ProduceDetailActivity extends AppCompatActivity {
     }
 
     private List<String> produceNames = new ArrayList<>();
+    private List<String> produceImgs = new ArrayList<>();
 
     private void initData() {
-        produceNames.add("安全风扇防护罩安全罩安全网宝宝安全工业风扇");
-        produceNames.add("描述描述");
-        produceNames.add("描述描述");
-
         LinearLayoutManager manager = new LinearLayoutManager(this);
         producedeatilRv.setLayoutManager(manager);
-        ProduceDetailAdapter produceDetailAdapter = new ProduceDetailAdapter(produceNames);
+        if (desc != null && desc.contains("[img]")) {
+            produceNames.clear();
+            produceImgs.clear();
+            //除去[img]
+            desc = desc.substring(5, desc.length());
+            //分割
+            desc = desc.replace("[img]","|");
+            String[] split = desc.split("\\|");
+            if (split.length > 0) {
+
+//                /upfile/201806/636639683536823591.png[/img]泄爆口也称为泄爆面积，
+//                [br]比如房间的
+//                  [img]/upfile/201806/636639683536823591.png
+//                  泄爆口也称为泄爆面积，
+//                [br]比如房间的
+                for (int i = 0; i < split.length; i++) {
+                    String str = split[i].replace("[/img]",";");
+                    String[] split1 = str.split(";");
+
+                    //如果大于2
+                    if (split1.length == 2) {
+                        //第一个是图片
+                        produceImgs.add(split1[0]);
+                        produceNames.add(split1[1]);
+
+                    }else {
+                        if (split1[0] != null && split[0].contains("png")) {
+                            produceImgs.add(split1[0]);
+                        }else {
+                            produceNames.add(split1[0]);
+                        }
+                    }
+
+
+                }
+            }
+
+        }
+
+
+        if (produceNames.size() >= produceImgs.size()) {
+            produceDetailAdapter = new ProduceDetailAdapter(produceNames, produceImgs,
+                    this, true);
+
+        } else {
+            produceDetailAdapter = new ProduceDetailAdapter(produceImgs, produceNames, this, false);
+        }
         producedeatilRv.setAdapter(produceDetailAdapter);
 
 
     }
+
+    ProduceDetailAdapter produceDetailAdapter;
 
     private void initActionbar(String title) {
         ActionBar actionBar = getSupportActionBar();
@@ -79,6 +126,7 @@ public class ProduceDetailActivity extends AppCompatActivity {
 
     public static void intent2Produce(Context context, Bundle bundle) {
         Intent intent = new Intent(context, ProduceDetailActivity.class);
+        intent.putExtra("Desc", bundle.getString("Desc"));
         intent.putExtra("title", bundle.getString("title"));
         context.startActivity(intent);
 

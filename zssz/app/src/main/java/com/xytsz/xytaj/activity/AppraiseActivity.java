@@ -17,10 +17,14 @@ import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -151,9 +155,10 @@ public class AppraiseActivity extends AppCompatActivity {
 
     }
 
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     private String uptoserver(String appraise, int role, String barText)throws Exception {
+        headerList.clear();
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.appraisemethodName);
 //        soapObject.addProperty("tel", phone);
 //        soapObject.addProperty("name", visitor);
@@ -165,7 +170,11 @@ public class AppraiseActivity extends AppCompatActivity {
         envelope.dotNet = true;
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.appraise_SOAP_ACTION, envelope);
+
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+        httpTransportSE.call(NetUrl.appraise_SOAP_ACTION, envelope/*,headerList*/);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

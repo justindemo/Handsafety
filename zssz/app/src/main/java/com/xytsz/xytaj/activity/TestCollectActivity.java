@@ -20,13 +20,16 @@ import com.xytsz.xytaj.bean.TestCollect;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -99,6 +102,13 @@ public class TestCollectActivity extends AppCompatActivity {
     }
 
     private void initData() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
         new Thread(){
             @Override
             public void run() {
@@ -120,6 +130,7 @@ public class TestCollectActivity extends AppCompatActivity {
         }.start();
     }
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private String getData()throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.testcollectmethod);
         soapObject.addProperty("TrainID", trainId);
@@ -130,7 +141,7 @@ public class TestCollectActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

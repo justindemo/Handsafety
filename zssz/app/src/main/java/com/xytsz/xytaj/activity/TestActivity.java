@@ -1,7 +1,6 @@
 package com.xytsz.xytaj.activity;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
+
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.TopicAdapter;
 import com.xytsz.xytaj.bean.AnwerInfo;
@@ -31,20 +30,17 @@ import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.ui.ReaderViewPager;
 import com.xytsz.xytaj.ui.SlidingUpPanelLayout;
-import com.xytsz.xytaj.util.CallBackUtil;
-import com.xytsz.xytaj.util.IntentUtil;
 import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +48,7 @@ import java.util.List;
  * <p/>
  * 考试
  */
-public class TestActivity extends AppCompatActivity implements ReadFragment.OnReadFragmentListener {
+public class TestActivity extends AppCompatActivity  {
 
 
     private SlidingUpPanelLayout mLayout; // 最外层布局
@@ -115,7 +111,6 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
 
         initReadViewPager();
 
-        CallBackUtil.setReadFragementListener(this);
         Button bt_pre = (Button) findViewById(R.id.bt_pre);
         Button bt_next = (Button) findViewById(R.id.bt_next);
         TextView tv_up_answer = (TextView) findViewById(R.id.tv_up_anwer);
@@ -170,13 +165,13 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
 
                 }
 
-
                 new AlertDialog.Builder(TestActivity.this).setTitle("您的分数").
                         setMessage(score +"").setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         ToastUtil.shortToast(getApplicationContext(), "正在提交...");
+                        //提交成绩
                         upData();
                     }
                 }).create().show();
@@ -224,12 +219,10 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
-
-
         return result;
     }
 
@@ -375,9 +368,16 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
         }
     }
 
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     // 解析json封装实体类
     private void getAnwer() {
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+
         new Thread() {
             @Override
             public void run() {
@@ -408,7 +408,7 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
@@ -417,20 +417,7 @@ public class TestActivity extends AppCompatActivity implements ReadFragment.OnRe
         return result;
     }
 
-    @Override
-    public void onNext(final int position) {
 
-        //延时滑动到下一题
-        if (position <= datas.size() - 1) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    readerViewPager.setCurrentItem(position);
-                }
-            }, 1000);
-
-        }
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

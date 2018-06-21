@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.xytsz.xytaj.activity.PhotoShowActivity;
-import com.xytsz.xytaj.activity.SearchRoadActivity;
+
 import com.xytsz.xytaj.activity.SendRoadDetailActivity;
 import com.xytsz.xytaj.bean.AudioUrl;
 import com.xytsz.xytaj.bean.ImageUrl;
@@ -43,8 +43,10 @@ import com.xytsz.xytaj.ui.TimeChoiceButton;
 import com.xytsz.xytaj.R;
 
 import com.xytsz.xytaj.util.SoundUtil;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -106,6 +108,7 @@ public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchVie
 
     private List<String> dbData = new ArrayList<>();
     private ListView lv;
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     public SendRoadAdapter(Context context, Handler handler, List<Review> reviews,
                            List<List<ImageUrl>> imageUrlLists,
@@ -126,6 +129,14 @@ public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchVie
         }
 
         soundUtil = new SoundUtil();
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(context,GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+
     }
 
     @Override
@@ -707,7 +718,7 @@ public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchVie
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(NetUrl.toDispatching_SOAP_ACTION, envelope);
+        httpTransportSE.call(NetUrl.toDispatching_SOAP_ACTION, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

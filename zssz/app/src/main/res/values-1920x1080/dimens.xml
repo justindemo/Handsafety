@@ -9,7 +9,7 @@
     <dimen name="my_height">170dp</dimen>
     <dimen name="supply_height">175dp</dimen>
     <dimen name="supply_bg_height">230dp</dimen>
-    <dimen name="facility_bg_height">90dp</dimen>
+    <dimen name="facility_bg_height">200dp</dimen>
 
 
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingLeft="6dp"
     android:paddingRight="6dp"
@@ -9,11 +10,12 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:text="标题"
         android:textStyle="bold"
         android:paddingTop="6dp"
         android:paddingLeft="6dp"
         android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:id="@+id/tv_facilitycop_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -22,20 +24,22 @@
         android:padding="6dp"
         android:id="@+id/tv_facilitycop_msg"
         android:textSize="12sp"
-        android:maxLines="2"
+        android:maxLines="1"
         android:ellipsize="end"
+        android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/iv_facilitycop"
         android:textColor="@color/cc_light_dark"
         android:text="北京向阳天科技有限公司成立于2007年，专注搭建智慧“家”管理平台。向阳天以“七剑创客”团队文化，七剑暗合北斗七星推动我司整体经营理念."
         android:layout_below="@+id/tv_facilitycop_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <ImageView
+    <com.xytsz.xytaj.ui.RoundImageView
         android:src="@mipmap/companydetail"
         android:id="@+id/iv_facilitycop"
+        app:type="round"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="100dp"
+        android:layout_height="55dp" />
     <View
         android:layout_marginTop="6dp"
         android:background="@color/cc_line"

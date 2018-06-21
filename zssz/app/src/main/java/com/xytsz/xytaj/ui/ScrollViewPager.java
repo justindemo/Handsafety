@@ -7,18 +7,22 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.animation.DecelerateInterpolator;
+
 
 import com.bumptech.glide.Glide;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.MemberCompanyShowActivity;
-import com.xytsz.xytaj.bean.Scroller;
-import com.xytsz.xytaj.util.ToastUtil;
+import com.xytsz.xytaj.bean.FacilityHead;
+import com.xytsz.xytaj.global.GlobalContanstant;
+import com.xytsz.xytaj.net.NetUrl;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +32,7 @@ import java.util.List;
  */
 public class ScrollViewPager extends ViewPager {
 
-    private List<Scroller> scrollers = new ArrayList<>();
+    private List<FacilityHead.DataBean> scrollers = new ArrayList<>();
 
     private Context context;
     private List<View> mllDots = new ArrayList<>();
@@ -42,13 +46,27 @@ public class ScrollViewPager extends ViewPager {
     private Handler handler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             // 实现界面切换
-            ScrollViewPager.this.setCurrentItem(currentPosition);
+            ScrollViewPager.this.setCurrentItem(currentPosition,true);
             // 一次切换完成,接着执行第二次切换
             roll();
-        };
+        }
     };
-    private List<String> imageUrls;
     private int mTouchSlop;
+
+    //viewPager 平滑
+    private void setScrollerDuration() {
+        try {
+            Field field = ViewPager.class.getDeclaredField("mScroller");
+            field.setAccessible(true);
+            FixedSpeedScroller scroller = new FixedSpeedScroller(context,
+                    new DecelerateInterpolator());
+            scroller.setmDuration(1000);
+            field.set(this, scroller);
+        } catch (Exception e) {
+            Log.e("@", "", e);
+        }
+    }
+
 
     public ScrollViewPager(Context context, List<View> llDots) {
         super(context);
@@ -57,7 +75,7 @@ public class ScrollViewPager extends ViewPager {
 
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
-
+        setScrollerDuration();
         runnableTask = new RunnableTask();
 
         addOnPageChangeListener(new OnPageChangeListener() {
@@ -93,9 +111,9 @@ public class ScrollViewPager extends ViewPager {
         super(context, attrs);
     }
 
-    public void initImage(List<String> imageUrls){
-//        this.scrollers = imageUrls;
-        this.imageUrls = imageUrls;
+    public void initImage(List<FacilityHead.DataBean> imageUrls){
+        this.scrollers = imageUrls;
+//        this.imageUrls = imageUrls;
     }
 
     public void roll(){
@@ -117,7 +135,7 @@ public class ScrollViewPager extends ViewPager {
 
         @Override
         public int getCount() {
-            return imageUrls.size();
+            return scrollers.size();
         }
 
         @Override
@@ -134,10 +152,9 @@ public class ScrollViewPager extends ViewPager {
         @Override
         public Object instantiateItem(final ViewGroup container, final int position) {
             View view = View.inflate(getContext(), R.layout.viewpager_imageview,null);
-            ImageView imageview = (ImageView) view.findViewById(R.id.imageview);
-            Glide.with(getContext()).load(imageUrls.get(position)).into(imageview);
-
-
+            RoundImageView imageview = (RoundImageView) view.findViewById(R.id.imageview);
+            Glide.with(getContext()).load(NetUrl.AllURL+scrollers.get(position).getCompanyImg())
+                    .placeholder(R.mipmap.holder_big).into(imageview);
 
 
             container.addView(view);
@@ -186,9 +203,11 @@ public class ScrollViewPager extends ViewPager {
         @Override
         public void run() {
             //设置无线滚动
-            currentPosition = (currentPosition + 1) % imageUrls.size();
-            // 进行滚动操作
-            handler.obtainMessage().sendToTarget();// 将延迟消息转发到handler中
+            if (mllDots.size() != 1) {
+                currentPosition = (currentPosition + 1) % mllDots.size();
+                // 进行滚动操作
+                handler.obtainMessage().sendToTarget();// 将延迟消息转发到handler中
+            }
         }
     }
     // 滑动viewpager要实现的效果
@@ -213,8 +232,6 @@ public class ScrollViewPager extends ViewPager {
             case MotionEvent.ACTION_MOVE:
                 int moveX = (int) ev.getX();
                 int moveY = (int) ev.getY();
-
-
 
 
                 // 判断是横向滑动还是竖向滑动
@@ -254,8 +271,8 @@ public class ScrollViewPager extends ViewPager {
                 if (touchFlag == 0){
                     int currentItem = getCurrentItem();
                     Intent intent = new Intent(context,MemberCompanyShowActivity.class);
-                    intent.putExtra("id", currentItem);
-                    intent.putExtra("companyName", "公司名称");
+                    intent.putExtra("companyID", scrollers.get(currentItem).getCompanyID());
+                    intent.putExtra("fromID", GlobalContanstant.fromScroller);
                     context.startActivity(intent);
                 }
                 break;

@@ -29,6 +29,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -94,9 +95,13 @@ public class RoadActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.review_progressbar);
     }
     //从服务器获取当前道路的信息  所有
-
+    private static List<HeaderProperty> headerList = new ArrayList<>();
     private void initData() {
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
 
+        headerList.add(headerPropertyObj);
         mProgressBar.setVisibility(View.VISIBLE);
         //获取的数据当作 list传入构造中   ***应该传的是bean
         new Thread() {
@@ -122,7 +127,7 @@ public class RoadActivity extends AppCompatActivity {
                                 /**
                                  * 获取到图片的URl
                                  */
-                                String json = MyApplication.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW);
+                                String json = getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
                                 if (json != null) {
                                     //String list = new JSONObject(json).getJSONArray("").toString();
                                     List<ImageUrl> imageUrlList = new Gson().fromJson(json, new TypeToken<List<ImageUrl>>() {
@@ -132,7 +137,7 @@ public class RoadActivity extends AppCompatActivity {
                                 }
 
 
-                                String audioUrljson = getAudio(taskNumber);
+                                String audioUrljson = getAudio(taskNumber,headerList);
 
                                 if (audioUrljson != null){
                                     AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
@@ -175,6 +180,27 @@ public class RoadActivity extends AppCompatActivity {
 
     }
 
+    public static String getAllImagUrl(String taskNumber, int phaseIndication,List<HeaderProperty> headerList) throws Exception {
+
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getAllImageURLmethodName);
+        soapObject.addProperty("DeciceCheckNum", taskNumber);
+        soapObject.addProperty("PhaseId", phaseIndication);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.setOutputSoapObject(soapObject);
+        envelope.dotNet = true;
+        envelope.bodyOut = soapObject;
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+
+        httpTransportSE.call(NetUrl.getAllImageURL_SOAP_ACTION, envelope,headerList);
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        String result = object.getProperty(0).toString();
+        return result;
+    }
+
+
+
     public static String getServiceData(String methodname,  int personId)throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace,methodname);
         soapObject.addProperty("personId",personId);
@@ -185,7 +211,7 @@ public class RoadActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTasklist_SOAP_ACTION,envelope);
+        httpTransportSE.call(NetUrl.getTasklist_SOAP_ACTION,envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String json = object.getProperty(0).toString();
@@ -193,7 +219,8 @@ public class RoadActivity extends AppCompatActivity {
         return json;
     }
 
-    public static String getAudio(String taskNumber) throws Exception {
+    public static String getAudio(String taskNumber,List<HeaderProperty> headerList) throws Exception {
+
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getAudioMethodName);
         soapObject.addProperty("DeciceCheckNum",taskNumber);
 
@@ -204,7 +231,7 @@ public class RoadActivity extends AppCompatActivity {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(NetUrl.getAudio_SOAP_ACTION, envelope);
+        httpTransportSE.call(NetUrl.getAudio_SOAP_ACTION, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

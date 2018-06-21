@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,21 +24,19 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.TextureMapView;
-import com.baidu.mapapi.model.LatLng;import com.dalong.marqueeview.MarqueeView;
+import com.baidu.mapapi.model.LatLng;
 
 import com.google.zxing.activity.CaptureActivity;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.CheckRoadActivity;
 import com.xytsz.xytaj.activity.DealActivity;
-import com.xytsz.xytaj.activity.PatrolListActivity;
+
 import com.xytsz.xytaj.activity.PostRoadActivity;
 import com.xytsz.xytaj.activity.ReportActivity;
 import com.xytsz.xytaj.activity.RoadActivity;
 import com.xytsz.xytaj.activity.SendRoadActivity;
 import com.xytsz.xytaj.base.BaseFragment;
 
-import com.xytsz.xytaj.bean.Person;
-import com.xytsz.xytaj.bean.Review;
 import com.xytsz.xytaj.global.GlobalContanstant;
 
 import com.xytsz.xytaj.net.NetUrl;
@@ -48,6 +47,7 @@ import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -109,7 +109,6 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
 
     private TextView mActionbartext;
-    private LinearLayout mllScan;
     private TextView mtvPatrolNumber;
     private List<String> patrolNumbers = new ArrayList<>();
 
@@ -126,7 +125,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         mllSend = view.findViewById(R.id.ll_home_send);
         mllUncheck = view.findViewById(R.id.ll_home_uncheck);
         mllCheck = view.findViewById(R.id.ll_home_check);
-        mllScan = (LinearLayout) view.findViewById(R.id.ll_home_scan);
+
         mtvdealNumber = (TextView) view.findViewById(R.id.tv_home_deal_number);
         mtvreviewNumber = (TextView) view.findViewById(R.id.tv_home_review_number);
         mtvsendNumber = (TextView) view.findViewById(R.id.tv_home_send_number);
@@ -140,7 +139,6 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
     @Override
     public void initData() {
-
 
         noData = getString(R.string.table_nodata);
 
@@ -165,12 +163,22 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         mllDeal.setOnClickListener(listener);
         mllSend.setOnClickListener(listener);
         mllReview.setOnClickListener(listener);
-        mllScan.setOnClickListener(listener);
+
 
     }
 
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     private void getData() {
+
+        headerList.clear();
+        if (HomeFragment.this.getActivity() != null) {
+            HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                    SpUtils.getString(HomeFragment.this.getActivity(), GlobalContanstant.CookieHeader));
+
+            headerList.add(headerPropertyObj);
+        }
+
         patrolNumbers.clear();
         new Thread() {
             @Override
@@ -226,7 +234,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getTasklist_SOAP_ACTION, envelope);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String json = object.getProperty(0).toString();
@@ -310,9 +318,9 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
     @Override
     public void onDestroy() {
-        mapview.onDestroy();
         super.onDestroy();
-        if(locationClient != null){
+        mapview.onDestroy();
+        if (locationClient != null) {
             locationClient.stop();
             locationClient.unRegisterLocationListener(myListener);
         }
@@ -333,6 +341,14 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
                     mtvdealNumber.setVisibility(View.VISIBLE);
 
                     List<String> list = (List<String>) msg.obj;
+
+                    for (String str : list) {
+                        if (TextUtils.equals(str, GlobalContanstant.NoLogin)) {
+                            ToastUtil.shortToast(getContext(),"请先登录");
+                            return;
+                        }
+                    }
+
                     for (int i = 0; i < list.size(); i++) {
                         if (list.get(i).equals("0")) {
                             switch (i) {
@@ -368,14 +384,14 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
                     break;
                 case FAIL:
-                    if (HomeFragment.this.getActivity() != null){
-                        ToastUtil.shortToast(HomeFragment.this.getActivity(), noData);
+                    if (HomeFragment.this.getActivity() != null) {
+//                        ToastUtil.shortToast(HomeFragment.this.getActivity(), "");
                     }
                     break;
                 case ISLOAD:
                     String isload = (String) msg.obj;
                     if (!isload.equals("true")) {
-                        ToastUtil.shortToast(getContext(), "上报位置信息失败，请检查网络");
+//                        ToastUtil.shortToast(getContext(), "上报位置信息失败，请检查网络");
                     }
                     break;
             }
@@ -438,31 +454,9 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
                     //验收
                     IntentUtil.startActivity(getContext(), CheckRoadActivity.class);
                     break;
-                case R.id.ll_home_scan:
 
-                    // PermissionUtils.requestPermission(HomeFragment.this.getActivity(),PermissionUtils.CODE_CAMERA,mPermissionGrant);
-                    break;
             }
         }
-    }
-
-    private String toUpLoadLocation(int personID, String latitude, String longitude) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.uploadLocationmethodName);
-        soapObject.addProperty("personId", personID);
-        soapObject.addProperty("latitude", latitude);
-        soapObject.addProperty("longitude", longitude);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.setOutputSoapObject(soapObject);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.toUploadlocation_SOAP_ACTION, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        String result = object.getProperty(0).toString();
-        return result;
     }
 
 

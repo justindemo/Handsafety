@@ -40,6 +40,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -97,9 +98,9 @@ public class SendRoadActivity extends AppCompatActivity {
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setLargeIcon(largeBitmap)
                             .setContentIntent(getContentIntent())
-                            .setPriority(Notification.PRIORITY_HIGH)//高优先级
-                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                            .setVisibility(Notification.VISIBILITY_PRIVATE)
+                            .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_HIGH)//高优先级
+                            .setDefaults(NotificationCompat.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                            .setVisibility(android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE)
                             //自动隐藏
                             .setAutoCancel(true)
 
@@ -152,8 +153,15 @@ public class SendRoadActivity extends AppCompatActivity {
 
 
     private List<AudioUrl> audioUrls = new ArrayList<>();
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     private void initData() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
 
         mProgressBar.setVisibility(View.VISIBLE);
         //点击的时候请求参数
@@ -165,7 +173,7 @@ public class SendRoadActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    final String reviewData =DealActivity.getServiceData(NetUrl.getsendtask,personId);
+                    String reviewData =DealActivity.getServiceData(NetUrl.getsendtask,personId);
                     String allPersonList = getAllPersonList();
 
                     if (reviewData != null) {
@@ -186,7 +194,7 @@ public class SendRoadActivity extends AppCompatActivity {
                                 /**
                                  * 获取到图片的URl
                                  */
-                                String json = MyApplication.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW);
+                                String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
 
                                 if (json != null) {
                                     List<ImageUrl> imageUrlList = new Gson().fromJson(json, new TypeToken<List<ImageUrl>>() {
@@ -196,7 +204,7 @@ public class SendRoadActivity extends AppCompatActivity {
 
                                 }
 
-                                String audioUrljson = RoadActivity.getAudio(taskNumber);
+                                String audioUrljson = RoadActivity.getAudio(taskNumber,headerList);
                                 if (audioUrljson != null) {
                                     AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
                                     audioUrls.add(audioUrl);
@@ -256,7 +264,7 @@ public class SendRoadActivity extends AppCompatActivity {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(NetUrl.getPersonList_SOAP_ACTION, envelope);
+        httpTransportSE.call(NetUrl.getPersonList_SOAP_ACTION, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

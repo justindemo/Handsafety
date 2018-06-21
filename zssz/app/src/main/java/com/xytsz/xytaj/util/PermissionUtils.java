@@ -1,6 +1,7 @@
 package com.xytsz.xytaj.util;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -49,6 +50,7 @@ public class PermissionUtils {
     public static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     public static final String PERMISSION_ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     public static final String PERMISSION_ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    @SuppressLint("InlinedApi")
     public static final String PERMISSION_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public static final String PERMISSION_RECEIVE_SMS = Manifest.permission.RECEIVE_SMS;

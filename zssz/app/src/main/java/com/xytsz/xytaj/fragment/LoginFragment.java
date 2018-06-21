@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -46,10 +48,8 @@ public class LoginFragment extends android.support.v4.app.Fragment {
 
     private static final int PERSONDATA = 11123;
     private static final int FAILLOGIN = 11133;
-    private static final int ISMEMBER = 11143;
 
-    private List<String> personNameList = new ArrayList<>();
-    private List<String> personIDList = new ArrayList<>();
+
     private EditText login_id;
     private EditText passWord;
     private Button login;
@@ -71,19 +71,7 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                 case FAILLOGIN:
                     ToastUtil.shortToast(getActivity(), checknet);
                     break;
-                case ISMEMBER:
-                    List<Person> list = (List<Person>) msg.obj;
-                    if (list.size() != 0) {
-                        for (Person detail : list) {
-                            personNameList.add(detail.getName());
-                            personIDList.add(detail.getId() + "");
-                        }
-                        SpUtils.putStrListValue(getActivity(), GlobalContanstant.PERSONNAMELIST, personNameList);
-                        SpUtils.putStrListValue(getActivity(), GlobalContanstant.PERSONIDLIST, personIDList);
-                    } else {
-                        ToastUtil.shortToast(getActivity(), neterror);
-                    }
-                    break;
+
             }
         }
     };
@@ -137,8 +125,10 @@ public class LoginFragment extends android.support.v4.app.Fragment {
 
                     if (TextUtils.isEmpty(loginID) || TextUtils.isEmpty(pWD)) {
                         ToastUtil.shortToast(getContext(), nodata);
-
+                        return;
                     }
+
+                    SpUtils.exit(getActivity().getApplicationContext());
 
                     //上传服务器
                     new Thread() {
@@ -156,6 +146,8 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                                                 }
                                             });
                                         } else {
+
+
                                             final PersonInfo personInfo = JsonUtil.jsonToBean(json, PersonInfo.class);
                                             //保存到本地  ID  名字
                                             personid = personInfo.getID();
@@ -164,21 +156,8 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                                             String department = personInfo.getDeptName();
 
                                             int role = personInfo.getRole_ID();
-
-                                            String personJson = MyApplication.getAllPersonList(personid);
-                                            if (personJson != null) {
-                                                if (!personJson.equals("[]")){
-                                                    List<Person> memberList = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
-                                                    }.getType());
-                                                    Message message = Message.obtain();
-                                                    message.obj = memberList;
-                                                    message.what = ISMEMBER;
-                                                    handler.sendMessage(message);
-                                                }
-                                            }
-
                                             //sp 保存
-                                            SpUtils.exit(getActivity().getApplicationContext());
+//
 
 
                                             SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.LOGINID, loginID);
@@ -265,10 +244,22 @@ public class LoginFragment extends android.support.v4.app.Fragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        List headerList = httpTransportSE.call(null, envelope, null);
+        //获取cookie 新加的
+        for (Object header:headerList) {
+            HeaderProperty headerProperty = (HeaderProperty) header;
+            String headerKey = headerProperty.getKey();
+            String headerValue = headerProperty.getValue();
+            Log.d(headerKey," : "+ headerKey);
+            Log.d(headerValue," : "+ headerValue);
+//            System.out.println(headerKey +" : " + headerValue);
+            SpUtils.saveString(getActivity(),headerKey,headerValue);
+        }
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
+
+        
         return result;
     }
 }

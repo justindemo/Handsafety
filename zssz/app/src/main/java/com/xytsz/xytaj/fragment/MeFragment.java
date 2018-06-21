@@ -39,6 +39,7 @@ import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 import com.xytsz.xytaj.util.UpdateVersionUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -54,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -109,6 +111,7 @@ public class MeFragment extends BaseFragment {
     private String userName;
     private TextView mActionbartext;
     private TextView tvReviewNum;
+    private static boolean isClick;
 
 
     @Override
@@ -179,6 +182,16 @@ public class MeFragment extends BaseFragment {
         mLLReview.setOnClickListener(listener);
         //mTvData.setOnClickListener(listener);
         forUs.setOnClickListener(listener);
+
+
+        headerList.clear();
+        if (MeFragment.this.getActivity() != null) {
+            HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                    SpUtils.getString(MeFragment.this.getActivity(), GlobalContanstant.CookieHeader));
+
+            headerList.add(headerPropertyObj);
+        }
+
     }
 
 
@@ -204,6 +217,9 @@ public class MeFragment extends BaseFragment {
             switch (v.getId()) {
                 case R.id.iv_my_icon:
                     //
+
+
+
                     Intent intent1 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(intent1, 200);
                     break;
@@ -395,7 +411,7 @@ public class MeFragment extends BaseFragment {
 
                 HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
                 try {
-                    httpTransportSE.call(NetUrl.uploadHeadImg_SOAP_ACTION, envelope);
+                    httpTransportSE.call(NetUrl.uploadHeadImg_SOAP_ACTION, envelope,headerList);
                     SoapObject object = (SoapObject) envelope.bodyIn;
                     String result = object.getProperty(0).toString();
 
@@ -416,7 +432,7 @@ public class MeFragment extends BaseFragment {
 
     private String createFileName() {
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
         String fileName = format.format(date) + ".jpg";
         return fileName;
 
@@ -449,19 +465,15 @@ public class MeFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
     }
 
-    private List<String> numbers = new ArrayList<>();
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
 
-                case ISNUMBER:
-
-                    break;
 
                 case RESULT:
                     String result = (String) msg.obj;
@@ -482,7 +494,8 @@ public class MeFragment extends BaseFragment {
                     String info = (String) msg.obj;
                     if (info != null) {
                         //检查更新
-                        UpdateVersionUtil.localCheckedVersion(MeFragment.this.getActivity().getApplicationContext(), new UpdateVersionUtil.UpdateListener() {
+                        UpdateVersionUtil.localCheckedVersion(MeFragment.this.getActivity().getApplicationContext(),
+                                new UpdateVersionUtil.UpdateListener() {
 
                             @Override
                             public void onUpdateReturned(int updateStatus, final VersionInfo versionInfo) {
@@ -490,7 +503,7 @@ public class MeFragment extends BaseFragment {
                                 switch (updateStatus) {
                                     case UpdateStatus.YES:
                                         //弹出更新提示
-                                        UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,false);
+                                        isClick =UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,false);
                                         break;
                                     case UpdateStatus.NO:
                                         //没有新版本
@@ -499,7 +512,7 @@ public class MeFragment extends BaseFragment {
                                     case UpdateStatus.NOWIFI:
                                         //当前是非wifi网络
                                         //UpdateVersionUtil.showDialog(getContext(),versionInfo);
-                                        UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,true);
+                                        isClick =UpdateVersionUtil.showDialog(MeFragment.this.getActivity(), versionInfo,true);
 
 
                                         break;
@@ -514,6 +527,7 @@ public class MeFragment extends BaseFragment {
                                 }
                             }
                         }, info);
+                        isClick = false;
                     }
                     break;
             }
@@ -547,21 +561,27 @@ public class MeFragment extends BaseFragment {
 
             //更新
             case R.id.me_update:
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            String versionInfo = UpdateVersionUtil.getVersionInfo();
-                            Message message = Message.obtain();
-                            message.obj = versionInfo;
-                            message.what = VERSIONINFO;
-                            handler.sendMessage(message);
-                        } catch (Exception e) {
+
+                if (!isClick) {
+                    isClick = true;
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                String versionInfo = UpdateVersionUtil.getVersionInfo(headerList);
+                                Message message = Message.obtain();
+                                message.obj = versionInfo;
+                                message.what = VERSIONINFO;
+                                handler.sendMessage(message);
+                            } catch (Exception e) {
+
+                            }
 
                         }
+                    }.start();
 
-                    }
-                }.start();
+                }
+
                 break;
             //分享
             case R.id.me_share:
@@ -572,6 +592,8 @@ public class MeFragment extends BaseFragment {
             case R.id.me_exit:
                 SpUtils.exit(getActivity().getApplicationContext());
                 SpUtils.saveBoolean(getContext(), GlobalContanstant.ISFIRSTENTER, false);
+                //退出
+                userExit();
                 Intent intent1 = new Intent(MeFragment.this.getActivity(), MainActivity.class);
                 intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent1);
@@ -588,7 +610,34 @@ public class MeFragment extends BaseFragment {
         }
     }
 
+    private void userExit() {
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    exit();
+                } catch (Exception e) {
 
+                }
+
+            }
+        }.start();
+    }
+
+    private void exit() throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.UesrExit);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(null, envelope,headerList);
+
+    }
+
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
 
     private void showShare() {

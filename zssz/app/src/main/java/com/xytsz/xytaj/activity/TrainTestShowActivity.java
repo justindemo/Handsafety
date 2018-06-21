@@ -23,11 +23,13 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -35,7 +37,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/4/12.
- * 展示培训内容
+ * 展示培训内容列表
  */
 public class TrainTestShowActivity extends AppCompatActivity {
 
@@ -194,7 +196,17 @@ public class TrainTestShowActivity extends AppCompatActivity {
         initData();
     }
 
+
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private void initData() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+
 
         traintestshowProgressbar.setVisibility(View.VISIBLE);
         new Thread(){
@@ -227,7 +239,7 @@ public class TrainTestShowActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

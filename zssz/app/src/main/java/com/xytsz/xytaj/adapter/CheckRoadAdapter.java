@@ -27,7 +27,8 @@ public class CheckRoadAdapter extends BaseAdapter {
 
     private List<Review> reviewRoadDetails;
 
-    public CheckRoadAdapter(List<Review> reviewRoad, List<List<ImageUrl>> imageUrlLists, List<List<ImageUrl>> imageUrlPostLists) {
+    public CheckRoadAdapter(List<Review> reviewRoad, List<List<ImageUrl>> imageUrlLists,
+                            List<List<ImageUrl>> imageUrlPostLists) {
 
         this.reviewRoad = reviewRoad;
         this.imageUrlLists = imageUrlLists;

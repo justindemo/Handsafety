@@ -29,8 +29,10 @@ import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.BitmapUtil;
 import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.PermissionUtils;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -170,8 +172,15 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
 
     }
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private void updata() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
         new Thread() {
             @Override
             public void run() {
@@ -213,7 +222,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String isphotoSuccess = object.getProperty(0).toString();

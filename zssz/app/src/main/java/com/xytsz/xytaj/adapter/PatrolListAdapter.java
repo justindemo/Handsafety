@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Created by admin on 2018/3/26.
- *
+ * <p/>
  * 每日任务的适配器
  */
 public class PatrolListAdapter extends BaseQuickAdapter<PatrolListBean> {
@@ -25,20 +25,18 @@ public class PatrolListAdapter extends BaseQuickAdapter<PatrolListBean> {
     protected void convert(BaseViewHolder helper, PatrolListBean item) {
 
         //添加检查人1 和二
-        helper.setText(R.id.tv_facility_name,item.getDeviceName());
-        helper.setText(R.id.tv_facility_code,item.getDeviceNum());
-        helper.setText(R.id.tv_facility_location,item.getAddressInfo());
-        helper.setText(R.id.tv_facility_team,item.getDept_Name());
-        helper.setText(R.id.tv_facility_state,item.getState());
-        helper.setVisible(R.id.lv_check_title,isVisiable);
+        helper.setText(R.id.tv_facility_name, item.getDeviceName());
+        helper.setText(R.id.tv_facility_code, item.getDeviceNum());
+        helper.setText(R.id.tv_facility_location, item.getAddressInfo());
+        helper.setText(R.id.tv_facility_team, item.getDept_Name());
+        helper.setText(R.id.tv_facility_state, item.getState());
+        helper.setVisible(R.id.lv_check_title, isVisiable);
         //如果是false，不显示  true  显示，替换控件。
-        if (isVisiable) {
-            helper.setText(R.id.tv_facility_checkperson1, item.getCheckPersonName());
-            helper.setText(R.id.tv_facility_checkperson2, item.getCheckPersonName2());
-        }else {
-            helper.setText(R.id.tv_facility_person1, item.getCheckPersonName());
-            helper.setText(R.id.tv_facility_person2, item.getCheckPersonName2());
-        }
+        helper.setText(R.id.tv_facility_checkperson1, item.getRepeatPersonName());
+        helper.setText(R.id.tv_facility_checkperson2, item.getRepeatPersonName2());
+        helper.setText(R.id.tv_facility_person1, item.getCheckPersonName());
+        helper.setText(R.id.tv_facility_person2, item.getCheckPersonName2());
+
 
     }
 }

@@ -28,6 +28,34 @@ public class PatrolListBean implements Serializable{
     private String Administrator;
     private String AJDeviceType;
 
+    public String getRepeatPersonName() {
+        return RepeatPersonName;
+    }
+
+    public void setRepeatPersonName(String repeatPersonName) {
+        RepeatPersonName = repeatPersonName;
+    }
+
+    public String getRepeatPersonName2() {
+        return RepeatPersonName2;
+    }
+
+    public void setRepeatPersonName2(String repeatPersonName2) {
+        RepeatPersonName2 = repeatPersonName2;
+    }
+
+    private String RepeatPersonName;//排查人1 新加的
+    private String RepeatPersonName2;//排查人2
+
+    private String CheckPersonName;//检查人1 之前的
+
+    private String CheckPersonName2;//检查人2
+
+
+
+
+
+
     public String getCheckPersonName() {
         return CheckPersonName;
     }
@@ -44,8 +72,8 @@ public class PatrolListBean implements Serializable{
         CheckPersonName2 = checkPersonName2;
     }
 
-    private String CheckPersonName;
-    private String CheckPersonName2;
+
+
 
 
 

@@ -39,6 +39,7 @@ import com.xytsz.xytaj.util.SoundUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -81,10 +82,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     ImageView ivSendDetailPhoto3;
     @Bind(R.id.tv_send_problem_audio)
     TextView tvSendProblemAudio;
-    @Bind(R.id.iv_play_video)
-    ImageView ivPlayVideo;
-    @Bind(R.id.ll_video)
-    LinearLayout llVideo;
+
     @Bind(R.id.tv_send_detail_diseasedes)
     TextView tvSendDetailDiseasedes;
     @Bind(R.id.tv_send_detail_facility)
@@ -166,15 +164,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     }
 
                     break;
-                case SUCCESS:
-                    videopath = (String) msg.obj;
-                    if (videopath.isEmpty() || videopath == null || videopath.equals("false")) {
-                        llVideo.setVisibility(View.GONE);
-                    } else {
-                        llVideo.setVisibility(View.VISIBLE);
-                    }
 
-                    break;
                 case GlobalContanstant.CHECKROADPASS:
                     String result = (String) msg.obj;
                     if (result != null) {
@@ -405,8 +395,17 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 break;
         }
 
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+
 
     }
+
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     @Override
     public void onClick(View v) {
@@ -426,16 +425,12 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
-    @OnClick({R.id.iv_play_video, R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
+    @OnClick({ R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
             R.id.iv_review_icon3, R.id.tv_check_pass, R.id.tv_check_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
-            case R.id.iv_play_video:
-                Intent intent1 = new Intent(SendRoadDetailActivity.this, PlayVideoActivity.class);
-                intent1.putExtra("videoPath", videopath);
-                startActivity(intent1);
-                break;
+
             case R.id.tv_send_pass:
                 //拿到意见
                 mineAdvice = tvSendDetailMineAdvice.getText().toString().trim();
@@ -571,7 +566,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String result = object.getProperty(0).toString();
@@ -593,7 +588,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String result = object.getProperty(0).toString();
@@ -619,7 +614,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String isphotoSuccess = object.getProperty(0).toString();
@@ -678,7 +673,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                     }
 
                     ivReviewIcon1.setImageBitmap(bitmap);
-                    String fileName1 = saveToSDCard(bitmap);
+                    String fileName1 = saveToSDCard(bitmap,1);
                     //将选择的图片设置到控件上
                     String encode1 = ReportActivity.photo2Base64(path);
                     ivReviewIcon1.setClickable(false);
@@ -698,7 +693,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                         return;
                     }
                     ivReviewIcon2.setImageBitmap(bitmap);
-                    String fileName2 = saveToSDCard(bitmap);
+                    String fileName2 = saveToSDCard(bitmap,2);
                     //将选择的图片设置到控件上
                     ivReviewIcon2.setClickable(false);
                     String encode2 = ReportActivity.photo2Base64(path);
@@ -717,7 +712,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                         return;
                     }
                     ivReviewIcon3.setImageBitmap(bitmap);
-                    String fileName3 = saveToSDCard(bitmap);
+                    String fileName3 = saveToSDCard(bitmap,3);
                     ivReviewIcon3.setClickable(false);
                     //将选择的图片设置到控件上
                     String encode3 = ReportActivity.photo2Base64(path);
@@ -739,9 +734,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
     private String path;
 
-    private String saveToSDCard(Bitmap bitmap) {
+    private String saveToSDCard(Bitmap bitmap,int position) {
         //先要判断SD卡是否存在并且挂载
-        String photoName = createPhotoName();
+        String photoName = createPhotoName(position);
         path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             try {
@@ -768,10 +763,10 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
     }
 
-    private String createPhotoName() {
+    private String createPhotoName(int position) {
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String fileName = format.format(date)  +".jpg";
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA);
+        String fileName = format.format(date) +"_"+position + "_" + personID  +".jpg";
         return fileName;
 
     }
@@ -812,7 +807,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String data = object.getProperty(0).toString();

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -25,8 +26,10 @@ import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.ui.SearchView;
 import com.xytsz.xytaj.util.JsonUtil;
+import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -53,6 +56,7 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
     @Bind(R.id.morning_progressbar)
     LinearLayout morningProgressbar;
     private int meetingId;
+    private HeaderProperty headerPropertyObj;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,8 +68,59 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
         ButterKnife.bind(this);
 
         initActionbar();
+        //是否签到
+        isSign();
 
     }
+
+
+    private void isSign (){
+
+        HeaderProperty headerPropertyObj =  new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.clear();
+
+        headerList.add(headerPropertyObj);
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        String result = getIsSign(meetingId);
+                        Message message = Message.obtain();
+                        message.obj = result;
+                        message.what = GlobalContanstant.CHECKROADPASS;
+                        handler.sendMessage(message);
+                    } catch (Exception e) {
+                        Message message = Message.obtain();
+                        message.what = 300;
+                        handler.sendMessage(message);
+                    }
+                }
+            }.start();
+
+        }
+
+
+        private String getIsSign(int meetID) throws  Exception {
+            SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.isMeetingSign);
+            soapObject.addProperty("personId", personId);
+            soapObject.addProperty("meetId", meetID);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+            envelope.bodyOut = soapObject;
+            envelope.dotNet = true;
+            envelope.setOutputSoapObject(soapObject);
+
+            HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+            httpTransportSE.call(null, envelope,headerList);
+
+            SoapObject object = (SoapObject) envelope.bodyIn;
+            return object.getProperty(0).toString();
+
+        }
+
+
 
     private void initData() {
         autoCompleteData = null;
@@ -241,7 +296,6 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
         switch (view.getId()) {
             case R.id.tv_sign_person:
                 //弹窗
-
                 getData();
                 break;
             case R.id.report_sign:
@@ -283,8 +337,9 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
             }
         }.start();
     }
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private String upSerive(int personId) throws Exception {
+
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.uploadMeeting);
         soapObject.addProperty("meetId",meetingId);
         soapObject.addProperty("personId",personId);
@@ -294,7 +349,10 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+
+        //添加cookie
+//
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -338,6 +396,22 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
                         finish();
                     }
                     break;
+                case GlobalContanstant.CHECKROADPASS:
+                    morningProgressbar.setVisibility(View.GONE);
+                    String issign = (String) msg.obj;
+                    if (TextUtils.equals(issign,"true")){
+                        ToastUtil.shortToast(getApplicationContext(),"您已签到过");
+                        //新加
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        },1500);
+                    }
+
+                    break;
+
             }
         }
     };
@@ -374,7 +448,8 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 

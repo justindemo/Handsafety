@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 
 /**
  * Created by luoxw on 2016/6/20.
+ *
  */
 public class ItemDragAndSwipeCallback extends ItemTouchHelper.Callback {
 

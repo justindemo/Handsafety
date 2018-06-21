@@ -41,7 +41,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
 
     protected BaseViewHolder(View view) {
         super(view);
-        this.views = new SparseArray<View>();
+        this.views = new SparseArray<>();
         convertView = view;
 
     }

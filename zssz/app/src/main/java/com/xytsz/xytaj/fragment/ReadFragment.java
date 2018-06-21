@@ -18,8 +18,7 @@ import com.xytsz.xytaj.util.CallBackUtil;
 
 /**
  * ViewPager切换的View,用来显示题
- * <p>
- *
+ * <p/>
  */
 
 public class ReadFragment extends Fragment {
@@ -27,7 +26,7 @@ public class ReadFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private  int score;
+    private int score;
 
     private AnwerInfo.SubDataBean subDataBean;
     private View view;
@@ -79,7 +78,6 @@ public class ReadFragment extends Fragment {
     }
 
 
-
     private void initView() {
         TextView tv_question = (TextView) view.findViewById(R.id.tv_question);
         TextView tv_answer = (TextView) view.findViewById(R.id.tv_answer);
@@ -98,23 +96,22 @@ public class ReadFragment extends Fragment {
         mreadRB_d.setText(subDataBean.getOptiond());
         tv_answer.setText(subDataBean.getAnswer());
 
-        if (subDataBean.getOptionc().isEmpty() ||subDataBean.getOptionc() ==null){
+        if (subDataBean.getOptionc().isEmpty() || subDataBean.getOptionc() == null) {
             mreadRB_c.setVisibility(View.GONE);
             mreadRB_d.setVisibility(View.GONE);
-        }else if (subDataBean.getOptiond().isEmpty() || subDataBean.getOptiond() == null){
+        } else if (subDataBean.getOptiond().isEmpty() || subDataBean.getOptiond() == null) {
             mreadRB_d.setVisibility(View.GONE);
         }
 
 
         position = subDataBean.getQuestionid();
-        score =subDataBean.getScore();
-
+        score = subDataBean.getScore();
 
 
         mRg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
+                switch (checkedId) {
                     case R.id.read_rb_a:
                         //保存答案 并进入下一题，
                         subDataBean.setUserAnswer("A");
@@ -135,15 +132,15 @@ public class ReadFragment extends Fragment {
                 }
 
                 subDataBean.setVisibility(true);
-                if (isAnswer(subDataBean.getUserAnswer())){
+                if (isAnswer(subDataBean.getUserAnswer())) {
                     //分数加2
                     score = subDataBean.getMark();
                     subDataBean.setScore(score);
                 }
                 mllanswer.setVisibility(View.VISIBLE);
-                //其他的不能点击
+                //不能点击
                 initClick(false);
-                CallBackUtil.doNext(position);
+
 
             }
         });
@@ -156,8 +153,8 @@ public class ReadFragment extends Fragment {
         super.onResume();
         //是否有保存的答案 ，如果有就显示没有就不显示
         String userAnswer = subDataBean.getUserAnswer();
-        if (userAnswer != null){
-            switch (userAnswer){
+        if (userAnswer != null) {
+            switch (userAnswer) {
                 case "A":
                     mRg.check(R.id.read_rb_a);
                     break;
@@ -174,31 +171,28 @@ public class ReadFragment extends Fragment {
 
         }
 
-        if (subDataBean.isVisibility()){
+        if (subDataBean.isVisibility()) {
             mllanswer.setVisibility(View.VISIBLE);
         }
     }
 
     private void initClick(boolean isClick) {
-        mreadRB_a.setClickable(isClick);
-        mreadRB_b.setClickable(isClick);
-        mreadRB_c.setClickable(isClick);
-        mreadRB_d.setClickable(isClick);
+
+        for (int i = 0; i < mRg.getChildCount(); i++) {
+            mRg.getChildAt(i).setEnabled(isClick);
+        }
+
 
     }
 
     private boolean isAnswer(String answer) {
-        return TextUtils.equals(answer,subDataBean.getAnswer());
+        return TextUtils.equals(answer, subDataBean.getAnswer());
     }
-    private OnReadFragmentListener mListener;
 
-    public interface OnReadFragmentListener{
-         void onNext(int position);
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+
     }
 }

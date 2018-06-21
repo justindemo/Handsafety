@@ -47,6 +47,7 @@ import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 import com.xytsz.xytaj.util.UpdateVersionUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalDate;
 import org.ksoap2.serialization.SoapObject;
@@ -55,6 +56,7 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by admin on 2017/1/3.
@@ -67,7 +69,7 @@ public class HomeActivity extends AppCompatActivity {
     private RadioGroup mRadiogroup;
     private NoScrollViewpager mViewpager;
     private ArrayList<Fragment> fragments;
-    private Boolean isFive;
+
     private RelativeLayout rl_notonlie;
     private Button mbtrefresh;
     private ProgressBar mprogressbar;
@@ -76,7 +78,11 @@ public class HomeActivity extends AppCompatActivity {
     private boolean isFirst;
     private VersionInfo versionInfo;
     private RadioButton mRadiosupply;
-
+    /**
+     * 防止误触退出
+     */
+    private long mExitTime;
+    private static boolean isUpdata;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,8 +118,6 @@ public class HomeActivity extends AppCompatActivity {
 
         if (isNetworkAvailable(getApplicationContext())) {
             isOnCreat = true;
-            getData();
-
             mViewpager.setVisibility(View.VISIBLE);
             rl_notonlie.setVisibility(View.GONE);
             mprogressbar.setVisibility(View.GONE);
@@ -127,7 +131,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isNetworkAvailable(getApplicationContext())){
-                    getData();
+
                     //修改
                     mViewpager.setVisibility(View.VISIBLE);
                     rl_notonlie.setVisibility(View.GONE);
@@ -140,43 +144,6 @@ public class HomeActivity extends AppCompatActivity {
 
         initData();
     }
-
-    private void getData() {
-        new  Thread(){
-            @Override
-            public void run() {
-                try {
-                    int allUserCount = getAllUserCount(NetUrl.getAllUserCountMethodName, NetUrl.getAllUserCount_SOAP_ACITION);
-                    SpUtils.saveInt(getApplicationContext(), GlobalContanstant.ALLUSERCOUNT,allUserCount);
-
-                }catch (Exception e){
-
-                }
-
-            }
-        }.start();
-
-    }
-
-    public int getAllUserCount(String method,String soap_action) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(soap_action, envelope);
-
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        return Integer.valueOf(object.getProperty(0).toString());
-
-    }
-
-
-
 
     private void initView() {
         mRadiogroup = (RadioGroup) findViewById(R.id.homeactivity_rg_radiogroup);
@@ -209,9 +176,9 @@ public class HomeActivity extends AppCompatActivity {
         fragments.add(new HomeFragment());
         fragments.add(new SuperviseFragment());
         fragments.add(new MeFragment());
-        fragments.add(new SupplyFragment());
-
-
+        if (role == 5 || role == 6 ) {
+            fragments.add(new SupplyFragment());
+        }
 
         //把fragment填充到viewpager
 
@@ -281,54 +248,39 @@ public class HomeActivity extends AppCompatActivity {
 
 
         if (isFirst){
-            //先判断有没有现版本
-            new Thread(){
-                @Override
-                public void run() {
-                    try {
-                        String versionInfo = UpdateVersionUtil.getVersionInfo();
-                        Message message = Message.obtain();
-                        message.obj = versionInfo;
-                        message.what = VERSIONINFO;
-                        handler.sendMessage(message);
-                    } catch (Exception e) {
+            //添加cookie
+//        private List<HeaderProperty> headerList = new ArrayList<>();
+            headerList.clear();
+            HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                    SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+            headerList.add(headerPropertyObj);
+
+
+            if (!isUpdata) {
+                //先判断有没有现版本
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            String versionInfo = UpdateVersionUtil.getVersionInfo(headerList);
+                            Message message = Message.obtain();
+                            message.obj = versionInfo;
+                            message.what = VERSIONINFO;
+                            handler.sendMessage(message);
+                        } catch (Exception e) {
+
+                        }
 
                     }
-
-                }
-            }.start();
-
+                }.start();
+            }
         }
 
 
 
     }
-
-
-
-    private Boolean isweekfive() {
-
-        final long time = System.currentTimeMillis();
-
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTimeInMillis(time);
-
-        int week = calendar.get(Calendar.DAY_OF_WEEK);
-
-        int hour = calendar.get(Calendar.HOUR);
-
-        int minute = calendar.get(Calendar.MINUTE);
-        if (week == 6 && hour == 17 ){
-            return true;
-        }
-
-        return false;
-
-    }
-
-
-
+    private  List<HeaderProperty> headerList = new ArrayList<>();
 
     /**
      * @param context： 上下文
@@ -379,7 +331,7 @@ public class HomeActivity extends AppCompatActivity {
                                 switch (updateStatus) {
                                     case UpdateStatus.YES:
                                         //弹出更新提示
-                                        UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,false);
+                                        isUpdata= UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,false);
                                         break;
                                     case UpdateStatus.NO:
                                         //没有新版本
@@ -388,7 +340,7 @@ public class HomeActivity extends AppCompatActivity {
                                     case UpdateStatus.NOWIFI:
                                         //当前是非wifi网络
                                         //UpdateVersionUtil.showDialog(getContext(),versionInfo);
-                                        UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,true);
+                                        isUpdata = UpdateVersionUtil.showDialog(HomeActivity.this,versionInfo,true);
 
                                         break;
                                     case UpdateStatus.ERROR:
@@ -418,71 +370,22 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                ToastUtil.shortToast(HomeActivity.this,"再按一次退出程序");
+                mExitTime = System.currentTimeMillis();
 
-        if (keyCode == KeyEvent.KEYCODE_BACK)
-
-        {
-
-            // 创建退出对话框
-
-            AlertDialog.Builder isExit = new AlertDialog.Builder(this);
-
-            // 设置对话框标题
-
-            isExit.setTitle("系统提示");
-
-            // 设置对话框消息
-
-            isExit.setMessage("确定要退出吗");
-
-            // 添加选择按钮并注册监听
-
-            isExit.setPositiveButton("确定", listener);
-
-            isExit.setNegativeButton("取消", listener);
-
-            // 显示对话框
-
-            isExit.show();
-
-
+            } else {
+                finish();
+            }
+            return true;
         }
 
-        return false;
+        return super.onKeyDown(keyCode, event);
     }
 
 
-    DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
 
-    {
-
-        public void onClick(DialogInterface dialog, int which)
-
-        {
-
-            switch (which)
-
-            {
-
-                case AlertDialog.BUTTON_POSITIVE:// "确认"按钮退出程序
-
-                    finish();
-
-                    break;
-
-                case AlertDialog.BUTTON_NEGATIVE:// "取消"第二个按钮取消对话框
-
-                    break;
-
-                default:
-
-                    break;
-
-            }
-
-        }
-
-    };
 
 
     @Override
@@ -500,7 +403,7 @@ public class HomeActivity extends AppCompatActivity {
         //isOncreat  =false
        if (!isOnCreat) {
             if (isNetworkAvailable(getApplicationContext())) {
-                getData();
+
                 mViewpager.setVisibility(View.VISIBLE);
                 rl_notonlie.setVisibility(View.GONE);
                 mprogressbar.setVisibility(View.GONE);
@@ -513,25 +416,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         isOnCreat = false;
 
-        isFive =  isweekfive();
-        if (isFive){
-            String content ="主人,您已经使用一周的掌上市政了,花一分钟的时间对他评价一下吧！";
 
-            new AlertDialog.Builder(this).setTitle("掌上市政评价").setMessage(content).setNegativeButton("别烦我", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    isFive = false;
-                }
-            }).setPositiveButton("好的", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    IntentUtil.startActivity(HomeActivity.this,AppraiseActivity.class);
-                    dialog.dismiss();
-                    isFive = false;
-                }
-            }).create().show();
-        }
     }
 
     @Override

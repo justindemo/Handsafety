@@ -25,11 +25,13 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -45,9 +47,10 @@ public class MoringSignListActivity extends AppCompatActivity {
     RecyclerView moringsignRv;
     @Bind(R.id.moringsign_progressbar)
     LinearLayout moringsignProgressbar;
+    private List<String>  noPersonlist;
+
     private Handler handler = new Handler() {
 
-        private List<String>  noPersonlist;
 
         @Override
         public void handleMessage(Message msg) {
@@ -133,8 +136,17 @@ public class MoringSignListActivity extends AppCompatActivity {
         finish();
         return super.onSupportNavigateUp();
     }
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private void initData() {
+        //添加cookie
+//
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
+
         moringsignProgressbar.setVisibility(View.VISIBLE);
         new Thread() {
             @Override
@@ -177,7 +189,7 @@ public class MoringSignListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -196,7 +208,7 @@ public class MoringSignListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 

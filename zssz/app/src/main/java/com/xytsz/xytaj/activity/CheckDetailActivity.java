@@ -25,12 +25,14 @@ import com.xytsz.xytaj.util.SoundUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -81,10 +83,9 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private TextView mtvPass;
     private int position;
     private Review detail;
-
     private int personID;
-    private static final int SUCCESS = 500;
-    private String videopath;
+
+
 
     private Handler handler = new Handler() {
         @Override
@@ -121,14 +122,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
                     break;
 
-                case SUCCESS:
-                    videopath = (String) msg.obj;
-                    if (videopath.isEmpty() || videopath == null || videopath.equals("false")) {
-                        mllVideo.setVisibility(View.GONE);
-                    } else {
-                        mllVideo.setVisibility(View.VISIBLE);
-                    }
-                    break;
             }
         }
     };
@@ -141,8 +134,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private TextView mtvProblemAudio;
     private SoundUtil soundUtil;
     private TextView mtvfaname;
-    private LinearLayout mllVideo;
-    private ImageView mivPlay;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,21 +155,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         initAcitionbar();
         initView();
 
-//        //请求是否有视屏
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String videopath = SendRoadDetailActivity.getVideo(detail.getTaskNumber());
-//                    Message message = Message.obtain();
-//                    message.what = SUCCESS;
-//                    message.obj = videopath;
-//                    handler.sendMessage(message);
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//        }.start();
         initData();
     }
 
@@ -192,8 +168,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         mtvProblemLoca = (TextView) findViewById(R.id.tv_check_problem_loca);
         mtvProblemAudio = (TextView) findViewById(R.id.tv_check_problem_audio);
 
-        mllVideo = (LinearLayout) findViewById(R.id.ll_video);
-        mivPlay = (ImageView) findViewById(R.id.iv_play_video);
+
     }
 
     private void initData() {
@@ -219,7 +194,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         String problem = stringBuilder.toString().substring(0, stringBuilder.length() -1);
         tvCheckFacilityProblem.setText(problem);
 
-                mtvProblemLoca.setText(detail.getRemarks());
+        mtvProblemLoca.setText(detail.getRemarks());
 
         if (imageUrlReport != null) {
             imageUrl = imageUrlReport.get(position);
@@ -303,14 +278,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         }
 
 
-        mivPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(CheckDetailActivity.this, PlayVideoActivity.class);
-                intent1.putExtra("videoPath", videopath);
-                startActivity(intent1);
-            }
-        });
     }
 
     @Override
@@ -384,8 +351,9 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private String toInspection(int phaseIndication, int personID) throws Exception {
+        headerList.clear();
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
         soapObject.addProperty("id", detail.getId());
         soapObject.addProperty("state", phaseIndication);
@@ -399,8 +367,15 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        //添加cookie
+//        private List<HeaderProperty> headerList = new ArrayList<>();
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
 
-        httpTransportSE.call(NetUrl.toInspection_SOAP_ACTION, envelope);
+        headerList.add(headerPropertyObj);
+
+        httpTransportSE.call(NetUrl.toInspection_SOAP_ACTION, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -415,13 +390,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    private void goHome() {
-        Intent intent = new Intent(CheckDetailActivity.this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("backHome", GlobalContanstant.BACKHOME);
-        startActivity(intent);
-        finish();
-    }
 
 
     private void initAcitionbar() {

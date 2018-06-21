@@ -106,4 +106,10 @@ public class GlobalContanstant {
     public static final String ENVIR = "envir";
     public static final String NOPATROL ="nopatrol";
     public static final String NOCHECK = "nocheck";
+    public static final String CookieHeader ="Set-Cookie";
+    public static final String Cookie ="cookie";
+    public static final int fromScroller =1;
+    public static final int fromList =2;
+    public static final int UnImg = 100;
+    public static final String NoLogin = "NoLogin";
 }

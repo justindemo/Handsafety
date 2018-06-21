@@ -36,7 +36,6 @@ public class MoringSignAdapter extends BaseQuickAdapter<MoringMeeting> {
         helper.setText(R.id.tv_moringsign_stime,item.getBeginTime());
         helper.setText(R.id.tv_moringsign_etime,item.getEndTime());
         helper.setText(R.id.tv_moringsign_number,item.getCount()+"");
-        helper.setText(R.id.tv_moringsign_state,item.getState());
         helper.setText(R.id.tv_moringsign_totalnumber,item.getSumCount()+"");
 
         helper.setOnClickListener(R.id.tv_moringsign_titile, new View.OnClickListener() {

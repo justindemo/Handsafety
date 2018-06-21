@@ -23,11 +23,13 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -71,12 +73,12 @@ public class NoPatrolActivity extends AppCompatActivity {
                                 nocheckRv.setAdapter(patrolListAdapter);
 
                             } else {
-                                ToastUtil.shortToast(getApplicationContext(), "今天排查工作完成");
+                                ToastUtil.shortToast(getApplicationContext(), "今天工作完成");
                             }
 
                         }
                     } else {
-                        ToastUtil.shortToast(getApplicationContext(), "今天排查工作完成");
+                        ToastUtil.shortToast(getApplicationContext(), "今天工作完成");
                     }
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
@@ -119,8 +121,14 @@ public class NoPatrolActivity extends AppCompatActivity {
         initData();
 
     }
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     private void initData() {
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         new Thread() {
             @Override
@@ -146,15 +154,15 @@ public class NoPatrolActivity extends AppCompatActivity {
     private String downData(int personId) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
-        soapObject.addProperty("personId", personId);
+        soapObject.addProperty("personId", personId );
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
         envelope.dotNet = true;
         envelope.setOutputSoapObject(soapObject);
 
-        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL /*"http://192.168.1.179:10801"*/);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

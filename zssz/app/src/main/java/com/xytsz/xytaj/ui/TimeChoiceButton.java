@@ -27,7 +27,7 @@ import java.util.Locale;
 public class TimeChoiceButton extends Button {
 
     public  Calendar time = Calendar.getInstance(Locale.CHINA);
-    public static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    public static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.CHINA);
     private DatePicker datePicker;
     private TimePicker timePicker;
     private AlertDialog dialog;

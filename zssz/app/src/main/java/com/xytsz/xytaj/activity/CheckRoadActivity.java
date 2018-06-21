@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.MyApplication;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.CheckRoadAdapter;
-import com.xytsz.xytaj.adapter.DealAdapter;
+
 import com.xytsz.xytaj.bean.AudioUrl;
 import com.xytsz.xytaj.bean.ImageUrl;
 import com.xytsz.xytaj.bean.Review;
@@ -29,6 +29,7 @@ import com.xytsz.xytaj.util.JsonUtil;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -97,6 +98,7 @@ public class CheckRoadActivity extends AppCompatActivity {
     private List<Review> list;
     private ProgressBar mProgressBar;
     private int personid;
+    private HeaderProperty headerPropertyObj;
 
 
     @Override
@@ -117,7 +119,9 @@ public class CheckRoadActivity extends AppCompatActivity {
     }
 
     private void initData() {
-
+        headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+        headerList.clear();
+        headerList.add(headerPropertyObj);
         mProgressBar.setVisibility(View.VISIBLE);
         new Thread() {
             @Override
@@ -147,7 +151,7 @@ public class CheckRoadActivity extends AppCompatActivity {
                                  * 获取到图片的URl
                                  */
 
-                                String json = MyApplication.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW);
+                                String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
                                 String postJson = getPostImagUrl(taskNumber);
 
                                 if (json != null) {
@@ -167,7 +171,7 @@ public class CheckRoadActivity extends AppCompatActivity {
                                 }
 
 
-                                String audioUrljson = RoadActivity.getAudio(taskNumber);
+                                String audioUrljson = RoadActivity.getAudio(taskNumber,headerList);
                                 if (audioUrljson != null) {
                                     AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
                                     audioUrls.add(audioUrl);
@@ -201,7 +205,7 @@ public class CheckRoadActivity extends AppCompatActivity {
 
 
     }
-
+    private List<HeaderProperty> headerList = new ArrayList<>();
     public String getPostImagUrl(String taskNumber) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getAllImageURLmethodName);
@@ -215,7 +219,7 @@ public class CheckRoadActivity extends AppCompatActivity {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(null, envelope);
+        httpTransportSE.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

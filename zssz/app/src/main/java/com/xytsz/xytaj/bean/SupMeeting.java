@@ -25,6 +25,16 @@ public class SupMeeting implements Serializable {
     private String BeginTime;
     private String Url;
 
+    public String getDeptName() {
+        return DeptName;
+    }
+
+    public void setDeptName(String deptName) {
+        DeptName = deptName;
+    }
+
+    private String DeptName;
+
     public int getMeetId() {
         return MeetId;
     }

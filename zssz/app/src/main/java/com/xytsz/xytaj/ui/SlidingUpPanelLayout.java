@@ -250,7 +250,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
          *
          * @param panel The child view that was slid to an collapsed position
          */
-        public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
+      void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
     }
 
     /**

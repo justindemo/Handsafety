@@ -7,7 +7,7 @@
 
         <TextView
             android:layout_centerInParent="true"
-            android:text="掌上安监"
+            android:text=""
             android:id="@+id/actionbar_text"
             android:textColor="@color/white"
             android:textSize="20sp"

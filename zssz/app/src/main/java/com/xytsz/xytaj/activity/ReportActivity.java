@@ -3,17 +3,17 @@ package com.xytsz.xytaj.activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,25 +33,23 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.util.Base64;
-import android.util.Log;
+
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.baidu.location.BDAbstractLocationListener;
-import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
+import com.google.gson.reflect.TypeToken;
+import com.xytsz.xytaj.MyApplication;
 import com.xytsz.xytaj.R;
 
 import com.xytsz.xytaj.bean.DiseaseInformation;
+import com.xytsz.xytaj.bean.Person;
 import com.xytsz.xytaj.bean.ReportData;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
@@ -66,6 +64,7 @@ import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 
 
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 
 import org.ksoap2.serialization.SoapObject;
@@ -84,7 +83,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 
 /**
@@ -95,14 +93,11 @@ public class ReportActivity extends AppCompatActivity {
 
     private static final int AUDIO_SUCCESS = 500;
     private static final int AUDIO_FAIL = 404;
-    private static final int VIDEO_SUCCESS = 200;
-    private static final int VIDEO_FAIL = 303;
-    private LocationClient locationClient;
-    public BDAbstractLocationListener myListener = new MyListener();
+    private static final int ISMEMBER = 11143;
+
     private ImageView mIvphoto1;
     private ImageView mIvphoto2;
     private ImageView mIvphoto3;
-    private EditText mEtDesc;
     private EditText mEtlocation;
 
     private Button mbtReport;
@@ -110,12 +105,11 @@ public class ReportActivity extends AppCompatActivity {
     private static final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";//图片的存储目录
     private static final String audioPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Audio/";
     private DiseaseInformation diseaseInformation;
-    private String reportResult;
     private String isphotoSuccess1;
     private String path;
     private List<String> fileNames = new ArrayList<>();
     private List<String> imageBase64Strings = new ArrayList<>();
-    private String taskNumber;
+
     private Uri fileUri;
     private int personId;
     private String dialogtitle;
@@ -133,8 +127,6 @@ public class ReportActivity extends AppCompatActivity {
     private LinearLayout mllAudio;
 
     private boolean btn_vocie = false;
-    private boolean btn_road = false;
-    private boolean videoflg = false;
     private static long startTime;
     private SoundUtil soundUtil;
     private String deleteTitle;
@@ -144,23 +136,12 @@ public class ReportActivity extends AppCompatActivity {
     private String recordLittle;
     private String recordMax;
     private String audiosuccess;
-    private String videosuccess;
     private String audioFail;
     private String disrecord;
     private String reportMore;
     private String reportLocation;
-    private ImageView mIvAdd;
-    private ImageView mIvPlay;
-    private ImageView mIvVideoDelete;
-    private ImageView mIvAddVideo;
-    private FrameLayout mFlvideo;
-    private RelativeLayout mllplay;
-    private LinearLayout mllAddVideo;
-    private String videopath;
-    private String videoFail;
-    private String videoName;
-    private String deletevideoContent;
-    private String deleteVideoTitle;
+
+
     private String imageerror;
     private String uperror;
     private String reportsuccess;
@@ -170,18 +151,20 @@ public class ReportActivity extends AppCompatActivity {
     private Button mbtrefresh;
     private String scanResult;
     private TextView mFacility;
-    private TextView mFacilityTeam;
     private TextView mFacilityPerson;
     private TextView mFacilityCheck;
     private TextView mFacilityProblem;
     private TextView mFacilityLoca;
     private ReportData reportData;
+    /**
+     * 检查项
+     */
     private String[] problemitems;
     private String number;
     private String userName;
     private File file;
-    private Bitmap scaledBitmap;
-
+    private String remoteInfo;
+    private List<HeaderProperty> headerList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -208,14 +191,14 @@ public class ReportActivity extends AppCompatActivity {
         imgsuccess = this.getString(R.string.report_imgsuccess);
         request = this.getString(R.string.report_request);
         deleteTitle = getString(R.string.report_delete_title);
-        deleteVideoTitle = getString(R.string.report_delete_video_title);
+
         deleteContent = getString(R.string.report_delete_content);
-        deletevideoContent = getString(R.string.report_delete_video_content);
         deleteOk = getString(R.string.report_delete_ok);
         deleteCancle = getString(R.string.report_delete_cancle);
         recordLittle = getString(R.string.report_record_little);
         recordMax = getString(R.string.report_record_max);
 
+        reportLocation = getString(R.string.reportlocation);
 
         notifa = this.getString(R.string.report_notifica);
         notifatitle = this.getString(R.string.report_notifica_title);
@@ -225,15 +208,13 @@ public class ReportActivity extends AppCompatActivity {
         uperror = this.getString(R.string.report_uperror);
 
         audiosuccess = getString(R.string.audio_success);
-        videosuccess = getString(R.string.video_success);
         audioFail = getString(R.string.audio_fail);
-        videoFail = getString(R.string.video_fail);
+
 
         disrecord = getString(R.string.disrecord);
 
         reportMore = getString(R.string.reportmore);
 
-        reportLocation = getString(R.string.reportlocation);
 
         rl_notonlie = (RelativeLayout) findViewById(R.id.rl_notonline);
         ll_report = (LinearLayout) findViewById(R.id.ll_report);
@@ -241,11 +222,19 @@ public class ReportActivity extends AppCompatActivity {
         mbtrefresh = (Button) findViewById(R.id.btn_refresh);
 
         mFacility = (TextView) findViewById(R.id.report_facility);
-        mFacilityTeam = (TextView) findViewById(R.id.report_facility_team);
+
         mFacilityPerson = (TextView) findViewById(R.id.report_facility_person);
         mFacilityCheck = (TextView) findViewById(R.id.report_facility_check);
         mFacilityProblem = (TextView) findViewById(R.id.report_facility_problem);
         mFacilityLoca = (TextView) findViewById(R.id.report_facility_loca);
+
+
+        headerList.clear();
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+
+        headerList.add(headerPropertyObj);
+
 
         mbtrefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,6 +281,7 @@ public class ReportActivity extends AppCompatActivity {
                 try {
                     // 获取传的值，得到json
                     String reportData = getJson(NetUrl.getReportDataMethodname, NetUrl.getReport_SOAP_ACTION);
+
                     if (reportData != null) {
                         ReportData data = JsonUtil.jsonToBean(reportData, ReportData.class);
                         Message message = Message.obtain();
@@ -331,7 +321,7 @@ public class ReportActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(soap_action, envelope);
+        httpTransportSE.call(soap_action, envelope,headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -341,34 +331,13 @@ public class ReportActivity extends AppCompatActivity {
     private int[] problemId;
 
     private void initView() {
-
-        problemitems = new String[reportData.getList().size() + 1];
-        b = new boolean[reportData.getList().size() + 1];
-        problemId = new int[reportData.getList().size() + 1];
-
-        b[0] = false;
-        problemId[0] = 0;
-        StringBuilder sb = new StringBuilder();
-        problemitems[0] = "正常";
-        for (int i = 1; i < problemitems.length; i++) {
-            problemitems[i] = reportData.getList().get(i - 1).getCheckInfo();
-            sb.append(problemitems[i]).append("\n");
-            b[i] = false;
-            problemId[i] = 1;
-        }
-        String check = sb.toString().substring(0, sb.toString().length() - 1);
-
         mFacility.setText(reportData.getDeviceName());
         mFacilityPerson.setText(reportData.getAdministrator());
-
-        mFacilityCheck.setText(check);
-
         mFacilityLoca.setText(reportData.getAddressInfo());
 
         mIvphoto1 = (ImageView) findViewById(R.id.iv_report_icon1);
         mIvphoto2 = (ImageView) findViewById(R.id.iv_report_icon2);
         mIvphoto3 = (ImageView) findViewById(R.id.iv_report_icon3);
-        mEtDesc = (EditText) findViewById(R.id.problemDesc);
         mEtlocation = (EditText) findViewById(R.id.locationDesc);
         mbtReport = (Button) findViewById(R.id.report);
 
@@ -378,17 +347,6 @@ public class ReportActivity extends AppCompatActivity {
         mtvAudio = (TextView) findViewById(R.id.tv_audio);
         mtvReset = (TextView) findViewById(R.id.tv_re_record);
         mllAudio = (LinearLayout) findViewById(R.id.ll_audio);
-
-
-        //視頻输入
-        mIvAdd = (ImageView) findViewById(R.id.iv_add_video);
-        mIvPlay = (ImageView) findViewById(R.id.iv_play_video);
-        mIvVideoDelete = (ImageView) findViewById(R.id.iv_delete);
-        mIvAddVideo = (ImageView) findViewById(R.id.iv_video_des);
-        mFlvideo = (FrameLayout) findViewById(R.id.fl_video);
-
-        mllAddVideo = (LinearLayout) findViewById(R.id.ll_add_video);
-        mllplay = (RelativeLayout) findViewById(R.id.ll_play_video);
 
 
     }
@@ -411,21 +369,15 @@ public class ReportActivity extends AppCompatActivity {
         PermissionUtils.requestPermission(this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
         PermissionUtils.requestPermission(this, PermissionUtils.CODE_RECORD_AUDIO, mPermissionGrant);
 
-        //locat();
-
 
         mIvphoto1.setOnClickListener(listener);
         mIvphoto2.setOnClickListener(listener);
         mIvphoto3.setOnClickListener(listener);
         mbtReport.setOnClickListener(listener);
 
-
         mIvInput.setOnClickListener(listener);
 
-        mIvAdd.setOnClickListener(listener);
-        mIvAddVideo.setOnClickListener(listener);
-        mIvVideoDelete.setOnClickListener(listener);
-        mIvPlay.setOnClickListener(listener);
+
         mFacilityProblem.setOnClickListener(listener);
 
 
@@ -613,25 +565,6 @@ public class ReportActivity extends AppCompatActivity {
     }
 
 
-    private void locat() {
-        //进入上报页面的 时候 开始定位
-        locationClient = new LocationClient(getApplicationContext());
-        locationClient.registerLocationListener(myListener);
-
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);// 可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
-        option.setCoorType("bd09ll");// 可选，默认gcj02，设置返回的定位结果坐标系
-        int span = 5 * 1000;
-        option.setScanSpan(span);// 可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-        option.setIsNeedAddress(true);// 可选，设置是否需要地址信息，默认不需要
-        option.setOpenGps(true);// 可选，默认false,设置是否使用gps
-        option.setLocationNotify(false);// 可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
-        option.setIgnoreKillProcess(false);// 可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
-        option.SetIgnoreCacheException(false);// 可选，默认false，设置是否收集CRASH信息，默认收集
-        locationClient.setLocOption(option);
-        locationClient.start();
-    }
-
     private String person_id;
     private static final String Tag = "com.xytsz.xytaj.fileprovider";
 
@@ -658,7 +591,6 @@ public class ReportActivity extends AppCompatActivity {
     private String fileResult;
 
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionUtils.CODE_RECORD_AUDIO) {
@@ -671,12 +603,9 @@ public class ReportActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private boolean isVideo;
-    private int checkSelfPermission;
-    private List<Integer> problemlist = new ArrayList<>();
-    private boolean b[];
 
-    private int type;
+    private boolean ischeckProblem[];
+
     View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -684,34 +613,36 @@ public class ReportActivity extends AppCompatActivity {
 
                 case R.id.report_facility_problem:
 
-                    problemlist.clear();
                     //多选的dialog
-                    new AlertDialog.Builder(ReportActivity.this).setTitle("问题项").setMultiChoiceItems(problemitems, b, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                            b[which] = isChecked;
-                            problemId[which] = 0;
-                        }
-                    }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(ReportActivity.this).setTitle("问题项").
+                            setMultiChoiceItems(problemitems, ischeckProblem,
+                                    new DialogInterface.OnMultiChoiceClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                            ischeckProblem[which] = isChecked;
+                                            //被选中代表不正常
+                                            problemId[which] = 0;
+                                        }
+                                    }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             int tatolNum = 0;
-                            for (int i = 0; i < b.length; i++) {
-                                if (!b[i]) {
+                            for (int i = 0; i < ischeckProblem.length; i++) {
+                                if (!ischeckProblem[i]) {
                                     ++tatolNum;
                                 }
                             }
-
-                            if (tatolNum == b.length) {
+                            //未选
+                            if (tatolNum == ischeckProblem.length) {
                                 ToastUtil.shortToast(getApplicationContext(), "必须填写问题项");
                                 return;
                             }
 
-
-                            if (b[0]) {
-                                for (int i = 1; i < b.length; i++) {
-                                    if (b[i]) {
+                            //如果正常被选
+                            if (ischeckProblem[0]) {
+                                for (int i = 1; i < ischeckProblem.length; i++) {
+                                    //不正常的也有选择
+                                    if (ischeckProblem[i]) {
                                         ToastUtil.shortToast(getApplicationContext(), "请正确填写问题项");
                                         mFacilityProblem.setText("");
                                         return;
@@ -720,13 +651,13 @@ public class ReportActivity extends AppCompatActivity {
                             }
 
 
-                            StringBuilder sb = new StringBuilder();
+                            StringBuilder selectproblem = new StringBuilder();
                             for (int i = 0; i < problemitems.length; i++) {
-                                if (b[i]) {
-                                    sb.append(problemitems[i]).append(",");
+                                if (ischeckProblem[i]) {
+                                    selectproblem.append(problemitems[i]).append(",");
                                 }
                             }
-                            String problemtext = sb.toString().substring(0, sb.toString().length() - 1);
+                            String problemtext = selectproblem.toString().substring(0, selectproblem.toString().length() - 1);
                             mFacilityProblem.setText(problemtext);
                             dialog.dismiss();
 
@@ -741,58 +672,7 @@ public class ReportActivity extends AppCompatActivity {
 
                     break;
 
-                case R.id.iv_add_video:
-                    //加号
-                    if (videoflg) {
-                        mFlvideo.setVisibility(View.GONE);
-                        videoflg = false;
-                    } else {
-                        mFlvideo.setVisibility(View.VISIBLE);
-                        //是否有视频
-                        if (isVideo) {
-                            mllplay.setVisibility(View.VISIBLE);
-                            mllAddVideo.setVisibility(View.GONE);
-                        } else {
-                            mllAddVideo.setVisibility(View.VISIBLE);
-                            mllplay.setVisibility(View.GONE);
-                        }
-                        videoflg = true;
-                    }
-                    break;
-
-                //添加视频
-                case R.id.iv_video_des:
-                    Intent intent1 = new Intent(ReportActivity.this, RecordVideoActivity.class);
-                    startActivityForResult(intent1, 300);
-                    break;
-                //删除
-                case R.id.iv_delete:
-
-                    new AlertDialog.Builder(ReportActivity.this).setTitle(deleteVideoTitle).setMessage(deletevideoContent).setPositiveButton(deleteOk, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            File file = new File(videopath);
-                            file.delete();
-                            videopath = null;
-                            mllAddVideo.setVisibility(View.VISIBLE);
-                            mllplay.setVisibility(View.GONE);
-
-                            dialog.dismiss();
-                        }
-                    }).setNegativeButton(deleteCancle, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).create().show();
-
-                    break;
                 //播放
-                case R.id.iv_play_video:
-                    Intent intent = new Intent(ReportActivity.this, PlayVideoActivity.class);
-                    intent.putExtra("videoPath", videopath);
-                    startActivity(intent);
-                    break;
 
                 case R.id.iv_input_style:
                     if (btn_vocie) {
@@ -805,7 +685,7 @@ public class ReportActivity extends AppCompatActivity {
 
                         //判断是否有权限
                         try {
-                            checkSelfPermission = ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.RECORD_AUDIO);
+                            int checkSelfPermission = ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.RECORD_AUDIO);
 
                             if (checkSelfPermission != PackageManager.PERMISSION_GRANTED) {
                                 if (ActivityCompat.shouldShowRequestPermissionRationale(ReportActivity.this, android.Manifest.permission.RECORD_AUDIO)) {
@@ -837,7 +717,6 @@ public class ReportActivity extends AppCompatActivity {
                     PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                     PermissionUtils.requestPermission(ReportActivity.this, PermissionUtils.CODE_CAMERA, mPermissionGrant);
 
-
                     break;
                 case R.id.iv_report_icon2:
                     //拍照
@@ -848,12 +727,20 @@ public class ReportActivity extends AppCompatActivity {
                     camera(3);
                     break;
                 case R.id.report:
+                    /*
+                    初始化
+                     */
+                    checkId = null;
+                    selectProblemId = null;
+                    checkId = new StringBuilder();
+                    selectProblemId = new StringBuilder();
+
 
                     diseaseInformation.taskNumber = getTaskNumber();
 
                     mprogressbar.setVisibility(View.VISIBLE);
                     ToastUtil.shortToast(getApplicationContext(), uploading);
-
+                    //拿到 问题项
                     String facilityProblem = mFacilityProblem.getText().toString();
 
                     if (facilityProblem.isEmpty()) {
@@ -862,36 +749,45 @@ public class ReportActivity extends AppCompatActivity {
                         return;
                     }
 
+
                     //判断是否正常
                     if (facilityProblem.equals("正常")) {
+                        /** 1= 正常   2 = 不正常 */
                         diseaseInformation.problemTag = 1;
+                        //错误信息
                         diseaseInformation.problem = "";
+                        //传递ID:  id:1  正常  id：0  不正常
                         for (int i = 1; i < problemId.length; i++) {
-                            sb1.append(1).append(",");
+                            selectProblemId.append(1).append(",");
                         }
-                        diseaseInformation.problemID = sb1.toString().substring(0, sb1.toString().length() - 1);
+                        diseaseInformation.problemID = selectProblemId.toString().substring(0, selectProblemId.toString().length() - 1);
                     } else {
+                        //不正常
                         String p[] = facilityProblem.split(",");
 
                         for (int i = 0; i < p.length; i++) {
+                            //遍历检查项
                             for (ReportData.Problem pro : reportData.getList()) {
                                 if (p[i].equals(pro.getCheckInfo())) {
-                                    sb.append(pro.getCheckDic_ID()).append(",");
+                                    //拿到错误Id
+                                    checkId.append(pro.getCheckDic_ID()).append(",");
                                 }
                             }
                         }
                         diseaseInformation.problemTag = 2;
-                        diseaseInformation.problem = sb.toString().substring(0, sb.toString().length() - 1);
+                        //具体id
+                        diseaseInformation.problem = checkId.toString().substring(0, checkId.toString().length() - 1);
 
                         for (int i = 1; i < problemId.length; i++) {
-                            sb1.append(problemId[i]).append(",");
+                            selectProblemId.append(problemId[i]).append(",");
                         }
-                        diseaseInformation.problemID = sb1.toString().substring(0, sb1.toString().length() - 1);
+                        //用户选择
+                        diseaseInformation.problemID = selectProblemId.toString().substring(0,
+                                selectProblemId.toString().length() - 1);
 
                     }
 
 
-                    diseaseInformation.diseaseDescription = mEtDesc.getText().toString();
                     diseaseInformation.audioTime = mtvAudio.getText().toString();
                     //保存到服务器  弹吐司
                     if (mEtlocation != null) {
@@ -906,7 +802,7 @@ public class ReportActivity extends AppCompatActivity {
 
                     mprogressbar.setVisibility(View.VISIBLE);
                     diseaseInformation.uploadTime = getCurrentTime();
-                    diseaseInformation.photoName = createPhotoName();
+
 
                     diseaseInformation.upload_Person_ID = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
 
@@ -952,74 +848,55 @@ public class ReportActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                if (videopath != null) {
 
-                                    File file = new File(videopath);
-                                    if (file.exists()) {
-                                        try {
-                                            String encodeBase64File = FileBase64Util.encodeBase64File(videopath);
+                                try {
+                                    remoteInfo = getRemoteInfo(diseaseInformation);
 
-                                            diseaseInformation.encodeBase64File = encodeBase64File;
-                                            diseaseInformation.videoName = videoName;
-                                            String result = updateVideo(diseaseInformation);
-                                            Message message = Message.obtain();
-                                            message.what = VIDEO_SUCCESS;
-                                            message.obj = result;
-                                            handler.sendMessage(message);
-                                        } catch (Exception e) {
-                                            Message message = Message.obtain();
-                                            message.what = VIDEO_FAIL;
-                                            handler.sendMessage(message);
-                                        }
-                                    }
+                                } catch (Exception e) {
+                                    Message message = Message.obtain();
+                                    message.what = GlobalContanstant.REPORTEFAIL;
+                                    handler.sendMessage(message);
                                 }
 
 
-                                for (int i = 0; i < fileNames.size(); i++) {
-                                    diseaseInformation.photoName = fileNames.get(i);
-                                    diseaseInformation.encode = imageBase64Strings.get(i);
-
-                                    try {
-                                        isphotoSuccess1 = connectWebService(diseaseInformation);
-                                    } catch (Exception e) {
-                                        Message message = Message.obtain();
-                                        message.what = GlobalContanstant.IMAGEFAIL;
-                                        handler.sendMessage(message);
-                                    }
-
-                                }
-
-                                if (isphotoSuccess1 != null) {
-                                    if (isphotoSuccess1.equals("true")) {
+                                if (remoteInfo != null) {
+                                    if (remoteInfo.equals("true")) {
                                         handler.post(new Runnable() {
                                             @Override
                                             public void run() {
-                                                ToastUtil.shortToast(getApplicationContext(), imgsuccess);
+                                                ToastUtil.shortToast(getApplicationContext(), reportsuccess);
                                             }
                                         });
 
-                                        try {
 
-                                            String remoteInfo = getRemoteInfo(diseaseInformation);
-                                            Message message = Message.obtain();
-                                            message.obj = remoteInfo;
-                                            message.what = GlobalContanstant.REPORTESUCCESS;
-                                            handler.sendMessage(message);
-                                        } catch (Exception e) {
-                                            Message message = Message.obtain();
-                                            message.what = GlobalContanstant.REPORTEFAIL;
-                                            handler.sendMessage(message);
+                                        for (int i = 0; i < fileNames.size(); i++) {
+                                            diseaseInformation.photoName = fileNames.get(i);
+                                            diseaseInformation.encode = imageBase64Strings.get(i);
+
+                                            try {
+                                                isphotoSuccess1 = connectWebService(diseaseInformation);
+                                            } catch (Exception e) {
+                                                Message message = Message.obtain();
+                                                message.what = GlobalContanstant.IMAGEFAIL;
+                                                handler.sendMessage(message);
+                                            }
+
                                         }
+                                        Message message = Message.obtain();
+                                        message.obj = isphotoSuccess1;
+                                        message.what = GlobalContanstant.REPORTESUCCESS;
+                                        handler.sendMessage(message);
+
 
                                     } else {
                                         Message message = Message.obtain();
-                                        message.what = GlobalContanstant.IMAGEFAIL;
+                                        message.what = GlobalContanstant.REPORTEFAIL;
                                         handler.sendMessage(message);
                                     }
 
                                 } else {
                                     Message message = Message.obtain();
-                                    message.what = GlobalContanstant.IMAGEFAIL;
+                                    message.what = GlobalContanstant.REPORTEFAIL;
                                     handler.sendMessage(message);
                                 }
 
@@ -1055,8 +932,8 @@ public class ReportActivity extends AppCompatActivity {
         startActivityForResult(intent, position);
     }
 
-    private StringBuilder sb = new StringBuilder();
-    private StringBuilder sb1 = new StringBuilder();
+    private StringBuilder checkId = new StringBuilder();
+    private StringBuilder selectProblemId = new StringBuilder();
 
     //上传所有的数据
     public String getRemoteInfo(DiseaseInformation diseaseInformation) throws Exception {
@@ -1081,13 +958,13 @@ public class ReportActivity extends AppCompatActivity {
         envelope.dotNet = true;//由于是.net开发的webservice，所以这里要设置为true
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope);//调用
+        httpTransportSE.call(null, envelope,headerList);//调用
 
         // 获取返回的数据
         SoapObject object = (SoapObject) envelope.bodyIn;
         // 获取返回的结果
-        reportResult = object.getProperty(0).toString();
-        return reportResult;
+        return object.getProperty(0).toString();
+
 
     }
 
@@ -1109,34 +986,11 @@ public class ReportActivity extends AppCompatActivity {
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
-        String isphotoSuccess = object.getProperty(0).toString();
-        return isphotoSuccess;
+        return object.getProperty(0).toString();
 
-    }
-
-    private String updateVideo(DiseaseInformation diseaseInformation) throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.videomethodName);
-        //传递的参数
-        soapObject.addProperty("DeciceCheckNum", diseaseInformation.taskNumber);
-        soapObject.addProperty("FileName", diseaseInformation.videoName);  //文件类型
-        soapObject.addProperty("Mp4Base64", diseaseInformation.encodeBase64File);   //参数2  图片字符串
-        //设置访问地址 和 超时时间
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-        envelope.bodyOut = soapObject;
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(soapObject);
-
-
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
-        //链接后执行的回调
-        httpTranstation.call(null, envelope);
-        SoapObject object = (SoapObject) envelope.bodyIn;
-
-        String isphotoSuccess = object.getProperty(0).toString();
-        return isphotoSuccess;
 
     }
 
@@ -1159,33 +1013,32 @@ public class ReportActivity extends AppCompatActivity {
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope);
+        httpTranstation.call(null, envelope,headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
-        String isphotoSuccess = object.getProperty(0).toString();
-        return isphotoSuccess;
+        return object.getProperty(0).toString();
+
     }
 
     /**
      * 给拍的照片命名
      */
-    public String createPhotoName() {
+    public String createPhotoName(int position) {
         //以系统的当前时间给图片命名
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String fileName = format.format(date) + ".jpg";
-        return fileName;
+        return format.format(date) + "_" + position + "_" + personId + ".jpg";
+
     }
 
     private String pathUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/mymy/";
 
-
     /**
      * 保存到本地
      */
-    public String saveToSDCard(Bitmap bitmap) {
+    public String saveToSDCard(Bitmap bitmap, int position) {
         //先要判断SD卡是否存在并且挂载
-        String photoName = createPhotoName();
+        String photoName = createPhotoName(position);
         path = iconPath + photoName;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             try {
@@ -1230,20 +1083,6 @@ public class ReportActivity extends AppCompatActivity {
         if (resultCode == RESULT_CANCELED) {
             return;
         }
-        if (requestCode == 300) {
-            if (resultCode == 301) {
-                videopath = data.getStringExtra("videoPath");
-                if (videopath != null) {
-                    mllplay.setVisibility(View.VISIBLE);
-                    mllAddVideo.setVisibility(View.GONE);
-                } else {
-                    mllplay.setVisibility(View.GONE);
-                    mllAddVideo.setVisibility(View.VISIBLE);
-                }
-                videoName = data.getStringExtra("videoName");
-            }
-        }
-
 
         Bitmap bitmap = null;
 
@@ -1255,11 +1094,11 @@ public class ReportActivity extends AppCompatActivity {
                     bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
                 mIvphoto1.setImageBitmap(bitmap);
-                String fileName1 = saveToSDCard(bitmap);
+                String fileName1 = saveToSDCard(bitmap, 1);
                 //将选择的图片设置到控件上
                 mIvphoto1.setClickable(false);
                 String encode1 = photo2Base64(path);
@@ -1273,11 +1112,11 @@ public class ReportActivity extends AppCompatActivity {
 
 //                    bitmap = getBitmap(mIvphoto2, fileResult);
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
-                    mIvphoto2.setImageBitmap(bitmap);
-                String fileName2 = saveToSDCard(bitmap);
+                mIvphoto2.setImageBitmap(bitmap);
+                String fileName2 = saveToSDCard(bitmap, 2);
                 //将选择的图片设置到控件上
                 mIvphoto2.setClickable(false);
                 String encode2 = photo2Base64(path);
@@ -1293,11 +1132,11 @@ public class ReportActivity extends AppCompatActivity {
 
 //                    bitmap = getBitmap(mIvphoto1, fileResult);
                 }
-                if (bitmap == null){
+                if (bitmap == null) {
                     return;
                 }
                 mIvphoto3.setImageBitmap(bitmap);
-                String fileName3 = saveToSDCard(bitmap);
+                String fileName3 = saveToSDCard(bitmap, 3);
                 //将选择的图片设置到控件上
                 mIvphoto3.setClickable(false);
                 String encode3 = photo2Base64(path);
@@ -1311,7 +1150,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
 
-    protected static Bitmap getBitmap(ImageView imageView, String path) {
+    /*protected static Bitmap getBitmap(ImageView imageView, String path) {
         Bitmap bitmap;
         int width = 200;
 
@@ -1343,9 +1182,9 @@ public class ReportActivity extends AppCompatActivity {
             bitmap = rotateBitmap(bitmap, bitmapDegree);
         }
         return bitmap;
-    }
+    }*/
 
-    private static int getBitmapDegree(String path) {
+    /*private static int getBitmapDegree(String path) {
         int degree = 0;
         try {
             //从指定路径读取图片，获取exif信息
@@ -1372,10 +1211,10 @@ public class ReportActivity extends AppCompatActivity {
         }
 
         return degree;
-    }
+    }*/
 
 
-    private static Bitmap rotateBitmap(Bitmap bm, float orientationDegree) {
+   /* private static Bitmap rotateBitmap(Bitmap bm, float orientationDegree) {
         Matrix m = new Matrix();
         m.setRotate(orientationDegree, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
         try {
@@ -1385,10 +1224,8 @@ public class ReportActivity extends AppCompatActivity {
 
         }
         return null;
-    }
+    }*/
 
-
-    private Bitmap largeBitmap = null;
 
     public static String photo2Base64(String path) {
 
@@ -1420,6 +1257,7 @@ public class ReportActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
 
+
                 case DATA_SUCCESS:
                     reportData = (ReportData) msg.obj;
                     if (reportData != null) {
@@ -1428,12 +1266,13 @@ public class ReportActivity extends AppCompatActivity {
                                 ll_report.setVisibility(View.VISIBLE);
                                 rl_notonlie.setVisibility(View.GONE);
                                 mprogressbar.setVisibility(View.GONE);
+                                initArray();
                                 initView();
                                 initData();
                             } else {
                                 ToastUtil.shortToast(getApplicationContext(), "此设备不属于您维护");
                                 goHome();
-                                return;
+
                             }
 
 
@@ -1452,9 +1291,12 @@ public class ReportActivity extends AppCompatActivity {
                     break;
 
                 case GlobalContanstant.REPORTEFAIL:
+//                    initArray();
                     mbtReport.setVisibility(View.VISIBLE);
                     mprogressbar.setVisibility(View.GONE);
                     ToastUtil.shortToast(getApplicationContext(), uperror);
+                    mFacilityProblem.setText("");
+
                     break;
 
                 case GlobalContanstant.REPORTESUCCESS:
@@ -1464,42 +1306,30 @@ public class ReportActivity extends AppCompatActivity {
                     String reportSuccess = (String) msg.obj;
                     if (reportSuccess != null) {
                         if (reportSuccess.equals("true")) {
+                            String userName = SpUtils.getString(getApplicationContext(), GlobalContanstant.USERNAME);
+                            Bitmap largeBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                            NotificationManager nm = (NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+                            //Uri ringUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                            Notification noti = new NotificationCompat.Builder(getApplicationContext())
+                                    .setTicker(userName + notifatitle)
+                                    .setContentTitle(userName)
+                                    .setContentText(notifa)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setLargeIcon(largeBitmap)
+                                    .setContentIntent(getContentIntent())
+                                    .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_HIGH)//高优先级
+                                    .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE)
+                                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                    //自动隐藏
+                                    .setAutoCancel(true)
+                                    .build();
+                            //id =0 =  用来定义取消的id
+                            nm.notify(0, noti);
 
-                            //弹出通知：并提示音
-                            List<String> personNamelist = SpUtils.getStrListValue(getApplicationContext(), GlobalContanstant.PERSONNAMELIST);
-                            List<String> personIDlist = SpUtils.getStrListValue(getApplicationContext(), GlobalContanstant.PERSONIDLIST);
+                            ToastUtil.shortToast(getApplicationContext(), imgsuccess);
 
-                            for (int i = 0; i < personIDlist.size(); i++) {
-                                if (person_id.equals(personIDlist.get(i))) {
-                                    id = i;
-                                }
-                            }
+                            diseaseInformation = null;
 
-                            if (personNamelist.size() != 0) {
-                                String userName = personNamelist.get(id);
-                                largeBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                                NotificationManager nm = (NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-                                //Uri ringUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                                Notification noti = new NotificationCompat.Builder(getApplicationContext())
-                                        .setTicker(userName + notifatitle)
-                                        .setContentTitle(userName)
-                                        .setContentText(notifa)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setLargeIcon(largeBitmap)
-                                        .setContentIntent(getContentIntent())
-                                        .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_HIGH)//高优先级
-                                        .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE)
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        //自动隐藏
-                                        .setAutoCancel(true)
-                                        .build();
-                                //id =0 =  用来定义取消的id
-                                nm.notify(0, noti);
-
-                                ToastUtil.shortToast(getApplicationContext(), reportsuccess);
-
-                                diseaseInformation = null;
-                            }
                             goHome();
                         } else {
                             ToastUtil.shortToast(getApplicationContext(), uperror);
@@ -1523,11 +1353,7 @@ public class ReportActivity extends AppCompatActivity {
                     mprogressbar.setVisibility(View.GONE);
                     ToastUtil.shortToast(getApplicationContext(), audioFail);
                     return;
-                case VIDEO_FAIL:
-                    mbtReport.setVisibility(View.VISIBLE);
-                    mprogressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(), videoFail);
-                    break;
+
                 case AUDIO_SUCCESS:
                     String audioSuccess = (String) msg.obj;
                     if (audioSuccess != null) {
@@ -1540,23 +1366,37 @@ public class ReportActivity extends AppCompatActivity {
                     }
 
                     break;
-                case VIDEO_SUCCESS:
-                    String videoSuccess = (String) msg.obj;
-                    if (videoSuccess != null) {
-                        if (videoSuccess.equals("true")) {
-                            ToastUtil.shortToast(getApplicationContext(), videosuccess);
-                        }
-                    } else {
-                        mbtReport.setVisibility(View.VISIBLE);
-                        mprogressbar.setVisibility(View.GONE);
-                    }
-
-                    break;
 
 
             }
         }
     };
+
+    private void initArray() {
+        checkId = new StringBuilder();
+        selectProblemId = new StringBuilder();
+        //填充空间， 检查项加+1  1：正常
+        problemitems = new String[reportData.getList().size() + 1];
+        ischeckProblem = new boolean[reportData.getList().size() + 1];
+        problemId = new int[reportData.getList().size() + 1];
+
+        ischeckProblem[0] = false;
+        //0,代表不正常
+        problemId[0] = 1;
+        StringBuilder initprobleom = new StringBuilder();
+        problemitems[0] = "正常";
+        for (int i = 1; i < problemitems.length; i++) {
+            problemitems[i] = reportData.getList().get(i - 1).getCheckInfo();
+            initprobleom.append(problemitems[i]).append("\n");
+            //默认都不选中
+            ischeckProblem[i] = false;
+            //默认都正常
+            problemId[i] = 1;
+        }
+        String check = initprobleom.toString().substring(0, initprobleom.toString().length() - 1);
+        //设置检查项
+        mFacilityCheck.setText(check);
+    }
 
     private void goHome() {
         Intent intent = new Intent(ReportActivity.this, HomeActivity.class);
@@ -1577,23 +1417,9 @@ public class ReportActivity extends AppCompatActivity {
     }
 
 
-    private class MyListener extends BDAbstractLocationListener {
-        @Override
-        public void onReceiveLocation(BDLocation bdLocation) {
-            //经度
-            if (diseaseInformation != null) {
-                diseaseInformation.longitude = bdLocation.getLongitude() + "";
-                //维度
-                diseaseInformation.latitude = bdLocation.getLatitude() + "";
-            }
-
-
-        }
-    }
-
     //得到任务单号的方法
     private String getTaskNumber() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA);
         Date date = new Date(System.currentTimeMillis());
         String str = formatter.format(date);
         return str;
@@ -1601,46 +1427,17 @@ public class ReportActivity extends AppCompatActivity {
 
     //得到上穿时间
     private String getCurrentTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         Date date = new Date(System.currentTimeMillis());
         String str = formatter.format(date);
         return str;
     }
 
-    @Override
-    protected void onStart() {
-        if (locationClient != null) {
-            locationClient.start();
-        }
-        super.onStart();
-
-
-    }
-
-    @Override
-    protected void onPause() {
-        if (locationClient != null) {
-            locationClient.unRegisterLocationListener(myListener);
-            locationClient.stop();
-
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (locationClient != null) {
-            locationClient.stop();
-            locationClient.unRegisterLocationListener(myListener);
-            locationClient = null;
-        }
+
         diseaseInformation = null;
         finish();
     }

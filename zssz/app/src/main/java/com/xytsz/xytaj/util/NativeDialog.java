@@ -131,7 +131,7 @@ public class NativeDialog extends Dialog {
         WindowManager.LayoutParams lp = dialogWindow.getAttributes(); 
         /////////获取屏幕宽度
 		DisplayMetrics dm = new DisplayMetrics();
-		WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);;
+		WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
 		wm.getDefaultDisplay().getMetrics(dm);
 		int screenWidth = dm.widthPixels;
 		/////////设置高宽
