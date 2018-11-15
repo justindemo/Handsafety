@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.ui.RoundImageView;
 
 import java.util.List;
 
@@ -33,19 +34,26 @@ public class ProduceDetailAdapter extends BaseQuickAdapter<String> {
 
     @Override
     protected void convert(BaseViewHolder helper, String item) {
-        int adapterPosition = helper.getLayoutPosition();
-        ImageView view = helper.getView(R.id.iv_producedetail);
+        int layoutPosition = helper.getLayoutPosition();
+        RoundImageView view = helper.getView(R.id.iv_producedetail);
         if (b) {
+            //描述的size>=图片的size
             item = item.replace("[br]","");
             helper.setText(R.id.tv_producedetail, "\u3000\u3000"+item);
-            if (adapterPosition <= imgs.size()-1) {
-                Glide.with(context).load(NetUrl.AllURL + imgs.get(adapterPosition)).placeholder(R.mipmap.produce_big).into(view);
+            //当前条目如果 小于等于 图片的size
+            //那么就展示
+            if (layoutPosition <= imgs.size()-1) {
+                Glide.with(context).load(NetUrl.AllURL + imgs.get(layoutPosition)).placeholder(R.mipmap.produce_big).into(view);
             }else {
+//                多个描述 ，少图片的时候
                 helper.setVisible(R.id.iv_producedetail,false);
             }
         }else {
-            if (adapterPosition <= imgs.size()-1) {
-                helper.setText(R.id.tv_producedetail, "\u3000\u3000" +imgs.get(adapterPosition).replace("[br]", ""));
+            //描述的size<图片的size  item = 图片Url img 是文字
+            //当前条目如果 小于等于 文字的size-1   size 5 ，，，0-4
+            //那么久展示
+            if (layoutPosition <= imgs.size()-1) {
+                helper.setText(R.id.tv_producedetail, "\u3000\u3000" +imgs.get(layoutPosition).replace("[br]", ""));
             }else {
                 helper.setVisible(R.id.tv_producedetail,false);
             }

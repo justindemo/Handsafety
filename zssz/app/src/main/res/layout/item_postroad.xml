@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:paddingBottom="6dp"
    >
 
     <LinearLayout
@@ -23,7 +24,7 @@
             android:id="@+id/rl_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="6dp"
+            android:paddingLeft="6dp"
             >
 
             <TextView
@@ -38,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/tv_sendroad_vname"
-                android:text="一级病害"
+                android:text=""
                 android:textSize="16sp" />
 
 
@@ -77,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="位置描述位置描述位置描述位置描述位置描述位置描述位置描述位置描述位置描述"
+                    android:text=""
                     android:textSize="16sp" />
 
             </FrameLayout>
@@ -106,7 +107,8 @@
         </RelativeLayout>
     </LinearLayout>
     <RelativeLayout
-        android:layout_margin="3dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >

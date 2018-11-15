@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ll_report"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="6dp"
-        android:visibility="invisible">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="visible">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="6dp">
 
             <LinearLayout
                 android:layout_width="0px"
@@ -40,7 +43,6 @@
                     android:layout_weight="1"
                     android:background="@drawable/shape_uncheck_information"
                     android:gravity="start|center_vertical"
-                    android:text="@string/report_dealgrade"
                     android:textColor="@color/cc_text_blank"
                     android:textSize="18sp" />
 
@@ -65,7 +67,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/shape_uncheck_information"
                     android:gravity="start|center_vertical"
-                    android:text="@string/report_dealgrade"
+
                     android:textColor="@color/cc_text_blank"
                     android:textSize="18sp" />
 
@@ -75,6 +77,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="3dp">
 
@@ -84,22 +87,38 @@
                     android:text="@string/report_facategory"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/report_facility_check"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@drawable/shape_uncheck_information"
-                    android:gravity="start|center_vertical"
-                    android:text="检查设备："
-                    android:textColor="@color/cc_text_blank"
-                    android:textSize="18sp" />
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/report_facility_check"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="start|center_vertical"
+                        android:singleLine="true"
+                        android:textColor="@color/cc_text_blank"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:src="@mipmap/arrow_down" />
+                </LinearLayout>
+
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="3dp">
 
@@ -109,18 +128,36 @@
                     android:text="@string/report_faname"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/report_facility_problem"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@drawable/shape_uncheck_information"
-                    android:gravity="start|center_vertical"
-                    android:hint="@string/report_tip"
-                    android:text=""
-                    android:textColor="@color/cc_text_blank"
-                    android:textColorHint="@color/cc_supervise"
-                    android:textSize="18sp" />
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/report_facility_problem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="start|center_vertical"
+                        android:hint="@string/report_tip"
+                        android:singleLine="true"
+                        android:text=""
+                        android:textColor="@color/cc_text_blank"
+                        android:textColorHint="@color/cc_supervise"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/report_iv_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:src="@mipmap/arrow_down" />
+                </LinearLayout>
+
+
             </LinearLayout>
 
 
@@ -143,11 +180,22 @@
                     android:layout_weight="1"
                     android:background="@drawable/shape_uncheck_information"
                     android:gravity="start|center_vertical"
-                    android:text="检查备："
                     android:textColor="@color/cc_text_blank"
                     android:textSize="18sp" />
 
             </LinearLayout>
+
+
+            <Button
+                android:id="@+id/check_standard"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_margin="12dp"
+                android:background="@drawable/shape_custom_btn_bg"
+                android:text="@string/report_check_standard"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:visibility="gone" />
 
 
             <View
@@ -170,30 +218,69 @@
                 android:orientation="horizontal"
                 android:padding="5dp">
 
-                <ImageView
-                    android:id="@+id/iv_report_icon1"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                <RelativeLayout
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
 
-                    android:background="@mipmap/iv_add"
-                    android:scaleType="fitXY" />
+                    <ImageView
+                        android:id="@+id/iv_report_icon1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
 
-                <ImageView
-                    android:id="@+id/iv_report_icon2"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/iv_photo1_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+
+                <RelativeLayout
                     android:layout_marginLeft="10dp"
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
 
-                    android:background="@mipmap/iv_add"
-                    android:scaleType="fitXY" />
+                    <ImageView
+                        android:id="@+id/iv_report_icon2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
 
-                <ImageView
-                    android:id="@+id/iv_report_icon3"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/iv_photo2_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_marginLeft="10dp"
-                    android:background="@mipmap/iv_add"
-                    android:scaleType="fitXY" />
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
+
+                    <ImageView
+                        android:id="@+id/iv_report_icon3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
+
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/iv_photo3_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+
+
+
             </LinearLayout>
 
 
@@ -259,7 +346,6 @@
                     </LinearLayout>
 
                     <EditText
-
                         android:id="@+id/locationDesc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -270,33 +356,33 @@
 
             </LinearLayout>
 
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/report"
             android:layout_width="match_parent"
             android:layout_height="35dp"
-            android:layout_margin="3dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="6dp"
             android:background="@mipmap/report_update"
             android:text="@string/report_commit"
             android:textColor="@color/white"
             android:textSize="19sp" />
-
-
-
-        </LinearLayout>
-
-
+    </RelativeLayout>
 
 
     <!-- 请求数据-->
 
     <RelativeLayout
-        android:id="@+id/rl_notonline"
+        android:id="@+id/report_rl_notonline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:visibility="gone">
 
         <TextView
+            android:id="@+id/tv_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/btn_refresh"
@@ -332,5 +418,5 @@
             android:indeterminateDrawable="@drawable/progress_loading" />
     </LinearLayout>
 
-    </FrameLayout>
-</ScrollView>
+
+</FrameLayout>

@@ -129,6 +129,7 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                     }
 
                     SpUtils.exit(getActivity().getApplicationContext());
+                    SpUtils.saveBoolean(getActivity().getApplicationContext(),GlobalContanstant.ISFIRSTENTER, false);
 
                     //上传服务器
                     new Thread() {
@@ -157,8 +158,6 @@ public class LoginFragment extends android.support.v4.app.Fragment {
 
                                             int role = personInfo.getRole_ID();
                                             //sp 保存
-//
-
 
                                             SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.LOGINID, loginID);
                                             SpUtils.saveString(getActivity().getApplicationContext(), GlobalContanstant.PASSWORD, pWD);

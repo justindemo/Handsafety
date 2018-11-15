@@ -2,6 +2,7 @@ package com.xytsz.xytaj.activity;
 
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
@@ -23,15 +24,12 @@ public class SplashAcitvity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activty_splash);
+//        setContentView(R.layout.activty_splash);
 
-        LinearLayout mroot = (LinearLayout) findViewById(R.id.ll_splash_root);
+       /* LinearLayout mroot = (LinearLayout) findViewById(R.id.ll_splash_root);
         //动画效果参数直接定义
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0.3f, 1.0f);
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.7f, 1.0f);
         alphaAnimation.setDuration(1000);
-
-        mroot.setAnimation(alphaAnimation);
-
 
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -43,13 +41,13 @@ public class SplashAcitvity extends AppCompatActivity {
             public void onAnimationEnd(Animation animation) {
 
                 boolean isfirst = SpUtils.getBoolean(SplashAcitvity.this, GlobalContanstant.ISFIRSTENTER,true);
-                if (isfirst){
-                    IntentUtil.startActivity(SplashAcitvity.this,GuideActivity.class);
-                }else {
+//                if (isfirst){
+//                    IntentUtil.startActivity(SplashAcitvity.this,GuideActivity.class);
+//                }else {
                     IntentUtil.startActivity(SplashAcitvity.this,HomeActivity.class);
 
-                }
-                finish();
+//                }
+
 
             }
 
@@ -58,6 +56,23 @@ public class SplashAcitvity extends AppCompatActivity {
 
             }
         });
+
+
+        mroot.setAnimation(alphaAnimation);*/
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                String loginId = SpUtils.getString(getApplicationContext(), GlobalContanstant.LOGINID);
+                if (loginId != null && !loginId.isEmpty()) {
+                    IntentUtil.startActivity(SplashAcitvity.this, HomeActivity.class);
+                }else {
+                    IntentUtil.startActivity(SplashAcitvity.this, MainActivity.class);
+                }
+                SplashAcitvity.this.finish();
+            }
+        },2000);
 
     }
 }

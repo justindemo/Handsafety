@@ -47,7 +47,7 @@ import butterknife.OnClick;
  * <p>
  * 会议签到
  */
-public class MeetingSignActivity extends AppCompatActivity implements SearchView.SearchViewListener{
+public class MeetingSignActivity extends AppCompatActivity implements SearchView.SearchViewListener {
 
     @Bind(R.id.tv_sign_person)
     TextView tvSignPerson;
@@ -62,7 +62,7 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetingsign);
-        if(getIntent() != null){
+        if (getIntent() != null) {
             meetingId = getIntent().getIntExtra("trainId", -1);
         }
         ButterKnife.bind(this);
@@ -74,52 +74,51 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
     }
 
 
-    private void isSign (){
+    private void isSign() {
 
-        HeaderProperty headerPropertyObj =  new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.clear();
 
         headerList.add(headerPropertyObj);
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        String result = getIsSign(meetingId);
-                        Message message = Message.obtain();
-                        message.obj = result;
-                        message.what = GlobalContanstant.CHECKROADPASS;
-                        handler.sendMessage(message);
-                    } catch (Exception e) {
-                        Message message = Message.obtain();
-                        message.what = 300;
-                        handler.sendMessage(message);
-                    }
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    String result = getIsSign(meetingId);
+                    Message message = Message.obtain();
+                    message.obj = result;
+                    message.what = GlobalContanstant.CHECKROADPASS;
+                    handler.sendMessage(message);
+                } catch (Exception e) {
+                    Message message = Message.obtain();
+                    message.what = 300;
+                    handler.sendMessage(message);
                 }
-            }.start();
+            }
+        }.start();
 
-        }
+    }
 
 
-        private String getIsSign(int meetID) throws  Exception {
-            SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.isMeetingSign);
-            soapObject.addProperty("personId", personId);
-            soapObject.addProperty("meetId", meetID);
+    private String getIsSign(int meetID) throws Exception {
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.isMeetingSign);
+        soapObject.addProperty("personId", personId);
+        soapObject.addProperty("meetId", meetID);
 
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
-            envelope.bodyOut = soapObject;
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(soapObject);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
+        envelope.bodyOut = soapObject;
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
 
-            HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-            httpTransportSE.call(null, envelope,headerList);
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(null, envelope, headerList);
 
-            SoapObject object = (SoapObject) envelope.bodyIn;
-            return object.getProperty(0).toString();
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        return object.getProperty(0).toString();
 
-        }
-
+    }
 
 
     private void initData() {
@@ -130,24 +129,26 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
         dialog = new AlertDialog.Builder(MeetingSignActivity.this).create();
         dialog.setCancelable(true);// 可以用“返回键”取消
         dialog.setCanceledOnTouchOutside(true);//
-        dialog.show();
         dialog.setContentView(R.layout.sendroad_choicecheckperson);
+        dialog.show();
         lv = (ListView) dialog.findViewById(R.id.lv_sendroad_list);
         SearchView searchView = (SearchView) dialog.findViewById(R.id.search_layout);
         searchView.setSearchViewListener(MeetingSignActivity.this);
         searchView.setAutoCompleteAdapter(autoCompleteAdapter);
-        initPersonData();
-        if (lv != null) {
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //得到人名，显示
-                    tvSignPerson.setText(resultData.get(position));
-                    dialog.dismiss();
+        if (personlist != null) {
+            initPersonData();
+            if (lv != null) {
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        //得到人名，显示
+                        tvSignPerson.setText(resultData.get(position));
+                        dialog.dismiss();
 
-                }
+                    }
 
-            });
+                });
+            }
         }
         dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
@@ -235,6 +236,7 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
     }
 
     private ListView lv;
+
     @Override
     public void onRefreshAutoComplete(String text) {
         getAutoCompleteData(text);
@@ -297,13 +299,14 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
             case R.id.tv_sign_person:
                 //弹窗
                 getData();
+                initData();
                 break;
             case R.id.report_sign:
                 //签到
                 String personName = tvSignPerson.getText().toString();
-                if (personName.isEmpty()){
+                if (personName.isEmpty()) {
                     return;
-                }else {
+                } else {
                     for (Person person : persons) {
                         if (person.getName().equals(personName)) {
                             personId = person.getId();
@@ -318,12 +321,12 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
 
     private void upData() {
         morningProgressbar.setVisibility(View.VISIBLE);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
                     String result = upSerive(personId);
-                    if (result != null){
+                    if (result != null) {
                         Message message = Message.obtain();
                         message.what = GlobalContanstant.CHECKPASS;
                         message.obj = result;
@@ -337,12 +340,14 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
             }
         }.start();
     }
+
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     private String upSerive(int personId) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.uploadMeeting);
-        soapObject.addProperty("meetId",meetingId);
-        soapObject.addProperty("personId",personId);
+        soapObject.addProperty("meetId", meetingId);
+        soapObject.addProperty("personId", personId);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
         envelope.dotNet = true;
@@ -352,7 +357,7 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
 
         //添加cookie
 //
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -363,11 +368,11 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
     private List<Person> persons;
     private String[] personlist;
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case GlobalContanstant.MYSENDSUCCESS:
                     morningProgressbar.setVisibility(View.GONE);
                     String personjson = (String) msg.obj;
@@ -377,21 +382,20 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
                     for (int i = 0; i < personlist.length; i++) {
                         personlist[i] = persons.get(i).getName();
                     }
-                    initData();
                     break;
                 case GlobalContanstant.FAIL:
                     morningProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"未获取人员");
+                    ToastUtil.shortToast(getApplicationContext(), "未获取人员");
                     break;
 
                 case GlobalContanstant.CHECKFAIL:
                     morningProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"上传失败");
+                    ToastUtil.shortToast(getApplicationContext(), "上传失败");
                     break;
                 case GlobalContanstant.CHECKPASS:
                     morningProgressbar.setVisibility(View.GONE);
                     String result = (String) msg.obj;
-                    ToastUtil.shortToast(getApplicationContext(),result);
+                    ToastUtil.shortToast(getApplicationContext(), result);
                     if (result.equals("签到成功")) {
                         finish();
                     }
@@ -399,15 +403,15 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
                 case GlobalContanstant.CHECKROADPASS:
                     morningProgressbar.setVisibility(View.GONE);
                     String issign = (String) msg.obj;
-                    if (TextUtils.equals(issign,"true")){
-                        ToastUtil.shortToast(getApplicationContext(),"您已签到过");
+                    if (TextUtils.equals(issign, "true")) {
+                        ToastUtil.shortToast(getApplicationContext(), "您已签到过");
                         //新加
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 finish();
                             }
-                        },1500);
+                        }, 1500);
                     }
 
                     break;
@@ -419,12 +423,12 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
 
     private void getData() {
         morningProgressbar.setVisibility(View.VISIBLE);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
                     String personList = getPersonList();
-                    if (personList != null){
+                    if (personList != null) {
                         Message message = Message.obtain();
                         message.what = GlobalContanstant.MYSENDSUCCESS;
                         message.obj = personList;
@@ -449,7 +453,7 @@ public class MeetingSignActivity extends AppCompatActivity implements SearchView
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 

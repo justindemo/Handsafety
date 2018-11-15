@@ -139,7 +139,9 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
     @Override
     protected void onResume() {
         super.onResume();
-        markBaidumap.onResume();
+        if (markBaidumap != null) {
+            markBaidumap.onResume();
+        }
         if (locationClient != null){
             locationClient.start();
         }
@@ -148,7 +150,9 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
     @Override
     protected void onPause() {
         super.onPause();
-        markBaidumap.onPause();
+        if (markBaidumap != null) {
+            markBaidumap.onPause();
+        }
 
     }
 
@@ -184,7 +188,9 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        markBaidumap.onDestroy();
+        if (markBaidumap != null) {
+            markBaidumap.onDestroy();
+        }
         if (locationClient !=null){
             locationClient.stop();
             locationClient.registerLocationListener(myListener);
@@ -258,7 +264,6 @@ public class MarkPositionActivity extends AppCompatActivity implements BaiduMap.
         public void onReceiveLocation(BDLocation bdLocation) {
             //获取到经度
             mylongitude = bdLocation.getLongitude();
-            Log.i("精度", mylongitude + "");
             //获取到纬度
             mylatitude = bdLocation.getLatitude();
             //经纬度  填的是纬度，经度

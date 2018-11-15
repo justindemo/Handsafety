@@ -14,7 +14,7 @@
         android:layout_below="@+id/search_check_layout"
         android:id="@+id/lv_sendroad_checklist"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="170dp"/>
     <LinearLayout
         android:id="@+id/ll_sendroad_person"
         android:layout_margin="6dp"

@@ -5,12 +5,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,7 +30,6 @@ import com.xytsz.xytaj.bean.CompanyDetailCallback;
 import com.xytsz.xytaj.bean.CompanyList;
 import com.xytsz.xytaj.bean.CompanyProduce;
 import com.xytsz.xytaj.bean.CompanyProduceCallback;
-
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.net.UrlUtils;
@@ -41,7 +38,6 @@ import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
 import com.xytsz.xytaj.util.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +50,7 @@ import okhttp3.Call;
 
 /**
  * Created by admin on 2018/5/25.
- * <p/>
+ * <p>
  * 会员公司
  */
 public class MemberCompanyShowActivity extends AppCompatActivity {
@@ -83,6 +79,8 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
     LinearLayout companyLv;
     @Bind(R.id.companydetail_progressbar)
     LinearLayout companydetailProgressbar;
+    @Bind(R.id.tv_info_detail)
+    TextView tvInfoDetail;
     private String companyName;
 
 
@@ -124,34 +122,32 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_membershow);
         ButterKnife.bind(this);
-
-
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         if (companyName != null) {
             initActionbar(companyName);
         }
         if (companyDetail != null) {
-            companyID =companyDetail.getID();
+            companyID = companyDetail.getID();
             iphone = companyDetail.getCompanyTel();
             qq = companyDetail.getCompanyQQ();
             wechat = companyDetail.getCompanyWeixin();
             latitude = companyDetail.getCompanyLatitude();
             longitude = companyDetail.getCompanyLongitude();
-            Glide.with(getApplicationContext()).load(NetUrl.AllURL+companyDetail.getCompanyPicBack()).
+            Glide.with(getApplicationContext()).load(NetUrl.AllURL + companyDetail.getCompanyPicBack()).
                     placeholder(R.mipmap.holder_big)
                     .error(R.mipmap.holder_big)
                     .into(memberIvBg);
             String string = companyDetail.getCompanyDesc();
             string = string.replace("[br][br]", "\n");
-            tvCompanyIntro.setText("\u3000\u3000"+ string);
+            tvCompanyIntro.setText("\u3000\u3000" + string);
         } else {
-            if (companyID == -1){
+            if (companyID == -1) {
                 ToastUtil.shortToast(getApplicationContext(), "数据未加载");
                 Glide.with(getApplicationContext()).load(R.mipmap.holder_big)
                         .into(memberIvBg);
                 companydetailProgressbar.setVisibility(View.GONE);
                 return;
-            }else {
+            } else {
                 //获取这个公司的详细信息。
                 getCompanyDetail();
 
@@ -165,10 +161,9 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
     }
 
 
-
-    private void getCompanyDetail( ) {
+    private void getCompanyDetail() {
         String url = NetUrl.SERVERURL2 + NetUrl.getCompanyDetailData + companyID
-                +"?f=" +fromID +"&AJPersonID="+personId;
+                + "?f=" + fromID + "&AJPersonID=" + personId;
         OkHttpUtils
                 .get()
                 .url(url)
@@ -189,13 +184,14 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
                         latitude = response.getData().getCompanyLatitude();
                         longitude = response.getData().getCompanyLongitude();
                         Glide.with(getApplicationContext())
-                                .load(NetUrl.AllURL+response.getData().getCompanyPicBack())
+                                .load(NetUrl.AllURL + response.getData().getCompanyPicBack())
                                 .placeholder(R.mipmap.holder_big)
                                 .error(R.mipmap.holder_big)
                                 .into(memberIvBg);
                         String string = response.getData().getCompanyDesc();
                         string = string.replace("[br][br]", "\n");
-                        tvCompanyIntro.setText("\u3000\u3000"+ string);
+                        tvCompanyIntro.setText("\u3000\u3000" + string);
+
                         initActionbar(companyName);
                     }
                 });
@@ -271,7 +267,6 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
         params.put("pageNo", 1);
         params.put("companyID", companyID);
         params.put("topIndex", 1);
-        // TODO: 2018/6/20 新加的
         params.put("AJPersonID", personId);
         String spliceGetUrl = UrlUtils.spliceGetUrl(url, params);
         OkHttpUtils.get().url(spliceGetUrl)
@@ -328,11 +323,12 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
     }
 
-    @OnClick({R.id.iv_company_phone, R.id.iv_company_wechat, R.id.iv_company_qq, R.id.iv_company_address, R.id.tv_produce_company, R.id.tv_case})
+    @OnClick({R.id.iv_company_phone, R.id.iv_company_wechat, R.id.iv_company_qq, R.id.iv_company_address,
+            R.id.tv_produce_company, R.id.tv_case,R.id.tv_info_detail})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_company_phone:
@@ -408,6 +404,12 @@ public class MemberCompanyShowActivity extends AppCompatActivity {
                 bundle.putInt("ID", companyID);
                 ProduceListActivity.intent2Activity(MemberCompanyShowActivity.this, bundle);
                 break;
+
+            case R.id.tv_info_detail:
+
+                break;
         }
     }
+
+
 }

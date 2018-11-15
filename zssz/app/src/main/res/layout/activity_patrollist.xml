@@ -4,18 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/patrolrecycle"
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/patrol_refersh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <ProgressBar
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/patrolrecycle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+    <LinearLayout
         android:id="@+id/patrol_progressbar"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:indeterminateDrawable="@drawable/progress_loading"
-        />
+        android:layout_gravity="center"
+        android:background="@drawable/shape_modification_pb"
+        android:gravity="center"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_loading" />
+    </LinearLayout>
 
 </FrameLayout>

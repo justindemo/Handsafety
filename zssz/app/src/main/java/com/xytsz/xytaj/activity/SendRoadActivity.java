@@ -26,6 +26,10 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.xytsz.xytaj.MyApplication;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.SendRoadAdapter;
@@ -69,17 +73,24 @@ public class SendRoadActivity extends AppCompatActivity {
             switch (msg.what) {
                 case GlobalContanstant.SENDFAIL:
                     mProgressBar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(), "未数据获取,请稍后");
+                    mtvFail.setText("数据未获取");
+                    mtvFail.setVisibility(View.VISIBLE);
                     break;
                 case NOONE:
-                    ToastUtil.shortToast(getApplicationContext(), "已审批完毕");
+                    mtvFail.setVisibility(View.VISIBLE);
+                    mtvFail.setText("已审批完毕");
                     mProgressBar.setVisibility(View.GONE);
                     break;
 
                 case ISSEND:
                     String isPass = msg.getData().getString("issend");
+
                     if (isPass != null) {
                         if (isPass.equals("true")) {
+                            if (sendRoadAdapter.getCount() == 0) {
+                                mtvFail.setText("已审批完毕");
+                                mtvFail.setVisibility(View.VISIBLE);
+                            }
                             ToastUtil.shortToast(getApplicationContext(), "审批成功");
                         }
                     }
@@ -119,6 +130,12 @@ public class SendRoadActivity extends AppCompatActivity {
     private List<Person> personlist;
     private String[] servicePerson;
     private List<Review> reviews;
+    private List<Review> allDatas = new ArrayList<>();
+    private TextView mtvFail;
+    private boolean islastPage;
+    private int pageIndex;
+    private int pageSize = 10;
+    private SmartRefreshLayout sendroadRefersh;
 
     private PendingIntent getContentIntent() {
         Intent intent = new Intent(this, DealActivity.class);
@@ -129,9 +146,6 @@ public class SendRoadActivity extends AppCompatActivity {
 
 
     private List<List<ImageUrl>> imageUrlReportLists = new ArrayList<>();
-
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,13 +158,38 @@ public class SendRoadActivity extends AppCompatActivity {
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         mlv = (ListView) findViewById(R.id.lv_sendroad);
         mProgressBar = (ProgressBar) findViewById(R.id.review_progressbar);
+        mtvFail = (TextView) findViewById(R.id.tv_send_fail);
 
+        sendroadRefersh = (SmartRefreshLayout) findViewById(R.id.sendroad_refersh);
+        pageIndex = 1;
         initData();
+        sendroadRefersh.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                if (!islastPage) {
+                    refreshLayout.finishLoadMore(2000);
+                    ++pageIndex;
+
+                    initData();
+                } else {
+                    refreshLayout.finishLoadMore();
+                    ToastUtil.shortToast(getApplicationContext(), "没有更多了");
+                }
+
+
+            }
+        });
+
+        sendroadRefersh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                pageIndex = 1;
+                refreshLayout.finishRefresh(2000);
+                initData();
+            }
+        });
 
     }
-
-
-
 
     private List<AudioUrl> audioUrls = new ArrayList<>();
     private List<HeaderProperty> headerList = new ArrayList<>();
@@ -159,7 +198,7 @@ public class SendRoadActivity extends AppCompatActivity {
 
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
 
@@ -173,69 +212,94 @@ public class SendRoadActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    String reviewData =DealActivity.getServiceData(NetUrl.getsendtask,personId);
+                    String reviewData = getServiceData(NetUrl.getsendtask, personId);
                     String allPersonList = getAllPersonList();
 
                     if (reviewData != null) {
-                        reviews = JsonUtil.jsonToBean(reviewData, new TypeToken<List<Review>>() {
-                        }.getType());
-                        if (reviews.size() == 0) {
-                            Message message = Message.obtain();
-                            message.what = NOONE;
-                            handler.sendMessage(message);
+
+                        if (reviewData.equals("[]")) {
+                            islastPage = true;
+                            if (pageIndex == 1) {
+                                Message message = Message.obtain();
+                                message.what = NOONE;
+                                handler.sendMessage(message);
+                            }
                         } else {
+                            reviews = JsonUtil.jsonToBean(reviewData, new TypeToken<List<Review>>() {
+                            }.getType());
+                            if (reviews.size() != 0) {
 
-                            audioUrls.clear();
+                                if (pageIndex == 1) {
+                                    audioUrls.clear();
+                                    imageUrlReportLists.clear();
 
-                            //遍历list
+                                }
+                                //遍历list
+                                for (Review detail : reviews) {
+                                    String taskNumber = detail.getDeciceCheckNum();
+                                    /**
+                                     * 获取到图片的URl
+                                     */
+                                    String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW, headerList);
 
-                            for (Review detail : reviews) {
-                                String taskNumber = detail.getDeciceCheckNum();
-                                /**
-                                 * 获取到图片的URl
-                                 */
-                                String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
+                                    if (json != null) {
+                                        List<ImageUrl> imageUrlList = new Gson().fromJson(json, new TypeToken<List<ImageUrl>>() {
+                                        }.getType());
 
-                                if (json != null) {
-                                    List<ImageUrl> imageUrlList = new Gson().fromJson(json, new TypeToken<List<ImageUrl>>() {
+                                        imageUrlReportLists.add(imageUrlList);
+
+                                    }
+
+                                    String audioUrljson = RoadActivity.getAudio(taskNumber, headerList);
+                                    if (audioUrljson != null) {
+                                        AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
+                                        audioUrls.add(audioUrl);
+                                    }
+
+
+                                }
+
+                                if (!allPersonList.equals("false")) {
+
+                                    personlist = JsonUtil.jsonToBean(allPersonList, new TypeToken<List<Person>>() {
                                     }.getType());
+                                    //人员数量
 
-                                    imageUrlReportLists.add(imageUrlList);
 
+                                    servicePerson = new String[personlist.size()];
+                                    for (int i = 0; i < servicePerson.length; i++) {
+                                        servicePerson[i] = personlist.get(i).getName();
+                                    }
                                 }
 
-                                String audioUrljson = RoadActivity.getAudio(taskNumber,headerList);
-                                if (audioUrljson != null) {
-                                    AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
-                                    audioUrls.add(audioUrl);
-                                }
+                                if (pageIndex == 1) {
 
+                                    allDatas.clear();
+                                    allDatas.addAll(reviews);
+
+                                    sendRoadAdapter = new SendRoadAdapter(SendRoadActivity.this, handler, allDatas,
+                                            imageUrlReportLists, personlist, audioUrls, personId);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mlv.setAdapter(sendRoadAdapter);
+                                            mProgressBar.setVisibility(View.GONE);
+
+                                        }
+                                    });
+                                } else {
+                                    allDatas.addAll(reviews);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            sendRoadAdapter.notifyDataSetChanged();
+                                            mProgressBar.setVisibility(View.GONE);
+
+                                        }
+                                    });
+                                }
 
                             }
-
-                            if (!allPersonList.equals("false")) {
-
-                                personlist = JsonUtil.jsonToBean(allPersonList, new TypeToken<List<Person>>() {
-                                }.getType());
-                                //人员数量
-
-
-                                servicePerson = new String[personlist.size()];
-                                for (int i = 0; i < servicePerson.length; i++) {
-                                    servicePerson[i] = personlist.get(i).getName();
-                                }
-                            }
-
-                            sendRoadAdapter = new SendRoadAdapter(SendRoadActivity.this,handler, reviews,
-                                    imageUrlReportLists, personlist, audioUrls,personId);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mlv.setAdapter(sendRoadAdapter);
-                                    mProgressBar.setVisibility(View.GONE);
-
-                                }
-                            });
 
                         }
                     }
@@ -251,11 +315,31 @@ public class SendRoadActivity extends AppCompatActivity {
 
     }
 
+    private String getServiceData(String method, int personID) throws Exception {
+
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
+        soapObject.addProperty("personId", personID);
+        soapObject.addProperty("pageIndex", pageIndex);
+        soapObject.addProperty("pageSize", pageSize);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
+        envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(soapObject);
+
+        HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
+        httpTransportSE.call(NetUrl.getTasklist_SOAP_ACTION, envelope, headerList);
+
+        SoapObject object = (SoapObject) envelope.bodyIn;
+        String json = object.getProperty(0).toString();
+
+        return json;
+    }
 
 
     private String getAllPersonList() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getPersonList);
-        soapObject.addProperty("ID",personId);
+        soapObject.addProperty("ID", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.setOutputSoapObject(soapObject);
@@ -264,7 +348,7 @@ public class SendRoadActivity extends AppCompatActivity {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(NetUrl.getPersonList_SOAP_ACTION, envelope,headerList);
+        httpTransportSE.call(NetUrl.getPersonList_SOAP_ACTION, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

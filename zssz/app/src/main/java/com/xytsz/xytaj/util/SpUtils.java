@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class SpUtils {
 
-    private static final String CONFIG = "config";
+    private static final String CONFIG = "test03-config";
     private static SharedPreferences sp;
 
     /**

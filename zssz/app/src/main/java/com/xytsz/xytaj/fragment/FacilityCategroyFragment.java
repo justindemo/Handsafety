@@ -55,6 +55,10 @@ public class FacilityCategroyFragment extends BaseFragment {
     private List<FacilityCategroyCompany.CompanyList> topdata;
     private List<FacilityCategroyCompany.CompanyList> alldata = new ArrayList<>();
     private int personId;
+    private int dataCount;
+    //默认展示几个数据
+    private int pageSize = 8;
+    private List<FacilityCategroyCompany.CompanyList> data;
 
     public FacilityCategroyFragment() {
 
@@ -98,8 +102,22 @@ public class FacilityCategroyFragment extends BaseFragment {
         facilityCategroyRefreshlayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
-                ++pageNo;
-                getrandomData();
+                facilityCategroyRefreshlayout.finishLoadMore(2000);
+                if (dataCount != 0){
+                    int pagecount = dataCount / pageSize;
+                    int max = dataCount % pageSize;
+                    if (max >0) {
+                        ++pagecount;
+                    }
+                    if (pageNo < pagecount){
+                        ++pageNo;
+                        getrandomData();
+                    }else {
+                        ToastUtil.shortToast(getContext(),"没有更多了");
+                    }
+                }
+
+
             }
         });
 
@@ -110,7 +128,7 @@ public class FacilityCategroyFragment extends BaseFragment {
     private void getrandomData() {
         String url = NetUrl.SERVERURL2 + NetUrl.getFacilityCategroyData;
         params.clear();
-        params.put("pageSize", 6);
+        params.put("pageSize", pageSize);
         params.put("pageNo", pageNo);
         params.put("productClass", id);
         params.put("AJPersonID", personId);
@@ -125,19 +143,21 @@ public class FacilityCategroyFragment extends BaseFragment {
 
                     @Override
                     public void onResponse(FacilityCategroyCompany response, int id) {
-                        facilityCategroyRefreshlayout.finishLoadMore(2000);
+
                         if (response != null) {
-                            List<FacilityCategroyCompany.CompanyList> data = response.getData();
-                            if (data != null && data.size() != 0) {
+                            data = response.getData();
+                            dataCount = response.getDataCount();
+                            if (data != null && data.size() != 0 ) {
                                 alldata.addAll(data);
-                            } else {
+                            }else {
                                 return;
+
                             }
                             if (data.size() == 0) {
                                 ToastUtil.shortToast(getContext(), "moredata = null");
                             } else {
                                 if (pageNo == 1) {
-                                    categroyCompanyAdapter = new CategroyCompanyAdapter(alldata, FacilityCategroyFragment.this.getContext());
+                                    categroyCompanyAdapter = new CategroyCompanyAdapter(data, FacilityCategroyFragment.this.getContext());
                                     facilityCategroyRv.setAdapter(categroyCompanyAdapter);
                                     LayoutInflater inflater = FacilityCategroyFragment.this.getActivity().getLayoutInflater();
                                     View headView = inflater.inflate(R.layout.pop_tv, facilityCategroyRv, false);
@@ -189,6 +209,7 @@ public class FacilityCategroyFragment extends BaseFragment {
                     public void onResponse(FacilityCategroyCompany response, int id) {
                         if (response != null) {
                             topdata = response.getData();
+
                             if (topdata != null && topdata.size() != 0) {
 //                                ToastUtil.shortToast(getContext(), "top = ");
                                 alldata.addAll(topdata);

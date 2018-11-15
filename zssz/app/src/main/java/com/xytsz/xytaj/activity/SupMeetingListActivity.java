@@ -14,11 +14,13 @@ import android.widget.LinearLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.SupMeetingShowAdapter;
-import com.xytsz.xytaj.adapter.TraintestShowAdapter;
 import com.xytsz.xytaj.bean.SupMeeting;
-import com.xytsz.xytaj.bean.TrainContent;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
 import com.xytsz.xytaj.util.JsonUtil;
@@ -39,8 +41,8 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/5/9.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * 列表
  */
 public class SupMeetingListActivity extends AppCompatActivity {
@@ -49,6 +51,8 @@ public class SupMeetingListActivity extends AppCompatActivity {
     RecyclerView supmeetingRv;
     @Bind(R.id.supmeeting_progressbar)
     LinearLayout supmeetingProgressbar;
+    @Bind(R.id.meeting_refersh)
+    SmartRefreshLayout meetingRefersh;
     private int tag;
     private int personId;
     private String title;
@@ -58,19 +62,24 @@ public class SupMeetingListActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
 
-
                 case GlobalContanstant.MYSENDSUCCESS:
                     supmeetingProgressbar.setVisibility(View.GONE);
                     String json = (String) msg.obj;
-                    if (json != null && !json.equals("[]")) {
-                        supMeetings = JsonUtil.jsonToBean(json, new TypeToken<List<SupMeeting>>() {
-                        }.getType());
+                    if (json != null ) {
+                        if ( !json.equals("[]")) {
+                            supMeetings = JsonUtil.jsonToBean(json, new TypeToken<List<SupMeeting>>() {
+                            }.getType());
+                            if (pageIndex == 1){
+                                allDatas.clear();
+                                allDatas.addAll(supMeetings);
+                                supMeetingShowAdapter = new SupMeetingShowAdapter(allDatas);
+                                supmeetingRv.setAdapter(supMeetingShowAdapter);
+                            }else {
+                                allDatas.addAll(supMeetings);
+                                supMeetingShowAdapter.addData(supMeetings);
+                            }
 
-                        if (supMeetings.size() != 0) {
-                            LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
-                            supmeetingRv.setLayoutManager(manager);
-                            SupMeetingShowAdapter supMeetingShowAdapter = new SupMeetingShowAdapter(supMeetings);
-                            supmeetingRv.setAdapter(supMeetingShowAdapter);
+
                             supMeetingShowAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                                 @Override
                                 public void onItemClick(View view, int position) {
@@ -79,17 +88,17 @@ public class SupMeetingListActivity extends AppCompatActivity {
                                         //传递环节
                                         //跳转到指定界面
                                         case 0:
-                                            intent2show(position, supMeetings, SupMeetingContentActivity.class, false);
+                                            intent2show(position, allDatas, SupMeetingContentActivity.class, false);
 
                                             break;
                                         case 1:
 //                                             签到
-                                            intent2show(position, supMeetings, MeetingSignActivity.class, true);
+                                            intent2show(position, allDatas, MeetingSignActivity.class, true);
 
                                             break;
                                         case 2:
 //                                            培训照片
-                                            intent2show(position, supMeetings, TrainPhotoActivity.class, true);
+                                            intent2show(position, allDatas, TrainPhotoActivity.class, true);
                                             break;
 
                                     }
@@ -97,11 +106,15 @@ public class SupMeetingListActivity extends AppCompatActivity {
 
 
                             });
-                        } else {
-                            ToastUtil.shortToast(getApplicationContext(), "当前没有会议");
+
+
+
+                        }else {
+                            islastPage = true;
+                            if (pageIndex == 1){
+                                ToastUtil.shortToast(getApplicationContext(), "当前没有会议");
+                            }
                         }
-                    } else {
-                        ToastUtil.shortToast(getApplicationContext(), "当前没有会议");
                     }
 
                     break;
@@ -112,6 +125,7 @@ public class SupMeetingListActivity extends AppCompatActivity {
             }
         }
     };
+    private SupMeetingShowAdapter supMeetingShowAdapter;
 
 
     private void intent2show(int position, List<SupMeeting> supMeetings, Class<?> activity, boolean b) {
@@ -129,6 +143,10 @@ public class SupMeetingListActivity extends AppCompatActivity {
     }
 
     private List<SupMeeting> supMeetings;
+    private List<SupMeeting> allDatas = new ArrayList<>();
+    private int pageIndex;
+    private int pageSize = 10;
+    private boolean islastPage;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -155,8 +173,36 @@ public class SupMeetingListActivity extends AppCompatActivity {
 
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initactionbar(title);
-        initData();
+        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
+        supmeetingRv.setLayoutManager(manager);
+        pageIndex = 1;
 
+        initData();
+        meetingRefersh.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                if (!islastPage) {
+                    refreshLayout.finishLoadMore(2000);
+                    ++pageIndex;
+
+                    initData();
+                } else {
+                    refreshLayout.finishLoadMore();
+                    ToastUtil.shortToast(getApplicationContext(), "没有更多了");
+                }
+
+
+            }
+        });
+
+        meetingRefersh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                pageIndex = 1;
+                refreshLayout.finishRefresh(2000);
+                initData();
+            }
+        });
 
     }
 
@@ -178,10 +224,11 @@ public class SupMeetingListActivity extends AppCompatActivity {
     }
 
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     private void initData() {
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
         supmeetingProgressbar.setVisibility(View.VISIBLE);
@@ -208,6 +255,8 @@ public class SupMeetingListActivity extends AppCompatActivity {
     private String getData() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getsupMeetingList);
         soapObject.addProperty("personId", personId);
+        soapObject.addProperty("pageIndex", pageIndex);
+        soapObject.addProperty("pageSize", pageSize);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
@@ -215,7 +264,7 @@ public class SupMeetingListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

@@ -7,8 +7,8 @@ package com.xytsz.xytaj.net;
  */
 public class NetUrl {
 
-
-    public static final String SERVERURL = "http://otaj.xytgps.com/SZWEBSERVICE/aj.asmx";
+    public static final String SERVERURL = "http://test03.xytgps.com/SZWEBSERVICE/aj.asmx";
+//    public static final String SERVERURL = "http://otaj.xytgps.com/SZWEBSERVICE/aj.asmx";
 //    public static final String SERVERURL = "http://192.168.1.179:10801";
     public static final String AllURL = "http://ajgyl.xytgps.com";
     public static final String SERVERURL2 = "http://ajgyl.xytgps.com/Api/SupplyChain/";
@@ -23,6 +23,7 @@ public class NetUrl {
     public static final String loginmethodName = "ToLogin";
     public static final String photomethodName = "ToUploadImg";
     public static final String reportmethodName = "ToCheck";
+    public static final String randomreportmethodName = "ToCheckIsNotDevice";
     public static final String getdealtask = "GetListZG";
     //获取当前人员要处置的信息
     public static final String getManagementList = "GetMyTask";
@@ -133,7 +134,7 @@ public class NetUrl {
     public static final String testcollectmethod ="GetGrades";
     public static final String TrainphotomethodName ="ToUploadTrainImg";
     public static final String gettestmethod = "GetExamByTrainId";
-    public static final String uploadtestmethod ="ToAddExam";
+    public static final String uploadtestmethod ="SubmitExam";
     public static final String getnoPatrolTaskByPersonID ="GetTodayNotCheck";
 
     public static final String MeetingPhotoMethodName= "ToUploadImgOfMeeting";
@@ -158,4 +159,13 @@ public class NetUrl {
     public static final String isMeetingSign ="CheckMeetSign";
     public static final String tag ="?AJPersonID=";
     public static final String UesrExit ="ToLogout";
+    public static final String  getStandard ="GetSafetyUrl";
+
+
+    public static final String getNoPatrolCount = "GetTodayNotCheckCount";
+    public static final String getNoCheckCount= "GetTodayNotReviewCount";
+
+
+    public static final String getMeetingCount ="GetMeetingByPersonIdCount";
+    public static final String getTraintestCount = "GetALLTrainCount";
 }

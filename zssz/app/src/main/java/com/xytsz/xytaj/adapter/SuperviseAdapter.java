@@ -15,13 +15,13 @@ public class SuperviseAdapter extends BaseQuickAdapter<String> {
 
     private int[] mIcons = {R.mipmap.sup_moring,R.mipmap.sup_mytask,R.mipmap.train_insitution};
 
-    private int number;
+    private String number;
     public SuperviseAdapter(List<String> data ) {
         super(R.layout.item_more, data);
 
     }
 
-    public void setNumber(int number){
+    public void setNumber(String number){
         this.number = number;
     }
 
@@ -32,9 +32,11 @@ public class SuperviseAdapter extends BaseQuickAdapter<String> {
 
         int layoutPosition = viewHolder.getLayoutPosition();
         if (layoutPosition == 1){
-            if (number != 0){
+            if (number != null && !number.equals("0")){
                 viewHolder.setVisible(R.id.tv_mytask_number,true);
-                viewHolder.setText(R.id.tv_mytask_number,number+"");
+                viewHolder.setText(R.id.tv_mytask_number,number);
+            }else {
+                viewHolder.setVisible(R.id.tv_mytask_number,false);
             }
 
         }

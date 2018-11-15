@@ -193,6 +193,7 @@
             android:background="@color/graybackground" />
 
         <RelativeLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white">
@@ -218,12 +219,39 @@
                 android:layout_marginRight="12dp"
                 android:src="@mipmap/me_right" />
         </RelativeLayout>
-
-
         <View
+            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:background="@color/grayground" />
+            android:layout_height="0.2dp"
+            android:background="@color/graybackground" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/me_clean_cache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/clickeffect"
+                android:drawableLeft="@mipmap/mine_clean_cache"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:text="@string/mine_clean_cache"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="12dp"
+                android:src="@mipmap/me_right" />
+        </RelativeLayout>
+
 
         <LinearLayout
             android:id="@+id/me_activity"
@@ -331,10 +359,10 @@
     </LinearLayout>
 
     <Button
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="6dp"
         android:id="@+id/me_exit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="13dp"
         android:layout_marginRight="13dp"
@@ -343,5 +371,5 @@
         android:padding="6dp"
         android:text="@string/mine_exit"
         android:textColor="@color/cc_white"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 </RelativeLayout>

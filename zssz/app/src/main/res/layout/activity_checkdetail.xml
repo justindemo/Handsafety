@@ -13,10 +13,32 @@
         android:layout_height="wrap_content"
         android:padding="6dp"
         android:orientation="vertical">
-
         <LinearLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/report_dealgrade_way"
+                android:textColor="@color/cc_text_blank"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_check_facility_way"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_check_facility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             >
 
             <TextView
@@ -30,7 +52,7 @@
                 android:id="@+id/tv_check_facility"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="sscc"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -50,10 +72,11 @@
                 android:id="@+id/tv_check_facility_person"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="sscc"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/ll_check_department"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp">
@@ -69,7 +92,7 @@
                 android:id="@+id/tv_check_facility_team"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="sscc"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -89,7 +112,7 @@
                 android:id="@+id/tv_check_facility_loca"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="sscc"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -133,7 +156,7 @@
                 android:id="@+id/tv_check_reviewer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="张三三"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -154,7 +177,7 @@
                 android:id="@+id/tv_check_dealer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="王美丽"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -175,7 +198,7 @@
                 android:id="@+id/tv_check_reportetime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2017年3月2日16:45:06"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -196,7 +219,7 @@
                 android:id="@+id/tv_check_reviewtime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2017年3月2日16:47:06"
+                android:text=""
                 android:textSize="18sp" />
 
         </LinearLayout>
@@ -235,7 +258,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:text="位置描述"
+                    android:text=""
                     android:textSize="18sp" />
 
             </FrameLayout>
@@ -260,7 +283,7 @@
                 android:id="@+id/tv_check_detail_diseasedes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="miaoshu"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -281,7 +304,7 @@
                 android:id="@+id/tv_check_decs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="王美丽"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -302,7 +325,7 @@
                 android:id="@+id/tv_check_requesttime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2017年3月2日19:47:06"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -323,7 +346,7 @@
                 android:id="@+id/tv_check_resulttime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2017年3月2日16:47:06"
+                android:text=""
                 android:textSize="18sp" />
         </LinearLayout>
 

@@ -1,11 +1,8 @@
 package com.xytsz.xytaj.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -78,6 +74,24 @@ public class UnCheckActivity extends AppCompatActivity {
     private static final int IS_PHOTO_SUCCESS2 = 10000004;
     @Bind(R.id.uncheck_progressbar)
     LinearLayout uncheckProgressbar;
+    @Bind(R.id.iv_predeal_delete1)
+    ImageView ivPredealDelete1;
+    @Bind(R.id.iv_predeal_delete2)
+    ImageView ivPredealDelete2;
+    @Bind(R.id.iv_predeal_delete3)
+    ImageView ivPredealDelete3;
+    @Bind(R.id.iv_dealing_delete1)
+    ImageView ivDealingDelete1;
+    @Bind(R.id.iv_dealing_delete2)
+    ImageView ivDealingDelete2;
+    @Bind(R.id.iv_dealing_delete3)
+    ImageView ivDealingDelete3;
+    @Bind(R.id.iv_dealed_delete1)
+    ImageView ivDealedDelete1;
+    @Bind(R.id.iv_dealed_delete2)
+    ImageView ivDealedDelete2;
+    @Bind(R.id.iv_dealed_delete3)
+    ImageView ivDealedDelete3;
 
     private boolean isPostFirst;
     @Bind(R.id.iv_predeal_icon1)
@@ -121,9 +135,16 @@ public class UnCheckActivity extends AppCompatActivity {
                     String predealJson = data.getString("predealJson");
                     String dealingJson = data.getString("dealingJson");
                     //如果有值 先赋值  不能点击
-                    if (predealJson != null && !TextUtils.equals(dealingJson,GlobalContanstant.NoLogin)) {
+                    if (predealJson != null && !TextUtils.equals(dealingJson, GlobalContanstant.NoLogin)) {
                         List<ImageUrl> imageUrlList = JsonUtil.jsonToBean(predealJson,
-                                new TypeToken<List<ImageUrl>>() {}.getType());
+                                new TypeToken<List<ImageUrl>>() {
+                                }.getType());
+
+                        if (imageUrlList.size() > 0) {
+                            ivPredealDelete1.setVisibility(View.GONE);
+                            ivPredealDelete2.setVisibility(View.GONE);
+                            ivPredealDelete3.setVisibility(View.GONE);
+                        }
 
                         switch (imageUrlList.size()) {
                             //如果没有处置前的图片 都不能点击
@@ -170,9 +191,17 @@ public class UnCheckActivity extends AppCompatActivity {
                     }
 
                     //如果有值 先赋值  不能点击
-                    if (dealingJson != null && !TextUtils.equals(dealingJson,GlobalContanstant.NoLogin)) {
+                    if (dealingJson != null && !TextUtils.equals(dealingJson, GlobalContanstant.NoLogin)) {
                         List<ImageUrl> imageIngUrlList = JsonUtil.jsonToBean(dealingJson,
-                                new TypeToken<List<ImageUrl>>() {}.getType());
+                                new TypeToken<List<ImageUrl>>() {
+                                }.getType());
+
+                        if (imageIngUrlList.size() > 0) {
+                            ivDealingDelete1.setVisibility(View.GONE);
+                            ivDealingDelete2.setVisibility(View.GONE);
+                            ivDealingDelete3.setVisibility(View.GONE);
+                        }
+
                         switch (imageIngUrlList.size()) {
                             case 0:
                                 btUncheckDealing.setEnabled(false);
@@ -242,15 +271,15 @@ public class UnCheckActivity extends AppCompatActivity {
                                         diseaseInformation.photoName = fileNamesss.get(i);
                                         diseaseInformation.encode = imageBase64Stringsss.get(i);
                                         diseaseInformation.diviceNum = taskNumber;
-
-                                        try {
-                                            isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETPOST);
-                                        } catch (Exception e) {
-                                            Message message = Message.obtain();
-                                            message.what = GlobalContanstant.CHECKFAIL;
-                                            handler.sendMessage(message);
+                                        if (!diseaseInformation.photoName.isEmpty()) {
+                                            try {
+                                                isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETPOST);
+                                            } catch (Exception e) {
+                                                Message message = Message.obtain();
+                                                message.what = GlobalContanstant.CHECKFAIL;
+                                                handler.sendMessage(message);
+                                            }
                                         }
-
 
                                     }
                                     Message message = Message.obtain();
@@ -278,6 +307,9 @@ public class UnCheckActivity extends AppCompatActivity {
                             ToastUtil.shortToast(getApplicationContext(), "处置前照片上报成功");
                             btUncheckPredeal.setVisibility(View.GONE);
                             isPostFirst = true;
+                            ivPredealDelete1.setVisibility(View.GONE);
+                            ivPredealDelete2.setVisibility(View.GONE);
+                            ivPredealDelete3.setVisibility(View.GONE);
                             ivPredealIcon1.setEnabled(false);
                             ivPredealIcon2.setEnabled(false);
                             ivPredealIcon3.setEnabled(false);
@@ -298,6 +330,9 @@ public class UnCheckActivity extends AppCompatActivity {
                             ToastUtil.shortToast(getApplicationContext(), "处置中照片上报成功");
                             btUncheckDealing.setVisibility(View.GONE);
                             isPostSecond = true;
+                            ivDealingDelete1.setVisibility(View.GONE);
+                            ivDealingDelete2.setVisibility(View.GONE);
+                            ivDealingDelete3.setVisibility(View.GONE);
                             ivDealingIcon1.setEnabled(false);
                             ivDealingIcon2.setEnabled(false);
                             ivDealingIcon3.setEnabled(false);
@@ -458,7 +493,7 @@ public class UnCheckActivity extends AppCompatActivity {
         envelope.bodyOut = soapobject;
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(NetUrl.getRngImageURLSoap_Action, envelope,headerList);
+        httpTransportSE.call(NetUrl.getRngImageURLSoap_Action, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
@@ -539,7 +574,7 @@ public class UnCheckActivity extends AppCompatActivity {
                 File pictureFile = new File(path);
                 //压缩图片
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                 byte[] bytes = bos.toByteArray();
                 //将图片封装成File对象
                 FileOutputStream outputStream = new FileOutputStream(pictureFile);
@@ -630,17 +665,16 @@ public class UnCheckActivity extends AppCompatActivity {
     };
 
 
-    @OnClick({R.id.iv_predeal_icon1, R.id.iv_predeal_icon2, R.id.iv_predeal_icon3, R.id.bt_uncheck_predeal, R.id.iv_dealing_icon1, R.id.iv_dealing_icon2, R.id.iv_dealing_icon3, R.id.bt_uncheck_dealing, R.id.iv_dealed_icon1, R.id.iv_dealed_icon2, R.id.iv_dealed_icon3, R.id.bt_uncheck_dealed})
+    @OnClick({R.id.iv_predeal_icon1,
+            R.id.iv_predeal_icon2, R.id.iv_predeal_icon3, R.id.bt_uncheck_predeal,
+            R.id.iv_dealing_icon1, R.id.iv_dealing_icon2, R.id.iv_dealing_icon3,
+            R.id.bt_uncheck_dealing, R.id.iv_dealed_icon1, R.id.iv_dealed_icon2,
+            R.id.iv_dealed_icon3, R.id.bt_uncheck_dealed})
     public void onClick(View view) {
 
         switch (view.getId()) {
             case R.id.iv_predeal_icon1:
 
-                /*Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
-                file = new File(getPhotopath(1));
-                fileUri = Uri.fromFile(file);
-                intent1.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent1, 9001);*/
 
                 PermissionUtils.requestPermission(UnCheckActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE,
                         mPermissionGrant);
@@ -657,7 +691,13 @@ public class UnCheckActivity extends AppCompatActivity {
 
             // 点击上报处置前的照片
             case R.id.bt_uncheck_predeal:
-                ToastUtil.shortToast(getApplicationContext(), "正在上传，请稍候");
+                ToastUtil.shortToast(getApplicationContext(), "正在上传处置前照片，请稍候");
+                if (fileNames.get(0).isEmpty()) {
+                    ToastUtil.shortToast(getApplicationContext(), "");
+                    return;
+                }
+
+
                 new Thread() {
 
                     @Override
@@ -666,15 +706,16 @@ public class UnCheckActivity extends AppCompatActivity {
                             diseaseInformation.photoName = fileNames.get(i);
                             diseaseInformation.encode = imageBase64Strings.get(i);
                             diseaseInformation.diviceNum = taskNumber;
-                            try {
-                                isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETNOTIFY);
-                            } catch (Exception e) {
-                                Message message = Message.obtain();
-                                message.what = GlobalContanstant.CHECKFAIL;
-                                handler.sendMessage(message);
+                            if (!diseaseInformation.photoName.isEmpty()) {
+                                try {
+                                    isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETNOTIFY);
+                                } catch (Exception e) {
+                                    Message message = Message.obtain();
+                                    message.what = GlobalContanstant.CHECKFAIL;
+                                    handler.sendMessage(message);
+                                }
+
                             }
-
-
                         }
                         Message message = Message.obtain();
                         message.what = IS_PHOTO_SUCCESS1;
@@ -700,7 +741,7 @@ public class UnCheckActivity extends AppCompatActivity {
                 //是否有处置前的照片
 
                 if (isPostFirst) {
-                    ToastUtil.shortToast(getApplicationContext(), "正在上传，请稍候");
+                    ToastUtil.shortToast(getApplicationContext(), "正在上传处置中照片，请稍候");
                     new Thread() {
                         @Override
                         public void run() {
@@ -708,14 +749,16 @@ public class UnCheckActivity extends AppCompatActivity {
                                 diseaseInformation.photoName = fileNamess.get(i);
                                 diseaseInformation.encode = imageBase64Stringss.get(i);
                                 diseaseInformation.diviceNum = taskNumber;
-                                Log.i("diviceNum", diseaseInformation.diviceNum);
 
-                                try {
-                                    isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETSEND);
-                                } catch (Exception e) {
-                                    Message message = Message.obtain();
-                                    message.what = GlobalContanstant.CHECKFAIL;
-                                    handler.sendMessage(message);
+
+                                if (!diseaseInformation.photoName.isEmpty()) {
+                                    try {
+                                        isphotoSuccess = connectWebService(diseaseInformation, GlobalContanstant.GETSEND);
+                                    } catch (Exception e) {
+                                        Message message = Message.obtain();
+                                        message.what = GlobalContanstant.CHECKFAIL;
+                                        handler.sendMessage(message);
+                                    }
                                 }
 
 
@@ -824,7 +867,6 @@ public class UnCheckActivity extends AppCompatActivity {
                     if (data != null) {
                         bitmap = (Bitmap) data.getExtras().get("data");
                     } else {
-
                         bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                     }
@@ -836,8 +878,13 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivPredealIcon1.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNames.add(fileName);
-                    imageBase64Strings.add(encode);
+                    if (!ispredelete1) {
+                        fileNames.add(fileName);
+                        imageBase64Strings.add(encode);
+                    } else {
+                        fileNames.set(0, fileName);
+                        imageBase64Strings.set(0, encode);
+                    }
                     btUncheckPredeal.setEnabled(true);
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -857,8 +904,15 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivPredealIcon2.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNames.add(fileName);
-                    imageBase64Strings.add(encode);
+
+                    if (!ispredelete2) {
+                        fileNames.add(fileName);
+                        imageBase64Strings.add(encode);
+                    } else {
+                        fileNames.set(1, fileName);
+                        imageBase64Strings.set(1, encode);
+                    }
+
                     btUncheckPredeal.setEnabled(true);
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -877,8 +931,16 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivPredealIcon3.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNames.add(fileName);
-                    imageBase64Strings.add(encode);
+
+                    if (!ispredelete3) {
+                        fileNames.add(fileName);
+                        imageBase64Strings.add(encode);
+                    } else {
+                        fileNames.set(2, fileName);
+                        imageBase64Strings.set(2, encode);
+                    }
+
+
                     btUncheckPredeal.setEnabled(true);
                     btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -898,8 +960,15 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivDealingIcon1.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamess.add(fileName);
-                    imageBase64Stringss.add(encode);
+
+                    if (!isingdelete1) {
+                        fileNamess.add(fileName);
+                        imageBase64Stringss.add(encode);
+                    } else {
+                        fileNamess.set(0, fileName);
+                        imageBase64Stringss.set(0, encode);
+                    }
+
                     btUncheckDealing.setEnabled(true);
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -919,8 +988,16 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivDealingIcon2.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamess.add(fileName);
-                    imageBase64Stringss.add(encode);
+
+
+                    if (!isingdelete2) {
+                        fileNamess.add(fileName);
+                        imageBase64Stringss.add(encode);
+                    } else {
+                        fileNamess.set(1, fileName);
+                        imageBase64Stringss.set(1, encode);
+                    }
+
                     btUncheckDealing.setEnabled(true);
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -936,13 +1013,22 @@ public class UnCheckActivity extends AppCompatActivity {
                     if (bitmap == null) {
                         return;
                     }
+
                     ivDealingIcon3.setImageBitmap(bitmap);
                     fileName = saveToSDCard(bitmap, 6);
                     //将选择的图片设置到控件上
                     ivDealingIcon3.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamess.add(fileName);
-                    imageBase64Stringss.add(encode);
+
+                    if (!isingdelete3) {
+                        fileNamess.add(fileName);
+                        imageBase64Stringss.add(encode);
+                    } else {
+                        fileNamess.set(2, fileName);
+                        imageBase64Stringss.set(2, encode);
+                    }
+
+
                     btUncheckDealing.setEnabled(true);
                     btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_press);
                     break;
@@ -961,8 +1047,16 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivDealedIcon1.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamesss.add(fileName);
-                    imageBase64Stringsss.add(encode);
+
+
+                    if (!isdelete1) {
+                        fileNamesss.add(fileName);
+                        imageBase64Stringsss.add(encode);
+                    } else {
+                        fileNamesss.set(0, fileName);
+                        imageBase64Stringsss.set(0, encode);
+                    }
+
                     btUncheckDealed.setEnabled(true);
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
@@ -983,8 +1077,14 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivDealedIcon2.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamesss.add(fileName);
-                    imageBase64Stringsss.add(encode);
+                    if (!isdelete2) {
+                        fileNamesss.add(fileName);
+                        imageBase64Stringsss.add(encode);
+                    } else {
+                        fileNamesss.set(1, fileName);
+                        imageBase64Stringsss.set(1, encode);
+                    }
+
                     btUncheckDealed.setEnabled(true);
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
@@ -1005,8 +1105,17 @@ public class UnCheckActivity extends AppCompatActivity {
                     //将选择的图片设置到控件上
                     ivDealedIcon3.setClickable(false);
                     encode = photo2Base64(path);
-                    fileNamesss.add(fileName);
-                    imageBase64Stringsss.add(encode);
+
+
+                    if (!isdelete3) {
+                        fileNamesss.add(fileName);
+                        imageBase64Stringsss.add(encode);
+                    } else {
+                        fileNamesss.set(2, fileName);
+                        imageBase64Stringsss.set(2, encode);
+                    }
+
+
                     btUncheckDealed.setEnabled(true);
                     btUncheckDealed.setBackgroundResource(R.drawable.shape_btn_uncheck_press);
                     break;
@@ -1054,7 +1163,7 @@ public class UnCheckActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionUtils.requestPermissionsResult(UnCheckActivity.this, requestCode, permissions, grantResults, mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -1065,6 +1174,136 @@ public class UnCheckActivity extends AppCompatActivity {
             outState.putString("file_path", fileResult);
         }
         super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    private boolean ispredelete1;
+    private boolean ispredelete2;
+    private boolean ispredelete3;
+    private boolean isingdelete1;
+    private boolean isingdelete2;
+    private boolean isingdelete3;
+    private boolean isdelete1;
+    private boolean isdelete2;
+    private boolean isdelete3;
+
+    @OnClick({R.id.iv_predeal_delete1, R.id.iv_predeal_delete2,
+            R.id.iv_predeal_delete3, R.id.iv_dealing_delete1, R.id.iv_dealing_delete2, R.id.iv_dealing_delete3, R.id.iv_dealed_delete1, R.id.iv_dealed_delete2, R.id.iv_dealed_delete3})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.iv_predeal_delete1:
+                ivPredealIcon1.setClickable(true);
+                if (fileNames.size() == 1) {
+                    btUncheckPredeal.setEnabled(false);
+                    btUncheckPredeal.setBackgroundResource(R.drawable.btn_uncheck_nor);
+                }
+                ivPredealIcon1.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 0) {
+                    fileNames.set(0, "");
+                    imageBase64Strings.set(0, "");
+                    ispredelete1 = true;
+                }
+                clearImagList(fileNames, btUncheckPredeal);
+                break;
+            case R.id.iv_predeal_delete2:
+                ivPredealIcon2.setClickable(true);
+                ivPredealIcon2.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 1) {
+                    fileNames.set(1, "");
+                    imageBase64Strings.set(1, "");
+                    ispredelete2 = true;
+                }
+                clearImagList(fileNames, btUncheckPredeal);
+                break;
+            case R.id.iv_predeal_delete3:
+                ivPredealIcon3.setClickable(true);
+                ivPredealIcon3.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 2) {
+                    fileNames.set(2, "");
+                    imageBase64Strings.set(2, "");
+                    ispredelete3 = true;
+                }
+                clearImagList(fileNames, btUncheckPredeal);
+                break;
+            case R.id.iv_dealing_delete1:
+                if (fileNamess.size() == 1) {
+                    btUncheckDealing.setEnabled(false);
+                    btUncheckDealing.setBackgroundResource(R.drawable.btn_uncheck_nor);
+                }
+                ivDealingIcon1.setClickable(true);
+                ivDealingIcon1.setImageResource(R.mipmap.iv_add);
+                if (fileNamess.size() > 0) {
+                    fileNamess.set(0, "");
+                    imageBase64Stringss.set(0, "");
+                    isingdelete1 = true;
+                }
+                clearImagList(fileNamess, btUncheckDealing);
+                break;
+            case R.id.iv_dealing_delete2:
+
+                ivDealingIcon2.setClickable(true);
+                ivDealingIcon2.setImageResource(R.mipmap.iv_add);
+                if (fileNamess.size() > 1) {
+                    fileNamess.set(1, "");
+                    imageBase64Stringss.set(1, "");
+                    isingdelete2 = true;
+                }
+                clearImagList(fileNamess, btUncheckDealing);
+                break;
+            case R.id.iv_dealing_delete3:
+                ivDealingIcon3.setClickable(true);
+                ivDealingIcon3.setImageResource(R.mipmap.iv_add);
+                if (fileNamess.size() > 2) {
+                    fileNamess.set(2, "");
+                    imageBase64Stringss.set(2, "");
+                    isingdelete3 = true;
+                }
+                clearImagList(fileNamess, btUncheckDealing);
+                break;
+            case R.id.iv_dealed_delete1:
+                if (fileNamesss.size() == 1) {
+                    btUncheckDealed.setEnabled(false);
+                    btUncheckDealed.setBackgroundResource(R.drawable.btn_uncheck_nor);
+                }
+                ivDealedIcon1.setClickable(true);
+                ivDealedIcon1.setImageResource(R.mipmap.iv_add);
+                if (fileNamesss.size() > 0) {
+                    fileNamesss.set(0, "");
+                    imageBase64Stringsss.set(0, "");
+                    isdelete1 = true;
+                }
+                clearImagList(fileNamesss, btUncheckDealed);
+                break;
+            case R.id.iv_dealed_delete2:
+                ivDealedIcon2.setClickable(true);
+                ivDealedIcon2.setImageResource(R.mipmap.iv_add);
+                if (fileNamesss.size() > 1) {
+                    fileNamesss.set(1, "");
+                    imageBase64Stringsss.set(1, "");
+                    isdelete2 = true;
+                }
+                clearImagList(fileNamesss, btUncheckDealed);
+                break;
+            case R.id.iv_dealed_delete3:
+                ivDealedIcon3.setClickable(true);
+                ivDealedIcon3.setImageResource(R.mipmap.iv_add);
+                if (fileNamesss.size() > 2) {
+                    fileNamesss.set(2, "");
+                    imageBase64Stringsss.set(2, "");
+                    isdelete3 = true;
+                }
+                clearImagList(fileNamesss, btUncheckDealed);
+
+                break;
+        }
+    }
+
+    private void clearImagList(List<String> imgurls, Button btn) {
+        for (String str : imgurls) {
+            if (str.isEmpty()) {
+                btn.setEnabled(false);
+                btn.setBackgroundResource(R.drawable.btn_uncheck_nor);
+            }
+        }
     }
 }
 

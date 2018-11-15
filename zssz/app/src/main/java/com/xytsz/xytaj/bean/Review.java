@@ -69,6 +69,26 @@ public class Review implements Serializable {
     private String DeviceName;
     private String sendCheckPerson;
 
+    public int getCheckType() {
+        return CheckType;
+    }
+
+    public void setCheckType(int checkType) {
+        CheckType = checkType;
+    }
+
+    private int CheckType;
+
+    public boolean isRandom() {
+        return isRandom;
+    }
+
+    public void setRandom(boolean random) {
+        isRandom = random;
+    }
+
+    private boolean isRandom;
+
     public int getSendCheckPersonId() {
         return sendCheckPersonId;
     }

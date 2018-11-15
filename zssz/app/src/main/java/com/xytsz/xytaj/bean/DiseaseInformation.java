@@ -77,7 +77,9 @@ public class DiseaseInformation implements KvmSerializable {
     public String videoName;
     public String audioTime;
     public String selectPerson;
+    public String divice;
     private List<CheckItem> checkItems  = new ArrayList<>();
+    public String location;
 
     public List<CheckItem> getCheckItems() {
         return checkItems;

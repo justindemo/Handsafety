@@ -76,6 +76,12 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     TextView tvCheckProblemLoca;
     @Bind(R.id.tv_check_decs)
     TextView tvCheckDecs;
+    @Bind(R.id.ll_check_facility)
+    LinearLayout llCheckFacility;
+    @Bind(R.id.ll_check_department)
+    LinearLayout llCheckDepartment;
+    @Bind(R.id.tv_check_facility_way)
+    TextView tvCheckFacilityWay;
     private TextView mtvRoad;
     private ImageView mivReporte;
     private ImageView mivDealed;
@@ -84,7 +90,6 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private int position;
     private Review detail;
     private int personID;
-
 
 
     private Handler handler = new Handler() {
@@ -173,108 +178,122 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void initData() {
 
-        tvCheckFacility.setText(detail.getDeviceName());
-        tvCheckFacilityPerson.setText(detail.getCheckPersonName());
-        tvCheckFacilityTeam.setText(detail.getDeptName());
-        tvCheckFacilityLoca.setText(detail.getAddressInfo());
-        tvCheckReviewer.setText(detail.getZZCSSHPersonName());
-        tvCheckDealer.setText(detail.getWXPersonName());
-        tvCheckReportetime.setText(detail.getCheckTime());
-        tvCheckReviewtime.setText(detail.getZZCSSHTime());
-        tvCheckDecs.setText(detail.getWXInfo());
-        tvCheckRequesttime.setText(detail.getZZCSTime());
-        tvCheckResulttime.setText(detail.getWXTime());
-
-
-        StringBuilder stringBuilder = new StringBuilder();
-        List<String> errorInfo = detail.getErrorInfo();
-        for (String s : errorInfo) {
-            stringBuilder.append(s).append(";");
-        }
-        String problem = stringBuilder.toString().substring(0, stringBuilder.length() -1);
-        tvCheckFacilityProblem.setText(problem);
-
-        mtvProblemLoca.setText(detail.getRemarks());
-
-        if (imageUrlReport != null) {
-            imageUrl = imageUrlReport.get(position);
-            if (imageUrl.size() != 0) {
-                String imgurl = imageUrl.get(0).getImgurl();
-                Glide.with(getApplicationContext()).load(imgurl).into(mivReporte);
+        if (detail != null) {
+            if (detail.getCheckType() == 2) {
+                llCheckDepartment.setVisibility(View.GONE);
+                llCheckFacility.setVisibility(View.VISIBLE);
+                tvCheckFacilityWay.setText(getResources().getString(R.string.randomreprote));
             } else {
-
-                Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivReporte);
+                llCheckDepartment.setVisibility(View.VISIBLE);
+                llCheckFacility.setVisibility(View.VISIBLE);
+                tvCheckFacilityWay.setText(getResources().getString(R.string.standardreprote));
             }
-        }
-        if (imageUrlPost != null) {
-            imageUrlpost = imageUrlPost.get(position);
-            if (imageUrlpost.size() != 0) {
-                String imgurlpost = imageUrlpost.get(0).getImgurl();
-                Glide.with(getApplicationContext()).load(imgurlpost).into(mivDealed);
-            } else {
-                Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivDealed);
+
+
+            tvCheckFacility.setText(detail.getDeviceName());
+            tvCheckFacilityPerson.setText(detail.getCheckPersonName());
+            tvCheckFacilityTeam.setText(detail.getDeptName());
+            tvCheckFacilityLoca.setText(detail.getAddressInfo());
+            tvCheckReviewer.setText(detail.getZZCSSHPersonName());
+            tvCheckDealer.setText(detail.getWXPersonName());
+            tvCheckReportetime.setText(detail.getCheckTime());
+            tvCheckReviewtime.setText(detail.getZZCSSHTime());
+            tvCheckDecs.setText(detail.getWXInfo());
+            tvCheckRequesttime.setText(detail.getZZCSTime());
+            tvCheckResulttime.setText(detail.getWXTime());
+
+            StringBuilder stringBuilder = new StringBuilder();
+            List<String> errorInfo = detail.getErrorInfo();
+            for (String s : errorInfo) {
+                stringBuilder.append(s).append(";");
             }
-        }
+            String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+            tvCheckFacilityProblem.setText(problem);
 
-        mivDealed.setOnClickListener(this);
-        mivReporte.setOnClickListener(this);
-        mtvPass.setOnClickListener(this);
-        mtvBack.setOnClickListener(this);
+            mtvProblemLoca.setText(detail.getRemarks());
 
+            if (imageUrlReport != null) {
+                imageUrl = imageUrlReport.get(position);
+                if (imageUrl.size() != 0) {
+                    String imgurl = imageUrl.get(0).getImgurl();
+                    Glide.with(getApplicationContext()).load(imgurl).into(mivReporte);
+                } else {
 
-        if (detail.getRemarks().isEmpty()) {
-            final AudioUrl audioUrl = audioUrls.get(position);
-            if (audioUrl != null) {
-                if (audioUrl.getAudioUrl() != null) {
-                    if (!audioUrl.getAudioUrl().equals("false")) {
-
-                        if (!audioUrl.getTime().isEmpty()) {
-                            mtvProblemLoca.setVisibility(View.GONE);
-                            mtvProblemAudio.setVisibility(View.VISIBLE);
-                            soundUtil = new SoundUtil();
-                            mtvProblemAudio.setText(audioUrl.getTime());
-
-                            mtvProblemAudio.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                    Drawable drawable = getResources().getDrawable(R.mipmap.pause);
-                                    final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
-
-                                    mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
-
-
-                                    soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
-                                        @Override
-                                        public void onFinish() {
-                                            mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
-                                        }
-
-                                        @Override
-                                        public void onError() {
-
-                                        }
-                                    });
-
-                                    soundUtil.play(audioUrl.getAudioUrl());
-                                }
-                            });
-                        }
-                    } else {
-                        mtvProblemLoca.setVisibility(View.VISIBLE);
-
-                        mtvProblemAudio.setVisibility(View.GONE);
-                    }
+                    Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivReporte);
                 }
+            }
+            if (imageUrlPost != null) {
+                imageUrlpost = imageUrlPost.get(position);
+                if (imageUrlpost.size() != 0) {
+                    String imgurlpost = imageUrlpost.get(0).getImgurl();
+                    Glide.with(getApplicationContext()).load(imgurlpost).into(mivDealed);
+                } else {
+                    Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivDealed);
+                }
+            }
+
+            mivDealed.setOnClickListener(this);
+            mivReporte.setOnClickListener(this);
+            mtvPass.setOnClickListener(this);
+            mtvBack.setOnClickListener(this);
+
+            if (detail.getRemarks().isEmpty()) {
+                final AudioUrl audioUrl = audioUrls.get(position);
+                if (audioUrl != null) {
+                    if (audioUrl.getAudioUrl() != null) {
+                        if (!audioUrl.getAudioUrl().equals("false")) {
+
+                            if (!audioUrl.getTime().isEmpty()) {
+                                mtvProblemLoca.setVisibility(View.GONE);
+                                mtvProblemAudio.setVisibility(View.VISIBLE);
+                                soundUtil = new SoundUtil();
+                                mtvProblemAudio.setText(audioUrl.getTime());
+
+                                mtvProblemAudio.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        Drawable drawable = getResources().getDrawable(R.mipmap.pause);
+                                        final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
+
+                                        mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+
+
+                                        soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
+                                            @Override
+                                            public void onFinish() {
+                                                mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
+
+                                        soundUtil.play(audioUrl.getAudioUrl());
+                                    }
+                                });
+                            }
+                        } else {
+                            mtvProblemLoca.setVisibility(View.VISIBLE);
+
+                            mtvProblemAudio.setVisibility(View.GONE);
+                        }
+                    }
+                } else {
+                    mtvProblemLoca.setVisibility(View.VISIBLE);
+                    mtvProblemAudio.setVisibility(View.GONE);
+                }
+
             } else {
                 mtvProblemLoca.setVisibility(View.VISIBLE);
+
                 mtvProblemAudio.setVisibility(View.GONE);
             }
 
         } else {
-            mtvProblemLoca.setVisibility(View.VISIBLE);
-
-            mtvProblemAudio.setVisibility(View.GONE);
+            ToastUtil.shortToast(getApplicationContext(), "数据未获取");
         }
 
 
@@ -352,6 +371,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     private String toInspection(int phaseIndication, int personID) throws Exception {
         headerList.clear();
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.dealmethodName);
@@ -371,11 +391,11 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
 //        private List<HeaderProperty> headerList = new ArrayList<>();
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
 
-        httpTransportSE.call(NetUrl.toInspection_SOAP_ACTION, envelope,headerList);
+        httpTransportSE.call(NetUrl.toInspection_SOAP_ACTION, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -390,14 +410,12 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-
-
     private void initAcitionbar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle("作业详情");
+            actionBar.setTitle(R.string.problem_detail);
         }
     }
 

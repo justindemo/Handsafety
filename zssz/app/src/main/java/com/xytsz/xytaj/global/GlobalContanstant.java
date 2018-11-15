@@ -112,4 +112,6 @@ public class GlobalContanstant {
     public static final int fromList =2;
     public static final int UnImg = 100;
     public static final String NoLogin = "NoLogin";
+    public static final int ISEMPTY = 10012;
+    public static final int NODATA = 300;
 }

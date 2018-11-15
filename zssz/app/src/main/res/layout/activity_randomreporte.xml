@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="6dp">
+
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="0px"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/randomreport_dealgrade"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/random_report_facility"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_uncheck_information"
+                    android:gravity="start|center_vertical"
+                    android:textColor="@color/cc_text_blank"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_department"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/random_report_facility_person"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_uncheck_information"
+                    android:gravity="start|center_vertical"
+                    android:textColor="@color/cc_text_blank"
+                    android:textSize="18sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_roadname"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/random_report_facility_loca"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_uncheck_information"
+                    android:gravity="start|center_vertical"
+                    android:textColor="@color/cc_text_blank"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_faname"
+                    android:textSize="18sp" />
+
+                    <EditText
+                        android:background="@drawable/shape_uncheck_information"
+                        android:id="@+id/random_report_facility_problem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center_vertical"
+                        android:textColor="@color/cc_text_blank"
+                        android:textSize="18sp" />
+
+
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="6dp"
+                android:background="@color/graybackground" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="@string/report_image"
+                android:textSize="18sp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <RelativeLayout
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
+
+                    <ImageView
+                        android:id="@+id/random_iv_report_icon1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
+
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/random_iv_photo1_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
+
+                    <ImageView
+                        android:id="@+id/random_iv_report_icon2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
+
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/random_iv_photo2_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="@dimen/report_img"
+                    android:layout_height="@dimen/report_img">
+
+                    <ImageView
+                        android:id="@+id/random_iv_report_icon3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/iv_add"
+                        android:scaleType="fitXY" />
+
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:id="@+id/random_iv_photo3_delete"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/iv_delete_video" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_input_style"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@mipmap/iv_audio" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp">
+
+                <LinearLayout
+                    android:id="@+id/ll_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tv_press_audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        android:background="@drawable/selector_tv_audio"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:text="@string/report_tv_press_audio"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tv_audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="3dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_tv_audio"
+                        android:drawableLeft="@mipmap/iv_audio_play"
+                        android:gravity="center"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tv_re_record"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="3dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_tv_audio"
+                        android:gravity="center"
+                        android:text="@string/report_tv_record"
+                        android:textSize="18sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/locationDesc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/report_locaiton"
+                    android:maxLines="4"
+                    android:textSize="18sp" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_report"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="6dp"
+            android:background="@mipmap/report_update"
+            android:text="@string/report_commit"
+            android:textColor="@color/white"
+            android:textSize="19sp" />
+    </RelativeLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/report_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_modification_pb"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_loading" />
+    </LinearLayout>
+
+
+
+
+
+</FrameLayout>

@@ -37,6 +37,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.Bind;
@@ -45,7 +46,7 @@ import okhttp3.Call;
 
 /**
  * Created by admin on 2018/5/28.
- * <p/>
+ * <p>
  * 产品分类
  */
 public class FacilityCategoryActivity extends AppCompatActivity {
@@ -118,8 +119,9 @@ public class FacilityCategoryActivity extends AppCompatActivity {
     }
 
     private int maxPager;
+
     private void getHeadList() {
-        OkHttpUtils.get().url(NetUrl.SERVERURL2 + NetUrl.getScrollerData +NetUrl.tag +personId )
+        OkHttpUtils.get().url(NetUrl.SERVERURL2 + NetUrl.getScrollerData + NetUrl.tag + personId)
                 .build().execute(new FacilityHeadCallback() {
 
             @Override
@@ -130,14 +132,20 @@ public class FacilityCategoryActivity extends AppCompatActivity {
             @Override
             public void onResponse(FacilityHead response, int id) {
                 if (response != null) {
-                    headDatas =   response.getData();
+                    headDatas = response.getData();
                     if (headDatas != null && headDatas.size() != 0) {
+                        Iterator<FacilityHead.DataBean> iterators =
+                                headDatas.iterator();
+                        while (iterators.hasNext()) {
+                            if (iterators.next().getAdClass() != 2) {
+                                iterators.remove();
+                            }
+                        }
 
-//                        maxPager = headDatas.size() * 1000*100;
-//                        facilityHeadVp.setPageMargin(DensityUtil.dip2px(getApplicationContext(), 10));
+
                         facilityHeadVp.setPageTransformer(true, new ZoomOutPageTransformer());
-                        facilityHeadVp.setAdapter(new FacilityHeadAdapter(FacilityCategoryActivity.this, headDatas,parentId));
-                        if (headDatas.size() >=3) {
+                        facilityHeadVp.setAdapter(new FacilityHeadAdapter(FacilityCategoryActivity.this, headDatas, parentId));
+                        if (headDatas.size() >= 3) {
                             facilityHeadVp.setCurrentItem(1);
                             facilityHeadVp.setOffscreenPageLimit(3);
                         }
@@ -147,7 +155,7 @@ public class FacilityCategoryActivity extends AppCompatActivity {
                             @Override
                             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-                                if (rl != null){
+                                if (rl != null) {
                                     rl.invalidate();
                                 }
 
@@ -163,7 +171,7 @@ public class FacilityCategoryActivity extends AppCompatActivity {
                             public void onPageScrollStateChanged(int state) {
                                 if (state == ViewPager.SCROLL_STATE_IDLE) {
                                     handler.sendEmptyMessageDelayed(VIEWPAGER_CHANGE, 3000);
-                                }else{
+                                } else {
                                     handler.removeMessages(VIEWPAGER_CHANGE);//停止给handler发送消息
                                 }
                             }
@@ -187,7 +195,7 @@ public class FacilityCategoryActivity extends AppCompatActivity {
 
                             @Override
                             public boolean onTouch(View v, MotionEvent event) {
-                                switch (event.getAction()){
+                                switch (event.getAction()) {
                                     case MotionEvent.ACTION_DOWN:
 
                                         touchFlag = 0;
@@ -198,21 +206,21 @@ public class FacilityCategoryActivity extends AppCompatActivity {
                                     case MotionEvent.ACTION_MOVE:
                                         int moveX = (int) event.getX();
 
-                                        if (Math.abs(moveX - downX) < mTouchSlop){
-                                                touchFlag= 0;
-                                            }else {
-                                                touchFlag =-1;
-                                            }
+                                        if (Math.abs(moveX - downX) < mTouchSlop) {
+                                            touchFlag = 0;
+                                        } else {
+                                            touchFlag = -1;
+                                        }
 
 
                                         break;
                                     case MotionEvent.ACTION_UP:
 
-                                        if (touchFlag == 0){
-                                            ToastUtil.shortToast(getApplicationContext(),"点击了");
+                                        if (touchFlag == 0) {
+//                                            ToastUtil.shortToast(getApplicationContext(),"点击了");
                                             int currentItem = facilityHeadVp.getCurrentItem();
 //                                            currentItem = currentItem% headDatas.size();
-                                            Intent intent = new Intent(FacilityCategoryActivity.this,MemberCompanyShowActivity.class);
+                                            Intent intent = new Intent(FacilityCategoryActivity.this, MemberCompanyShowActivity.class);
                                             intent.putExtra("companyID", headDatas.get(currentItem).getCompanyID());
                                             intent.putExtra("fromID", GlobalContanstant.fromList);
 
@@ -231,13 +239,15 @@ public class FacilityCategoryActivity extends AppCompatActivity {
         });
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
-                if (headDatas.size()>1) {
+            if (headDatas !=null) {
+                if (headDatas.size() > 1) {
                     switchPage();
                 }
+            }
         }
     };
 
@@ -254,6 +264,7 @@ public class FacilityCategoryActivity extends AppCompatActivity {
             Log.e("@", "", e);
         }
     }
+
     private void switchPage() {
 
         int currentItem = facilityHeadVp.getCurrentItem();//获取当前显示界面的位置
@@ -267,11 +278,11 @@ public class FacilityCategoryActivity extends AppCompatActivity {
             currentItem++;
         }*/
 
-        currentItem = (currentItem +1)% headDatas.size();
+        currentItem = (currentItem + 1) % headDatas.size();
 
         setScrollerDuration();
         //3.将viwepager设置成显示下一个界面
-        facilityHeadVp.setCurrentItem(currentItem,true);
+        facilityHeadVp.setCurrentItem(currentItem, true);
         //4.在发送一个延迟消息,进行下一次的界面切换
         handler.sendEmptyMessageDelayed(VIEWPAGER_CHANGE, 3000);
     }

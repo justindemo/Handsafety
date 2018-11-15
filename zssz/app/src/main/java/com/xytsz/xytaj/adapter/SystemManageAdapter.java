@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class SystemManageAdapter extends BaseQuickAdapter<String> {
     private int[] micons = new int[]{R.mipmap.system_health,R.mipmap.system_boom,R.mipmap.system_control,
-            R.mipmap.system_envrio,R.mipmap.system_flood};
+            R.mipmap.system_envrio,R.mipmap.system_books,R.mipmap.system_law,R.mipmap.system_boom};
     private int[] meetingicons = new int[]{R.mipmap.train_material,R.mipmap.train_sign,R.mipmap.train_photo};
     private boolean isMeeting;
 

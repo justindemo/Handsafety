@@ -3,7 +3,6 @@ package com.xytsz.xytaj.activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -51,7 +51,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -121,6 +120,20 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     TextView tvCheckBack;
     @Bind(R.id.ll_check_idea)
     LinearLayout llCheckIdea;
+    @Bind(R.id.tv_send_detail_address1)
+    FrameLayout tvSendDetailAddress1;
+    @Bind(R.id.iv_review_delete1)
+    ImageView ivReviewDelete1;
+    @Bind(R.id.iv_review_delete2)
+    ImageView ivReviewDelete2;
+    @Bind(R.id.iv_review_delete3)
+    ImageView ivReviewDelete3;
+    @Bind(R.id.ll_facility)
+    LinearLayout llFacility;
+    @Bind(R.id.ll_department)
+    LinearLayout llDepartment;
+    @Bind(R.id.tv_send_detail_facility_way)
+    TextView tvSendDetailFacilityWay;
 
     private Review detail;
     private List<ImageUrl> imageUrls;
@@ -204,7 +217,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
             switch (requestCode) {
                 case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
                     File file = new File(filepath);
-                    if (!file.exists()){
+                    if (!file.exists()) {
                         file.mkdirs();
                     }
                     break;
@@ -249,11 +262,29 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
 
     private void initAcitionbar() {
+        String title = "";
+
+        switch (tag) {
+            case GlobalContanstant.REVIEW:
+                title = getResources().getString(R.string.review);
+                break;
+            //代表整改
+            case GlobalContanstant.NOTIFY:
+
+                title = getResources().getString(R.string.deal);
+                break;
+            //代表 审批
+            case GlobalContanstant.SEND:
+                title = getResources().getString(R.string.send);
+                break;
+        }
+
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(R.string.problem_detail);
+            actionBar.setTitle(title);
         }
     }
 
@@ -269,106 +300,121 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
 
         diseaseInformation = new DiseaseInformation();
-        tvSendDetailFacility.setText(detail.getDeviceName());
-        tvSendDetailFacilityPerson.setText(detail.getCheckPersonName());
-        tvSendDetailFacilityTeam.setText(detail.getDeptName());
-        StringBuilder stringBuilder = new StringBuilder();
-        List<String> errorInfo = detail.getErrorInfo();
 
-
-        if (errorInfo == null || errorInfo.size() == 0) {
-            tvSendDetailFacilityProblem.setText("正常");
-        } else {
-            for (String s : errorInfo) {
-                stringBuilder.append(s).append(";");
+        if (detail != null) {
+            if (detail.getCheckType() == 2) {
+                llFacility.setVisibility(View.VISIBLE);
+                llDepartment.setVisibility(View.GONE);
+                tvSendDetailFacilityWay.setText(getResources().getString(R.string.randomreprote));
+            } else {
+                llFacility.setVisibility(View.VISIBLE);
+                llDepartment.setVisibility(View.VISIBLE);
+                tvSendDetailFacilityWay.setText(getResources().getString(R.string.standardreprote));
             }
-            String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-            tvSendDetailFacilityProblem.setText(problem);
-        }
+
+            tvSendDetailFacility.setText(detail.getDeviceName());
+            tvSendDetailFacilityPerson.setText(detail.getCheckPersonName());
+            tvSendDetailFacilityTeam.setText(detail.getDeptName());
+            StringBuilder stringBuilder = new StringBuilder();
+            List<String> errorInfo = detail.getErrorInfo();
 
 
-        tvSendDetailReportetime.setText(detail.getCheckTime());
-        tvSendDetailAddress.setText(detail.getRemarks());
-        tvSendDetailFacilityLoca.setText(detail.getAddressInfo());
-
-
-        if (imageUrls.size() != 0) {
-            if (imageUrls.size() == 1) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
-                ivSendDetailPhoto2.setVisibility(View.INVISIBLE);
-                ivSendDetailPhoto3.setVisibility(View.INVISIBLE);
-            } else if (imageUrls.size() == 2) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
-                Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(ivSendDetailPhoto2);
-                ivSendDetailPhoto3.setVisibility(View.INVISIBLE);
-            } else if (imageUrls.size() == 3) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
-                Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(ivSendDetailPhoto2);
-                Glide.with(getApplicationContext()).load(imageUrls.get(2).getImgurl()).into(ivSendDetailPhoto3);
-            }
-        } else {
-            ivSendDetailPhoto1.setVisibility(View.VISIBLE);
-            ivSendDetailPhoto1.setVisibility(View.INVISIBLE);
-            ivSendDetailPhoto1.setVisibility(View.INVISIBLE);
-            Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(ivSendDetailPhoto1);
-
-        }
-
-        ivSendDetailPhoto1.setOnClickListener(this);
-        ivSendDetailPhoto2.setOnClickListener(this);
-        ivSendDetailPhoto3.setOnClickListener(this);
-
-
-        if (detail.getRemarks().isEmpty()) {
-            if (audioUrl != null) {
-                if (audioUrl.getAudioUrl() != null) {
-                    if (!audioUrl.getAudioUrl().equals("false")) {
-
-                        if (!audioUrl.getTime().isEmpty()) {
-                            tvSendDetailAddress.setVisibility(View.GONE);
-                            tvSendProblemAudio.setVisibility(View.VISIBLE);
-                            soundUtil = new SoundUtil();
-                            tvSendProblemAudio.setText(audioUrl.getTime());
-
-                            tvSendProblemAudio.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                    Drawable drawable = getResources().getDrawable(R.mipmap.pause);
-                                    final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
-
-                                    tvSendProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
-
-
-                                    soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
-                                        @Override
-                                        public void onFinish() {
-                                            tvSendProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
-                                        }
-
-                                        @Override
-                                        public void onError() {
-
-                                        }
-                                    });
-
-                                    soundUtil.play(audioUrl.getAudioUrl());
-                                }
-                            });
-                        }
-                    } else {
-                        tvSendDetailAddress.setVisibility(View.VISIBLE);
-                        tvSendProblemAudio.setVisibility(View.GONE);
-                    }
+            if (errorInfo == null || errorInfo.size() == 0) {
+                tvSendDetailFacilityProblem.setText("正常");
+            } else {
+                for (String s : errorInfo) {
+                    stringBuilder.append(s).append(";");
                 }
+                String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+                tvSendDetailFacilityProblem.setText(problem);
+            }
+
+
+            tvSendDetailReportetime.setText(detail.getCheckTime());
+            tvSendDetailAddress.setText(detail.getRemarks());
+            tvSendDetailFacilityLoca.setText(detail.getAddressInfo());
+
+
+            if (imageUrls.size() != 0) {
+                if (imageUrls.size() == 1) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
+                    ivSendDetailPhoto2.setVisibility(View.INVISIBLE);
+                    ivSendDetailPhoto3.setVisibility(View.INVISIBLE);
+                } else if (imageUrls.size() == 2) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(ivSendDetailPhoto2);
+                    ivSendDetailPhoto3.setVisibility(View.INVISIBLE);
+                } else if (imageUrls.size() == 3) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(ivSendDetailPhoto1);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(ivSendDetailPhoto2);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(2).getImgurl()).into(ivSendDetailPhoto3);
+                }
+            } else {
+                ivSendDetailPhoto1.setVisibility(View.VISIBLE);
+                ivSendDetailPhoto1.setVisibility(View.INVISIBLE);
+                ivSendDetailPhoto1.setVisibility(View.INVISIBLE);
+                Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(ivSendDetailPhoto1);
+
+            }
+
+            ivSendDetailPhoto1.setOnClickListener(this);
+            ivSendDetailPhoto2.setOnClickListener(this);
+            ivSendDetailPhoto3.setOnClickListener(this);
+
+
+            if (detail.getRemarks().isEmpty()) {
+                if (audioUrl != null) {
+                    if (audioUrl.getAudioUrl() != null) {
+                        if (!audioUrl.getAudioUrl().equals("false")) {
+
+                            if (!audioUrl.getTime().isEmpty()) {
+                                tvSendDetailAddress.setVisibility(View.GONE);
+                                tvSendProblemAudio.setVisibility(View.VISIBLE);
+                                soundUtil = new SoundUtil();
+                                tvSendProblemAudio.setText(audioUrl.getTime());
+
+                                tvSendProblemAudio.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        Drawable drawable = getResources().getDrawable(R.mipmap.pause);
+                                        final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
+
+                                        tvSendProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+
+
+                                        soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
+                                            @Override
+                                            public void onFinish() {
+                                                tvSendProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
+
+                                        soundUtil.play(audioUrl.getAudioUrl());
+                                    }
+                                });
+                            }
+                        } else {
+                            tvSendDetailAddress.setVisibility(View.VISIBLE);
+                            tvSendProblemAudio.setVisibility(View.GONE);
+                        }
+                    }
+                } else {
+                    tvSendDetailAddress.setVisibility(View.VISIBLE);
+                    tvSendProblemAudio.setVisibility(View.GONE);
+                }
+
             } else {
                 tvSendDetailAddress.setVisibility(View.VISIBLE);
                 tvSendProblemAudio.setVisibility(View.GONE);
             }
-
         } else {
-            tvSendDetailAddress.setVisibility(View.VISIBLE);
-            tvSendProblemAudio.setVisibility(View.GONE);
+            ToastUtil.shortToast(getApplicationContext(), "数据未获取");
         }
 
         switch (tag) {
@@ -397,10 +443,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
-
 
 
     }
@@ -425,11 +470,45 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
-    @OnClick({ R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
-            R.id.iv_review_icon3, R.id.tv_check_pass, R.id.tv_check_back})
+    private boolean isdelete1;
+    private boolean isdelete2;
+    private boolean isdelete3;
+
+
+    @OnClick({R.id.tv_send_pass, R.id.iv_review_icon1, R.id.iv_review_icon2,
+            R.id.iv_review_icon3, R.id.tv_check_pass, R.id.tv_check_back, R.id.iv_review_delete1,
+            R.id.iv_review_delete2, R.id.iv_review_delete3})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.iv_review_delete1:
+                ivReviewIcon1.setClickable(true);
+                ivReviewIcon1.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 0) {
+                    fileNames.set(0, "");
+                    imageBase64Strings.set(0, "");
+                    isdelete1 = true;
+                }
 
+                break;
+            case R.id.iv_review_delete2:
+                ivReviewIcon2.setClickable(true);
+                ivReviewIcon2.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 1) {
+                    fileNames.set(1, "");
+                    imageBase64Strings.set(1, "");
+                    isdelete2 = true;
+                }
+                break;
+            case R.id.iv_review_delete3:
+
+                ivReviewIcon3.setClickable(true);
+                ivReviewIcon3.setImageResource(R.mipmap.iv_add);
+                if (fileNames.size() > 2) {
+                    fileNames.set(2, "");
+                    imageBase64Strings.set(2, "");
+                    isdelete3 = true;
+                }
+                break;
 
             case R.id.tv_send_pass:
                 //拿到意见
@@ -455,16 +534,12 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 break;
 
             case R.id.tv_check_pass:
-                sendroadProgressbar.setVisibility(View.VISIBLE);
-                llRoadIdea.setVisibility(View.GONE);
-                llCheckIdea.setVisibility(View.GONE);
+
                 upImage(true);
 
                 break;
             case R.id.tv_check_back:
-                sendroadProgressbar.setVisibility(View.VISIBLE);
-                llRoadIdea.setVisibility(View.GONE);
-                llCheckIdea.setVisibility(View.GONE);
+
                 upImage(false);
 
                 break;
@@ -472,9 +547,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
             case R.id.iv_review_icon1:
 
                 PermissionUtils.requestPermission(SendRoadDetailActivity.this,
-                            PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
+                        PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
                 PermissionUtils.requestPermission(SendRoadDetailActivity.this,
-                            PermissionUtils.CODE_CAMERA, mPermissionGrant);
+                        PermissionUtils.CODE_CAMERA, mPermissionGrant);
 
 
                 break;
@@ -494,6 +569,17 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private String result;
 
     private void upImage(final boolean t) {
+        if (fileNames != null) {
+            if (fileNames.size() == 0) {
+                ToastUtil.shortToast(getApplicationContext(), "请先拍照");
+                return;
+            } else {
+                sendroadProgressbar.setVisibility(View.VISIBLE);
+                llRoadIdea.setVisibility(View.GONE);
+                llCheckIdea.setVisibility(View.GONE);
+            }
+        }
+
 
         new Thread() {
             @Override
@@ -501,14 +587,15 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 for (int i = 0; i < fileNames.size(); i++) {
                     diseaseInformation.photoName = fileNames.get(i);
                     diseaseInformation.encode = imageBase64Strings.get(i);
+                    if (!diseaseInformation.photoName.isEmpty()) {
+                        try {
+                            isphotoSuccess1 = connectWebService(diseaseInformation);
 
-                    try {
-                        isphotoSuccess1 = connectWebService(diseaseInformation);
-
-                    } catch (Exception e) {
-                        Message message = Message.obtain();
-                        message.what = GlobalContanstant.IMAGEFAIL;
-                        handler.sendMessage(message);
+                        } catch (Exception e) {
+                            Message message = Message.obtain();
+                            message.what = GlobalContanstant.IMAGEFAIL;
+                            handler.sendMessage(message);
+                        }
                     }
 
                 }
@@ -564,9 +651,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         envelope.setOutputSoapObject(soapObject);
 
 
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
+        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL, 50000);
         //链接后执行的回调
-        httpTranstation.call(null, envelope,headerList);
+        httpTranstation.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String result = object.getProperty(0).toString();
@@ -588,7 +675,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
 
         HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
         //链接后执行的回调
-        httpTranstation.call(null, envelope,headerList);
+        httpTranstation.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String result = object.getProperty(0).toString();
@@ -612,9 +699,9 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         envelope.setOutputSoapObject(soapObject);
 
 
-        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL);
+        HttpTransportSE httpTranstation = new HttpTransportSE(NetUrl.SERVERURL, 50000);
         //链接后执行的回调
-        httpTranstation.call(null, envelope,headerList);
+        httpTranstation.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
 
         String isphotoSuccess = object.getProperty(0).toString();
@@ -624,9 +711,10 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
     }
+
     private void camera(int position) {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         if (Build.VERSION.SDK_INT >= 24) {
@@ -647,7 +735,6 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     }
 
 
-
     private List<String> fileNames = new ArrayList<>();
     private List<String> imageBase64Strings = new ArrayList<>();
 
@@ -661,24 +748,30 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
             switch (requestCode) {
                 case Take_Photo:
                     if (data != null) {
-                       bitmap = (Bitmap) data.getExtras().get("data");
+                        bitmap = (Bitmap) data.getExtras().get("data");
                     } else {
 //                        firstbitmap = ReportActivity.getBitmap(ivReviewIcon1, fileResult);
                         bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
 
                     }
-                    if (bitmap == null){
+                    if (bitmap == null) {
                         return;
-                    }
+                    } else {
+                        ivReviewIcon1.setImageBitmap(bitmap);
+                        String fileName1 = saveToSDCard(bitmap, 1);
+                        //将选择的图片设置到控件上
+                        String encode1 = ReportActivity.photo2Base64(path);
+                        ivReviewIcon1.setClickable(false);
+                        if (!isdelete1) {
+                            fileNames.add(fileName1);
+                            imageBase64Strings.add(encode1);
+                        } else {
+                            fileNames.set(0, fileName1);
+                            imageBase64Strings.set(0, encode1);
+                        }
 
-                    ivReviewIcon1.setImageBitmap(bitmap);
-                    String fileName1 = saveToSDCard(bitmap,1);
-                    //将选择的图片设置到控件上
-                    String encode1 = ReportActivity.photo2Base64(path);
-                    ivReviewIcon1.setClickable(false);
-                    fileNames.add(fileName1);
-                    imageBase64Strings.add(encode1);
+                    }
                     break;
 
                 case 200:
@@ -689,16 +782,24 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                         bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                     }
-                    if (bitmap == null){
+                    if (bitmap == null) {
                         return;
+                    } else {
+                        ivReviewIcon2.setImageBitmap(bitmap);
+                        String fileName2 = saveToSDCard(bitmap, 2);
+                        //将选择的图片设置到控件上
+                        ivReviewIcon2.setClickable(false);
+                        String encode2 = ReportActivity.photo2Base64(path);
+
+                        if (!isdelete2) {
+                            fileNames.add(fileName2);
+                            imageBase64Strings.add(encode2);
+                        } else {
+                            fileNames.set(1, fileName2);
+                            imageBase64Strings.set(1, encode2);
+                        }
+
                     }
-                    ivReviewIcon2.setImageBitmap(bitmap);
-                    String fileName2 = saveToSDCard(bitmap,2);
-                    //将选择的图片设置到控件上
-                    ivReviewIcon2.setClickable(false);
-                    String encode2 = ReportActivity.photo2Base64(path);
-                    fileNames.add(fileName2);
-                    imageBase64Strings.add(encode2);
                     break;
                 case 300:
                     if (data != null) {
@@ -708,17 +809,24 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                         bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
                     }
-                    if (bitmap == null){
+                    if (bitmap == null) {
                         return;
-                    }
-                    ivReviewIcon3.setImageBitmap(bitmap);
-                    String fileName3 = saveToSDCard(bitmap,3);
-                    ivReviewIcon3.setClickable(false);
-                    //将选择的图片设置到控件上
-                    String encode3 = ReportActivity.photo2Base64(path);
-                    fileNames.add(fileName3);
-                    imageBase64Strings.add(encode3);
+                    } else {
+                        ivReviewIcon3.setImageBitmap(bitmap);
+                        String fileName3 = saveToSDCard(bitmap, 3);
+                        ivReviewIcon3.setClickable(false);
+                        //将选择的图片设置到控件上
+                        String encode3 = ReportActivity.photo2Base64(path);
 
+                        if (!isdelete3) {
+                            fileNames.add(fileName3);
+                            imageBase64Strings.add(encode3);
+                        } else {
+                            fileNames.set(2, fileName3);
+                            imageBase64Strings.set(2, encode3);
+                        }
+
+                    }
                     break;
             }
 
@@ -734,7 +842,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private final String iconPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Zsaj/Image/";
     private String path;
 
-    private String saveToSDCard(Bitmap bitmap,int position) {
+    private String saveToSDCard(Bitmap bitmap, int position) {
         //先要判断SD卡是否存在并且挂载
         String photoName = createPhotoName(position);
         path = iconPath + photoName;
@@ -743,7 +851,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
                 File pictureFile = new File(path);
                 //压缩图片
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 20, bos);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                 byte[] bytes = bos.toByteArray();
                 //将图片封装成File对象
                 FileOutputStream outputStream = new FileOutputStream(pictureFile);
@@ -766,7 +874,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
     private String createPhotoName(int position) {
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA);
-        String fileName = format.format(date) +"_"+position + "_" + personID  +".jpg";
+        String fileName = format.format(date) + "_" + position + "_" + personID + ".jpg";
         return fileName;
 
     }
@@ -807,7 +915,7 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String data = object.getProperty(0).toString();
@@ -833,4 +941,5 @@ public class SendRoadDetailActivity extends AppCompatActivity implements View.On
         }
         super.onSaveInstanceState(outState);
     }
+
 }

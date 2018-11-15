@@ -56,6 +56,7 @@ public class ProduceDetailActivity extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         producedeatilRv.setLayoutManager(manager);
         if (desc != null && desc.contains("[img]")) {
+            desc = desc.replaceAll(" ","");
             produceNames.clear();
             produceImgs.clear();
             //除去[img]
@@ -71,8 +72,8 @@ public class ProduceDetailActivity extends AppCompatActivity {
 //                  泄爆口也称为泄爆面积，
 //                [br]比如房间的
                 for (int i = 0; i < split.length; i++) {
-                    String str = split[i].replace("[/img]",";");
-                    String[] split1 = str.split(";");
+                    String str = split[i].replace("[/img]","|");
+                    String[] split1 = str.split("\\|");
 
                     //如果大于2
                     if (split1.length == 2) {
@@ -81,7 +82,7 @@ public class ProduceDetailActivity extends AppCompatActivity {
                         produceNames.add(split1[1]);
 
                     }else {
-                        if (split1[0] != null && split[0].contains("png")) {
+                        if (split1[0] != null && split1[0].contains("upfile")) {
                             produceImgs.add(split1[0]);
                         }else {
                             produceNames.add(split1[0]);
@@ -94,13 +95,13 @@ public class ProduceDetailActivity extends AppCompatActivity {
 
         }
 
-
+        //如果描述大于图片的数量
         if (produceNames.size() >= produceImgs.size()) {
             produceDetailAdapter = new ProduceDetailAdapter(produceNames, produceImgs,
                     this, true);
-
         } else {
-            produceDetailAdapter = new ProduceDetailAdapter(produceImgs, produceNames, this, false);
+            produceDetailAdapter = new ProduceDetailAdapter(produceImgs, produceNames,
+                    this, false);
         }
         producedeatilRv.setAdapter(produceDetailAdapter);
 

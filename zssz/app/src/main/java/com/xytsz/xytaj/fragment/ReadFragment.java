@@ -96,10 +96,10 @@ public class ReadFragment extends Fragment {
         mreadRB_d.setText(subDataBean.getOptiond());
         tv_answer.setText(subDataBean.getAnswer());
 
-        if (subDataBean.getOptionc().isEmpty() || subDataBean.getOptionc() == null) {
+        if (subDataBean.getOptionc() == null || subDataBean.getOptionc().isEmpty() ) {
             mreadRB_c.setVisibility(View.GONE);
             mreadRB_d.setVisibility(View.GONE);
-        } else if (subDataBean.getOptiond().isEmpty() || subDataBean.getOptiond() == null) {
+        } else if ( subDataBean.getOptiond() == null ||subDataBean.getOptiond().isEmpty() ) {
             mreadRB_d.setVisibility(View.GONE);
         }
 

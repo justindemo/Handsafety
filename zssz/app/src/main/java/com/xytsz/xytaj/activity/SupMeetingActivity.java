@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.SystemManageAdapter;
 
@@ -21,13 +22,14 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/5/9.
- * <p/>
+ * <p>
  * 会议纪要
  */
 public class SupMeetingActivity extends AppCompatActivity {
 
     @Bind(R.id.meeting_rv)
     RecyclerView meetingRv;
+
     private List<String> lists;
 
     @Override
@@ -45,7 +47,7 @@ public class SupMeetingActivity extends AppCompatActivity {
         GridLayoutManager manager = new GridLayoutManager(getApplicationContext(), 3);
         meetingRv.setLayoutManager(manager);
 
-        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists,true);
+        SystemManageAdapter systemManageAdapter = new SystemManageAdapter(lists, true);
         meetingRv.setAdapter(systemManageAdapter);
         systemManageAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override

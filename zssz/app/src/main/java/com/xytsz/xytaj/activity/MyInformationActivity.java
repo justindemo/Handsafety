@@ -94,46 +94,46 @@ public class MyInformationActivity extends AppCompatActivity {
 
         if (role == 0) {
             mineCompelet.setVisibility(View.VISIBLE);
-
-            if (username.equals(originalName)) {
-                ToastUtil.shortToast(getApplicationContext(), compelet);
-            } else {
-                myName.setText(username);
-                myName.setCursorVisible(false);
-                myName.setFocusable(false);
-                myName.setFocusableInTouchMode(false);
-                mineCompelet.setVisibility(View.GONE);
-            }
-
-            myTelephone.setText(phone);
-            myDepartment.setText(visitor);
-            mineCompelet.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    name = myName.getText().toString();
-                    if (TextUtils.isEmpty(name)) {
-                        ToastUtil.shortToast(getApplicationContext(), "姓名不能为空");
-                        return;
-                    }
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                String json = getvisitor();
-                                if (json != null) {
-                                    Message message = Message.obtain();
-                                    message.obj = json;
-                                    message.what = SUCCESS;
-                                    handler.sendMessage(message);
-                                }
-                            } catch (Exception e) {
-
-                            }
-                        }
-                    }.start();
+            if (username != null) {
+                if (username.equals(originalName)) {
+                    ToastUtil.shortToast(getApplicationContext(), compelet);
+                } else {
+                    myName.setText(username);
+                    myName.setCursorVisible(false);
+                    myName.setFocusable(false);
+                    myName.setFocusableInTouchMode(false);
+                    mineCompelet.setVisibility(View.GONE);
                 }
-            });
 
+                myTelephone.setText(phone);
+                myDepartment.setText(visitor);
+                mineCompelet.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        name = myName.getText().toString();
+                        if (TextUtils.isEmpty(name)) {
+                            ToastUtil.shortToast(getApplicationContext(), "姓名不能为空");
+                            return;
+                        }
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String json = getvisitor();
+                                    if (json != null) {
+                                        Message message = Message.obtain();
+                                        message.obj = json;
+                                        message.what = SUCCESS;
+                                        handler.sendMessage(message);
+                                    }
+                                } catch (Exception e) {
+
+                                }
+                            }
+                        }.start();
+                    }
+                });
+            }
         } else {
             myName.setText(username);
             myName.setCursorVisible(false);
@@ -195,7 +195,7 @@ public class MyInformationActivity extends AppCompatActivity {
 
     @OnClick(R.id.mine_modification_psd)
     public void onViewClicked() {
-        Intent intent = new Intent(MyInformationActivity.this,ModificationActivity.class);
+        Intent intent = new Intent(MyInformationActivity.this, ModificationActivity.class);
         startActivity(intent);
     }
 }

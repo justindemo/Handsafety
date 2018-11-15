@@ -71,28 +71,67 @@
                     android:orientation="horizontal"
                     android:padding="10dp">
 
-                    <ImageView
-                        android:id="@+id/iv_predeal_icon1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
 
-                    <ImageView
-                        android:id="@+id/iv_predeal_icon2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                    <RelativeLayout
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
 
-                    <ImageView
-                        android:id="@+id/iv_predeal_icon3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        <ImageView
+                            android:id="@+id/iv_predeal_icon1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_predeal_delete1"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="center" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_predeal_icon2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_predeal_delete2"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_predeal_icon3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_predeal_delete3"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+
 
                 </LinearLayout>
 
@@ -152,28 +191,69 @@
                     android:orientation="horizontal"
                     android:padding="10dp">
 
-                    <ImageView
-                        android:id="@+id/iv_dealing_icon1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
 
-                    <ImageView
-                        android:id="@+id/iv_dealing_icon2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                    <RelativeLayout
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
 
-                    <ImageView
-                        android:id="@+id/iv_dealing_icon3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        <ImageView
+                            android:id="@+id/iv_dealing_icon1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealing_delete1"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_dealing_icon2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealing_delete2"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_dealing_icon3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealing_delete3"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+
+
+
 
                 </LinearLayout>
 
@@ -233,29 +313,65 @@
                     android:orientation="horizontal"
                     android:padding="10dp">
 
-                    <ImageView
-                        android:id="@+id/iv_dealed_icon1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                    <RelativeLayout
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
 
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        <ImageView
+                            android:id="@+id/iv_dealed_icon1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
 
-                    <ImageView
-                        android:id="@+id/iv_dealed_icon2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealed_delete1"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
 
-                    <ImageView
-                        android:id="@+id/iv_dealed_icon3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        <ImageView
+                            android:id="@+id/iv_dealed_icon2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealed_delete2"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_dealed_icon3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_dealed_delete3"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
 
                 </LinearLayout>
 

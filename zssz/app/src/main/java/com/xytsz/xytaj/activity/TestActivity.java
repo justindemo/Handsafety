@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.TopicAdapter;
 import com.xytsz.xytaj.bean.AnwerInfo;
+import com.xytsz.xytaj.bean.ExamResult;
 import com.xytsz.xytaj.fragment.ReadFragment;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
@@ -80,13 +81,17 @@ public class TestActivity extends AppCompatActivity  {
                     ToastUtil.shortToast(getApplicationContext(), "上传失败");
                     break;
                 case GlobalContanstant.CHECKPASS:
-                    ToastUtil.shortToast(getApplicationContext(), "上传成功");
+                    String result = (String) msg.obj;
+                    ExamResult examResult = JsonUtil.jsonToBean(result,ExamResult.class);
+                    if (examResult != null) {
+                        ToastUtil.shortToast(getApplicationContext(), examResult.getMsg());
+                    }
                     finish();
                     break;
             }
         }
     };
-    private String result;
+
     private int personId;
 
     @Override
@@ -181,17 +186,23 @@ public class TestActivity extends AppCompatActivity  {
         });
     }
 
+    private String result;
+
     private void upData() {
         new Thread() {
             @Override
             public void run() {
                 try {
+
+                    StringBuilder stringBuilder = new StringBuilder();
                     for (AnwerInfo.SubDataBean detail :
                             datas) {
-
-                        result = up2service(detail);
+                        stringBuilder.append(detail.getId()).append(":")
+                                .append(detail.getUserAnswer()).append(",");
 
                     }
+                    String answerInfo = stringBuilder.toString().substring(0,stringBuilder.length()-1);
+                    String result = up2service(answerInfo);
                     Message message = Message.obtain();
                     message.what = GlobalContanstant.CHECKPASS;
                     message.obj = result;
@@ -205,12 +216,11 @@ public class TestActivity extends AppCompatActivity  {
         }.start();
     }
 
-    private String up2service(AnwerInfo.SubDataBean detail) throws Exception {
+    private String up2service(String answerInfo) throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.uploadtestmethod);
         soapObject.addProperty("TrainID", trainId);
         soapObject.addProperty("personId", personId);
-        soapObject.addProperty("ChoiceQstId", detail.getId());
-        soapObject.addProperty("StudentAnsw", detail.getUserAnswer());
+        soapObject.addProperty("examAnswer", answerInfo);
 
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);

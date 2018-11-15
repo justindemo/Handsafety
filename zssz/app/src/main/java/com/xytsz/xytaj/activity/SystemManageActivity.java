@@ -79,6 +79,8 @@ public class SystemManageActivity extends AppCompatActivity {
         lists.add("粉尘防爆");
         lists.add("消防安全");
         lists.add("环境保护");
+        lists.add("安全责任书");
+        lists.add("法律法规");
 
     }
 }

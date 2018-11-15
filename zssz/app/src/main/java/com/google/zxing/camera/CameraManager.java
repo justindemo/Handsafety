@@ -100,7 +100,11 @@ public final class CameraManager {
    * @return camera
    */
   public static Camera getCamera(){
-    return camera;
+    if (camera == null){
+        camera = Camera.open();
+    }
+      return camera;
+
   }
 
   private CameraManager(Context context) {

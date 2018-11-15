@@ -49,6 +49,7 @@ import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.view.ViewfinderView;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.activity.InputNumberActivity;
+import com.xytsz.xytaj.activity.RandomReportActivity;
 import com.xytsz.xytaj.util.IntentUtil;
 
 
@@ -89,6 +90,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     private Camera m_Camera;
     private boolean isLight;
     private Camera.Parameters parameters;
+    private LinearLayout actionReport;
 
 
     /**
@@ -106,6 +108,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 
         inputNumber = (LinearLayout) findViewById(R.id.ll_input_number);
         openLight = (LinearLayout) findViewById(R.id.ll_open_light);
+        actionReport = (LinearLayout) findViewById(R.id.ll_action);
 
         inputNumber.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,15 +122,24 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
             @Override
             public void onClick(View v) {
                 m_Camera = CameraManager.getCamera();
-                parameters = m_Camera.getParameters();
-                    if (!isLight){
+                if(m_Camera != null) {
+                    parameters = m_Camera.getParameters();
+                    if (!isLight) {
                         lightSwitch(false);
                         isLight = true;
-                    }else {
+                    } else {
                         lightSwitch(true);
                         isLight = false;
                     }
-
+                }
+            }
+        });
+        //是否展示
+        actionReport.setVisibility(View.VISIBLE);
+        actionReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IntentUtil.startActivity(v.getContext(),RandomReportActivity.class);
             }
         });
 
@@ -406,7 +418,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
             Intent resultIntent = new Intent();
             Bundle bundle = new Bundle();
             bundle.putString(INTENT_EXTRA_KEY_QR_SCAN, resultString);
-            System.out.println("sssssssssssssssss scan 0 = " + resultString);
+//            System.out.println("sssssssssssssssss scan 0 = " + resultString);
             // 不能使用Intent传递大于40kb的bitmap，可以使用一个单例对象存储这个bitmap
 //            bundle.putParcelable("bitmap", barcode);
 //            Logger.d("saomiao",resultString);

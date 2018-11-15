@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
 
         PermissionUtils.requestPermission(MainActivity.this,PermissionUtils.CODE_RECORD_AUDIO,mPermissionGrant);
-        PermissionUtils.requestPermission(MainActivity.this,PermissionUtils.CODE_ACCESS_FINE_LOCATION,mPermissionGrant);
+        PermissionUtils.requestPermission(MainActivity.this,PermissionUtils.CODE_ACCESS_COARSE_LOCATION,mPermissionGrant);
 
         PermissionUtils.requestPermission(MainActivity.this,PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE,mPermissionGrant);
 
@@ -95,13 +95,8 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
 
-        if (requestCode == PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE){
-            PermissionUtils.openSettingActivity(MainActivity.this, "请打开存储权限");
-            return;
-        }
-
         PermissionUtils.requestPermissionsResult(MainActivity.this,requestCode,permissions,grantResults,mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
 
 

@@ -13,8 +13,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_dealgrade_way"
+                    android:textColor="@color/cc_text_blank"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_send_detail_facility_way"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="18sp" />
+            </LinearLayout>
+
 
             <LinearLayout
+                android:layout_marginTop="6dp"
+                android:id="@+id/ll_facility"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -29,7 +51,7 @@
                     android:id="@+id/tv_send_detail_facility"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="sscc"
+                    android:text=""
                     android:textSize="18sp" />
             </LinearLayout>
 
@@ -49,11 +71,12 @@
                     android:id="@+id/tv_send_detail_facility_person"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="sscc"
+                    android:text=""
                     android:textSize="18sp" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_department"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp">
@@ -69,7 +92,7 @@
                     android:id="@+id/tv_send_detail_facility_team"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="sscc"
+                    android:text=""
                     android:textSize="18sp" />
             </LinearLayout>
 
@@ -89,7 +112,7 @@
                     android:id="@+id/tv_send_detail_facility_loca"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="sscc"
+                    android:text=""
                     android:textSize="18sp" />
             </LinearLayout>
 
@@ -171,7 +194,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
-                        android:text="@string/locationdes"
                         android:textSize="18sp" />
 
                 </FrameLayout>
@@ -258,31 +280,70 @@
                     android:orientation="horizontal"
                     android:padding="5dp">
 
-                    <ImageView
-                        android:id="@+id/iv_review_icon1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="3dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
 
-                    <ImageView
-                        android:id="@+id/iv_review_icon2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                    <RelativeLayout
+                        android:layout_marginTop="3dp"
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_review_icon1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_review_delete1"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="3dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
 
-                    <ImageView
-                        android:id="@+id/iv_review_icon3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        <ImageView
+                            android:id="@+id/iv_review_icon2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_review_delete2"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="3dp"
-                        android:background="@mipmap/iv_add"
-                        android:scaleType="fitXY" />
+                        android:layout_width="@dimen/report_img"
+                        android:layout_height="@dimen/report_img">
+
+                        <ImageView
+                            android:id="@+id/iv_review_icon3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/iv_add"
+                            android:scaleType="fitXY" />
+
+                        <ImageView
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/iv_review_delete3"
+                            android:layout_width="@dimen/report_delete"
+                            android:layout_height="@dimen/report_delete"
+                            android:src="@mipmap/iv_delete_video" />
+                    </RelativeLayout>
+
+
                 </LinearLayout>
             </LinearLayout>
 
@@ -299,7 +360,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="整改意见："
+                    android:text="整 改 意 见："
                     android:textColor="@color/cc_text_blank"
                     android:textSize="18sp" />
 
@@ -307,9 +368,7 @@
                     android:id="@+id/tv_send_detail_mine_advice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/shape_camrea_ok"
-                    android:padding="3dp"
-                    android:text=""
+                    android:hint="请填写"
                     android:textSize="18sp" />
             </LinearLayout>
 
@@ -317,7 +376,7 @@
             <View
                 android:id="@+id/space_view"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="20dp"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -343,7 +402,7 @@
                     android:id="@+id/tv_check_back"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_sendroad_tv"
                     android:gravity="center"

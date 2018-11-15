@@ -83,9 +83,8 @@ public class PermissionUtils {
             return;
         }
 
-        Log.i(TAG, "requestPermission requestCode:" + requestCode);
+
         if (requestCode < 0 || requestCode >= requestPermissions.length) {
-            Log.w(TAG, "requestPermission illegal requestCode:" + requestCode);
             return;
         }
 
@@ -105,28 +104,25 @@ public class PermissionUtils {
         } catch (RuntimeException e) {
             Toast.makeText(activity, "请打开此权限", Toast.LENGTH_SHORT)
                     .show();
-            Log.e(TAG, "RuntimeException:" + e.getMessage());
             return;
         }
 
         //如果权限没有允许
         if (checkSelfPermission != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "ActivityCompat.checkSelfPermission != PackageManager.PERMISSION_GRANTED");
-
 
             //23以上 要求
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, requestPermission)) {
-                Log.i(TAG, "requestPermission shouldShowRequestPermissionRationale");
+
                 shouldShowRationale(activity, requestCode, requestPermission);
 
             } else {
                 //23以下 不提示弹窗
-                Log.d(TAG, "requestCameraPermission else");
                 ActivityCompat.requestPermissions(activity, new String[]{requestPermission}, requestCode);
             }
 
         } else {
-            Log.d(TAG, "ActivityCompat.checkSelfPermission ==== PackageManager.PERMISSION_GRANTED");
+            //权限允许了
+
             //Toast.makeText(activity, "opened:" + requestPermissions[requestCode], Toast.LENGTH_SHORT).show();
             permissionGrant.onPermissionGranted(requestCode);
         }
@@ -206,7 +202,6 @@ public class PermissionUtils {
                 ActivityCompat.requestPermissions(activity,
                         new String[]{requestPermission},
                         requestCode);
-                Log.d(TAG, "showMessageOKCancel requestPermissions:" + requestPermission);
             }
         });
     }

@@ -313,6 +313,11 @@ public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchVie
 
                             str = reviewRoadDetail.getSendPerson();
 
+                            if(str == null || str.isEmpty()){
+                                ToastUtil.shortToast(v.getContext(),"请正确选择维修人");
+                                return;
+
+                            }
                             new AlertDialog.Builder(v.getContext()).setTitle("维修人").
                                     setMessage("确定让：" + str + " 维修?").setPositiveButton("确定",
                                     new DialogInterface.OnClickListener() {
@@ -369,6 +374,13 @@ public class SendRoadAdapter extends BaseAdapter implements SearchView.SearchVie
                                             imageUrlLists.remove(position);
                                             audioUrls.remove(position);
                                             notifyDataSetChanged();
+
+
+                                            /*if (reviews.size() == 0){
+                                                Message message1 = Message.obtain();
+                                                message1.what = GlobalContanstant.ISEMPTY;
+                                                handler.sendMessage(message);
+                                            }*/
                                             dialog.dismiss();
                                         }
                                     }).setNegativeButton("取消", new DialogInterface.OnClickListener() {

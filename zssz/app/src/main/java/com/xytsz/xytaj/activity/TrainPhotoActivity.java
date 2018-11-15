@@ -58,6 +58,7 @@ import butterknife.OnClick;
  * 培训照片
  */
 public class TrainPhotoActivity extends AppCompatActivity {
+
     @Bind(R.id.iv_train_icon1)
     ImageView ivTrainIcon1;
     @Bind(R.id.iv_train_icon2)
@@ -275,7 +276,7 @@ public class TrainPhotoActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private List<String> fileNames = new ArrayList<>();

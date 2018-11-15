@@ -93,21 +93,8 @@ public class SuperviseFragment extends BaseFragment {
             switch (msg.what) {
                 case GlobalContanstant.PATROLLISTSUCCESS:
                     String jsonData = (String) msg.obj;
-                    if (!jsonData.equals("[]")) {
-                        patrolListBeens = JsonUtil.jsonToBean(jsonData, new TypeToken<List<PatrolListBean>>() {
-                        }.getType());
 
-                        if (patrolListBeens != null) {
-                            if (patrolListBeens.size() != 0) {
-                                //展示
-                                number = patrolListBeens.size();
-                            }
-
-                        }
-                    } else {
-                        number = 0;
-                    }
-                    adapter.setNumber(number);
+                    adapter.setNumber(jsonData);
                     adapter.notifyDataSetChanged();
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
@@ -121,68 +108,33 @@ public class SuperviseFragment extends BaseFragment {
                     String nocheckData = data.getString("nocheckData");
                     String nopatorlData = data.getString("nopatrolData");
                     String meetinglist = data.getString("meetinglist");
-                    if (!trainList.equals("[]")) {
-                        trainContents = JsonUtil.jsonToBean(trainList, new TypeToken<List<TrainContent>>() {
-                        }.getType());
+                    if (trainList != null && !trainList.equals("[]") ) {
 
-                        if (trainContents != null) {
-                            if (trainContents.size() != 0) {
-                                //展示
-                                trainlistnumber = trainContents.size();
+                        trainlistnumber = Integer.valueOf(trainList);
 
 
-                            }
-
-                        }
                     } else {
-                        trainlistnumber = 0;
-                    }
+                            trainlistnumber = 0;
+                        }
 
                     if (nopatorlData != null && !nopatorlData.equals("[]")) {
-                        List<PatrolListBean> patrolListBeens1 = JsonUtil.jsonToBean(nopatorlData, new TypeToken<List<PatrolListBean>>() {
-                        }.getType());
 
-                        if (patrolListBeens1 != null) {
-                            if (patrolListBeens1.size() != 0) {
-                                //展示
-                                nopatorlNumber = patrolListBeens1.size();
+                        nopatorlNumber = Integer.valueOf(nopatorlData);
 
-                            }
 
-                        }
                     } else {
                         nopatorlNumber = 0;
                     }
 
 
                     if (nocheckData != null && !nocheckData.equals("[]")) {
-                        List<PatrolListBean> patrolListBeens1 = JsonUtil.jsonToBean(nocheckData, new TypeToken<List<PatrolListBean>>() {
-                        }.getType());
+                        nocheckNumber =  Integer.valueOf(nocheckData);
 
-                        if (patrolListBeens1 != null) {
-                            if (patrolListBeens1.size() != 0) {
-                                //展示
-                                nocheckNumber = patrolListBeens1.size();
-
-                            }
-
-                        }
                     } else {
                         nocheckNumber = 0;
                     }
-
-                    if (!meetinglist.equals("[]")) {
-                        List<SupMeeting> supMeetings = JsonUtil.jsonToBean(meetinglist, new TypeToken<List<SupMeeting>>() {
-                        }.getType());
-
-                        if (supMeetings != null) {
-                            if (supMeetings.size() != 0) {
-                                //展示
-                                meetingnumber = supMeetings.size();
-
-                            }
-
-                        }
+                    if (meetinglist != null && !meetinglist.equals("[]")) {
+                        meetingnumber =  Integer.valueOf(meetinglist);
                     } else {
                         meetingnumber = 0;
                     }
@@ -215,7 +167,7 @@ public class SuperviseFragment extends BaseFragment {
         titles1.add("应急预案");
         titles1.add("未排查任务");
         titles1.add("会议纪要");
-        titles1.add("未检查任务");
+        titles1.add("未核查任务");
 
         titles.clear();
         titles.add("早会签到");
@@ -252,7 +204,7 @@ public class SuperviseFragment extends BaseFragment {
         });
 
 
-        secondAdapter = new SuperviseSecondAdapter(titles1,role);
+        secondAdapter = new SuperviseSecondAdapter(titles1, role);
         recycleViewSecond.setAdapter(secondAdapter);
         secondAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
 
@@ -336,12 +288,12 @@ public class SuperviseFragment extends BaseFragment {
                         message1.obj = jsonData;
                         handler.sendMessage(message1);
                     }
-                    if (trainList != null && nopatrolData != null ) {
+                    if (trainList != null && nopatrolData != null && meetinglist != null && nocheckData != null) {
                         Message message2 = Message.obtain();
                         Bundle bundle = new Bundle();
                         bundle.putString("trainlist", trainList);
                         bundle.putString("nopatrolData", nopatrolData);
-                        bundle.putString("nocheckData",nocheckData);
+                        bundle.putString("nocheckData", nocheckData);
                         bundle.putString("meetinglist", meetinglist);
                         message2.what = GlobalContanstant.TRAINLISTSUCCESS;
                         message2.setData(bundle);
@@ -359,7 +311,7 @@ public class SuperviseFragment extends BaseFragment {
     }
 
     private String getnoPatrol() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getnoPatrolTaskByPersonID);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getNoPatrolCount);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -368,14 +320,14 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
     }
 
     private String getMeetingList() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getsupMeetingList);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getMeetingCount);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -384,16 +336,17 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
 
     }
 
+
     private String getUncheck() throws Exception {
 
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getnoCheckTaskByPersonID);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getNoCheckCount);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -402,14 +355,14 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
     }
 
     private String getTrainList() throws Exception {
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.trainTestshowmethod);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTraintestCount);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -418,7 +371,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -427,7 +380,7 @@ public class SuperviseFragment extends BaseFragment {
 
     private String downData(int personId) throws Exception {
 
-        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskByPersonID);
+        SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getMytaskmethod);
         soapObject.addProperty("personId", personId);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
@@ -436,7 +389,7 @@ public class SuperviseFragment extends BaseFragment {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

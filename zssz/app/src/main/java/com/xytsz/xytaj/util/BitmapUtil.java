@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.widget.ImageView;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class BitmapUtil {
             int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
 
-            switch (orientation){
+            switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     degree = 90;
                     break;
@@ -60,13 +61,72 @@ public class BitmapUtil {
 
     public static Bitmap getScaleBitmap(String fileResult) {
         Bitmap bitmap;
-        if (fileResult == null){
+        if (fileResult == null) {
             return null;
-        }else {
-            bitmap = BitmapFactory.decodeFile(fileResult);
-            bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
-            return bitmap;
+        } else {
+            try {
+                bitmap = getBitmap(fileResult);
+                if (bitmap != null) {
+                    bitmap =Bitmap.createScaledBitmap(bitmap,600,600,true);
+                    return bitmap;
+                }
+            } catch (IOException e) {
+                return null;
+            }
+            return null;
+
         }
+    }
+
+
+    private static Bitmap getBitmap(String path) throws IOException {
+        Bitmap bitmap;
+        int width = 600;
+        int height = 600;
+
+        BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
+
+        factoryOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, factoryOptions);
+
+        int imageWidth = factoryOptions.outWidth;
+        int imageHeight = factoryOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = 1;
+
+        if (imageHeight > height || imageWidth > width) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / scaleFactor) >= height && (halfWidth / scaleFactor) >= width) {
+                scaleFactor *= 2;
+            }
+        }
+        factoryOptions.inJustDecodeBounds = false;
+        factoryOptions.inSampleSize = scaleFactor;
+        factoryOptions.inPurgeable = true;
+
+        bitmap = BitmapFactory.decodeFile(path, factoryOptions);
+        //check the rotation of the image and display it properly
+        ExifInterface exif;
+
+        exif = new ExifInterface(path);
+
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+        Matrix matrix = new Matrix();
+        if (orientation == 6) {
+            matrix.postRotate(90);
+        } else if (orientation == 3) {
+            matrix.postRotate(180);
+        } else if (orientation == 8) {
+            matrix.postRotate(270);
+        }
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        return bitmap;
     }
 
 }

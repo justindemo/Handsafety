@@ -10,9 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.PatrolListAdapter;
 import com.xytsz.xytaj.bean.PatrolListBean;
@@ -36,7 +41,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2018/3/26.
- * <p/>
+ * <p>
  * 排查list
  */
 public class PatrolListActivity extends AppCompatActivity {
@@ -44,9 +49,12 @@ public class PatrolListActivity extends AppCompatActivity {
     @Bind(R.id.patrolrecycle)
     RecyclerView patrolrecycle;
     @Bind(R.id.patrol_progressbar)
-    ProgressBar patrolProgressbar;
+    LinearLayout patrolProgressbar;
+    @Bind(R.id.patrol_refersh)
+    SmartRefreshLayout patrolRefersh;
     private int personId;
     private List<PatrolListBean> patrolListBeens;
+    private List<PatrolListBean> allListBeens = new ArrayList<>();
     private int position;
     private Handler handler = new Handler() {
 
@@ -57,25 +65,35 @@ public class PatrolListActivity extends AppCompatActivity {
                 case GlobalContanstant.PATROLLISTSUCCESS:
                     patrolProgressbar.setVisibility(View.GONE);
                     String jsonData = (String) msg.obj;
-                    if (!jsonData.equals("[]")) {
-                        patrolListBeens = JsonUtil.jsonToBean(jsonData, new TypeToken<List<PatrolListBean>>() {
-                        }.getType());
+                    if (jsonData != null) {
+                        if (!jsonData.equals("[]")) {
+                            patrolListBeens = JsonUtil.jsonToBean(jsonData, new TypeToken<List<PatrolListBean>>() {
+                            }.getType());
 
-                        if (patrolListBeens != null) {
-                            if (patrolListBeens.size() != 0) {
-                                //展示
-                                LinearLayoutManager manager = new LinearLayoutManager(PatrolListActivity.this);
-                                patrolrecycle.setLayoutManager(manager);
-                                PatrolListAdapter patrolListAdapter = new PatrolListAdapter(patrolListBeens,false);
-                                patrolrecycle.setAdapter(patrolListAdapter);
+                            if (pageIndex == 1) {
+                                if (patrolListBeens != null && patrolListBeens.size() != 0) {
+                                    //展示
+                                    allListBeens.clear();
+                                    allListBeens.addAll(patrolListBeens);
+                                    patrolListAdapter = new PatrolListAdapter(allListBeens, false);
+                                    patrolrecycle.setAdapter(patrolListAdapter);
+
+                                } else {
+                                    ToastUtil.shortToast(getApplicationContext(), "今天排查工作完成");
+                                }
 
                             } else {
+                                patrolListAdapter.addData(patrolListBeens);
+                            }
+                        } else {
+                            islastPage = true;
+                            if (pageIndex == 1) {
                                 ToastUtil.shortToast(getApplicationContext(), "今天排查工作完成");
                             }
 
                         }
                     } else {
-                        ToastUtil.shortToast(getApplicationContext(), "今天排查工作完成");
+                        ToastUtil.shortToast(getApplicationContext(), "获取数据异常");
                     }
                     break;
                 case GlobalContanstant.PATROLLISTFAIL:
@@ -85,6 +103,11 @@ public class PatrolListActivity extends AppCompatActivity {
             }
         }
     };
+    private PatrolListAdapter patrolListAdapter;
+    private int pageIndex;
+    private int pageSize = 8;
+    private boolean islastPage;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +134,7 @@ public class PatrolListActivity extends AppCompatActivity {
     }
 
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     /**
      * 初始化数据
      */
@@ -119,17 +143,47 @@ public class PatrolListActivity extends AppCompatActivity {
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
+        pageIndex = 1;
+        LinearLayoutManager manager = new LinearLayoutManager(PatrolListActivity.this);
+        patrolrecycle.setLayoutManager(manager);
         getData();
+
+        patrolRefersh.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                if (!islastPage) {
+                    refreshLayout.finishLoadMore(2000);
+                    ++pageIndex;
+
+                    getData();
+                } else {
+                    refreshLayout.finishLoadMore();
+                    ToastUtil.shortToast(getApplicationContext(), "没有更多了");
+                }
+
+
+            }
+        });
+
+        patrolRefersh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                pageIndex = 1;
+                refreshLayout.finishRefresh(2000);
+                getData();
+            }
+        });
+
     }
 
     /**
      * 获取显示的数据
      */
     private void getData() {
-        patrolProgressbar.setVisibility(View.VISIBLE);
+        patrolProgressbar.setVisibility(View.GONE);
         new Thread() {
             @Override
             public void run() {
@@ -155,6 +209,8 @@ public class PatrolListActivity extends AppCompatActivity {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getTaskByPersonID);
         soapObject.addProperty("personId", personId);
+        soapObject.addProperty("pageIndex", pageIndex);
+        soapObject.addProperty("pageSize", pageSize);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
@@ -162,7 +218,7 @@ public class PatrolListActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;

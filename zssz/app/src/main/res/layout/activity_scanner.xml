@@ -62,6 +62,7 @@
                         android:layout_height="wrap_content" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/ll_open_light"
                     android:gravity="center"
@@ -81,7 +82,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/ll_action"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@mipmap/scanner_action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:layout_margin="6dp"
+                        android:textSize="16sp"
+                        android:textColor="@color/graybackground"
+                        android:text="@string/action_report"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
+                </LinearLayout>
 
             </LinearLayout>
         </RelativeLayout>

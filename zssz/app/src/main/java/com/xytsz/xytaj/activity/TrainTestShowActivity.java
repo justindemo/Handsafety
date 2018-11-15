@@ -14,6 +14,10 @@ import android.widget.LinearLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.TraintestShowAdapter;
 import com.xytsz.xytaj.bean.TrainContent;
@@ -45,33 +49,42 @@ public class TrainTestShowActivity extends AppCompatActivity {
     RecyclerView traintestshowRv;
     @Bind(R.id.traintestshow_progressbar)
     LinearLayout traintestshowProgressbar;
+    @Bind(R.id.traintest_refersh)
+    SmartRefreshLayout traintestRefersh;
     private int tag;
     private String title;
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case GlobalContanstant.FAIL:
                     traintestshowProgressbar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(),"数据未获取");
+                    ToastUtil.shortToast(getApplicationContext(), "数据未获取");
                     break;
                 case GlobalContanstant.MYSENDSUCCESS:
                     traintestshowProgressbar.setVisibility(View.GONE);
                     String json = (String) msg.obj;
-                    if (json != null && !json.equals("[]")){
-                        trainContents = JsonUtil.jsonToBean(json, new TypeToken<List<TrainContent>>() {
-                        }.getType());
+                    if (json != null) {
+                        if (!json.equals("[]")) {
+                            trainContents = JsonUtil.jsonToBean(json, new TypeToken<List<TrainContent>>() {
+                            }.getType());
+                            if (pageIndex == 1) {
+                                allDatas.clear();
+                                allDatas.addAll(trainContents);
+                                traintestShowAdapter = new TraintestShowAdapter(allDatas);
+                                traintestshowRv.setAdapter(traintestShowAdapter);
 
-                        if (trainContents.size()!= 0){
-                            LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
-                            traintestshowRv.setLayoutManager(manager);
-                            TraintestShowAdapter traintestShowAdapter = new TraintestShowAdapter(trainContents);
-                            traintestshowRv.setAdapter(traintestShowAdapter);
+                            } else {
+                                allDatas.addAll(trainContents);
+                                traintestShowAdapter.addData(trainContents);
+
+                            }
+
                             traintestShowAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                                 @Override
                                 public void onItemClick(View view, int position) {
-                                    switch (tag){
+                                    switch (tag) {
                                         //传递哪一场培训，
                                         //传递环节
                                         //跳转到指定界面
@@ -81,37 +94,38 @@ public class TrainTestShowActivity extends AppCompatActivity {
                                         case 2:
                                         case 3:
                                         case 4:
-                                            intent2show(position, trainContents,TrainTestDetailActivity.class,tag);
+                                            intent2show(position, allDatas, TrainTestDetailActivity.class, tag);
                                             break;
                                         case 5:
 //                                             培训签到
 
-                                            intent2show(position, trainContents,MoringSignActivity.class,true);
+                                            intent2show(position, allDatas, MoringSignActivity.class, true);
                                             break;
                                         case 6:
 //                                            培训照片
 
-                                            intent2show(position, trainContents,TrainPhotoActivity.class,true);
+                                            intent2show(position, allDatas, TrainPhotoActivity.class, true);
                                             break;
                                         case 7:
 //                                            培训考试
                                             //判断 考试状态
-                                            intent2show(position, trainContents,TestActivity.class,false);
+                                            intent2show(position, allDatas, TestActivity.class, false);
                                             break;
                                         case 8:
 //                                            成绩汇总
-                                            intent2show(position, trainContents,TestCollectActivity.class,false);
+                                            intent2show(position, allDatas, TestCollectActivity.class, false);
                                             break;
                                     }
                                 }
 
 
                             });
-                        }else {
-                            ToastUtil.shortToast(getApplicationContext(),"当前没有培训");
+                        } else {
+                            islastPage = true;
+                            if (pageIndex == 1) {
+                                ToastUtil.shortToast(getApplicationContext(), "当前没有培训");
+                            }
                         }
-                    }else {
-                        ToastUtil.shortToast(getApplicationContext(),"当前没有培训");
                     }
                     break;
             }
@@ -119,36 +133,38 @@ public class TrainTestShowActivity extends AppCompatActivity {
     };
     private int personId;
     private List<TrainContent> trainContents;
+    private List<TrainContent> allDatas = new ArrayList<>();
+    private int pageIndex;
+    private int pageSize = 10;
+    private boolean islastPage;
+    private TraintestShowAdapter traintestShowAdapter;
 
     /**
-     *
-     * @param position 培训场次
+     * @param position      培训场次
      * @param trainContents 培训内容
-     * @param activity 培训展示
-     * @param tag 培训标签（环节）
+     * @param activity      培训展示
+     * @param tag           培训标签（环节）
      */
     private void intent2show(int position, List<TrainContent> trainContents, Class<TrainTestDetailActivity> activity, int tag) {
-        Intent intent = new Intent(TrainTestShowActivity.this,activity);
+        Intent intent = new Intent(TrainTestShowActivity.this, activity);
         //传递哪一场培训
-        intent.putExtra("train",trainContents.get(position));
-        intent.putExtra("tag",tag);
+        intent.putExtra("train", trainContents.get(position));
+        intent.putExtra("tag", tag);
         startActivity(intent);
     }
 
     /**
-     *
-     * @param position 哪一场培训
+     * @param position      哪一场培训
      * @param trainContents 培训内容
-     * @param activity 指定环节
-     *
+     * @param activity      指定环节
      */
-    private void intent2show(int position, List<TrainContent> trainContents, Class<?> activity,boolean t) {
-        Intent intent = new Intent(TrainTestShowActivity.this,activity);
+    private void intent2show(int position, List<TrainContent> trainContents, Class<?> activity, boolean t) {
+        Intent intent = new Intent(TrainTestShowActivity.this, activity);
         //传递哪一场培训
-        if (t){
-            intent.putExtra("tag","trainsign");
+        if (t) {
+            intent.putExtra("tag", "trainsign");
         }
-        intent.putExtra("trainId",trainContents.get(position).getId());
+        intent.putExtra("trainId", trainContents.get(position).getId());
         startActivity(intent);
     }
 
@@ -193,23 +209,54 @@ public class TrainTestShowActivity extends AppCompatActivity {
 
         personId = SpUtils.getInt(getApplicationContext(), GlobalContanstant.PERSONID);
         initactionbar(title);
+        pageIndex = 1;
+        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
+        traintestshowRv.setLayoutManager(manager);
         initData();
+
+        traintestRefersh.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                if (!islastPage) {
+                    refreshLayout.finishLoadMore(2000);
+                    ++pageIndex;
+
+                    initData();
+                } else {
+                    refreshLayout.finishLoadMore();
+                    ToastUtil.shortToast(getApplicationContext(), "没有更多了");
+                }
+
+
+            }
+        });
+
+        traintestRefersh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                pageIndex = 1;
+                refreshLayout.finishRefresh(2000);
+                initData();
+            }
+        });
+
+
     }
 
 
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     private void initData() {
 
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
 
 
-
         traintestshowProgressbar.setVisibility(View.VISIBLE);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -229,9 +276,11 @@ public class TrainTestShowActivity extends AppCompatActivity {
 
     }
 
-    private String getData()throws Exception{
+    private String getData() throws Exception {
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.trainTestshowmethod);
         soapObject.addProperty("personId", personId);
+        soapObject.addProperty("pageIndex", pageIndex);
+        soapObject.addProperty("pageSize", pageSize);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
         envelope.bodyOut = soapObject;
@@ -239,7 +288,7 @@ public class TrainTestShowActivity extends AppCompatActivity {
         envelope.setOutputSoapObject(soapObject);
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();

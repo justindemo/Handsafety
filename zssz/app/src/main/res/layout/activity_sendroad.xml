@@ -4,27 +4,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:orientation="vertical"
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:layout_width="match_parent"
+        android:id="@+id/sendroad_refersh"
         android:layout_height="match_parent">
         <ListView
             android:id="@+id/lv_sendroad"
-            android:dividerHeight="1dp"
-            android:divider="@color/graybackground"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:divider="@color/graybackground"
+            android:dividerHeight="1dp" />
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
-    </RelativeLayout>
+
 
     <ProgressBar
         android:id="@+id/review_progressbar"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_gravity="center"
         android:indeterminateDrawable="@drawable/progress_loading"
-        />
+        android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tv_send_fail"
+        android:textSize="18sp"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </FrameLayout>

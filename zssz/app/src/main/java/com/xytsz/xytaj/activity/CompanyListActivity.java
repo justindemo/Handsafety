@@ -51,6 +51,7 @@ public class CompanyListActivity extends AppCompatActivity {
     private List<CompanyList.DataBean> data;
     private List<CompanyList.DataBean> allData = new ArrayList<>();
     private int personId;
+    private int dataCount;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,9 +88,21 @@ public class CompanyListActivity extends AppCompatActivity {
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
-                ++pageNo ;
-               getCompanyList();
+                refreshLayout.finishLoadMore(2000);
+                if (dataCount != 0) {
+                    int pagecount = dataCount / pageSize;
+                    int max = dataCount % pageSize;
+                    if (max >0) {
+                        ++pagecount;
+                    }
+                    if (pageNo < pagecount) {
+                        ++pageNo;
+                        getCompanyList();
+                    }else {
+                        ToastUtil.shortToast(getApplicationContext(),"没有更多了");
+                    }
 
+                }
             }
         });
 
@@ -97,14 +110,14 @@ public class CompanyListActivity extends AppCompatActivity {
 
     private Map<String, Integer> params = new HashMap<>();
     private int pageNo = 1;
-
+    private int pageSize = 8;
     private FacilityCategroyAdapter facilityCategroyAdapter;
 
 
     private void getCompanyList() {
         String url = NetUrl.SERVERURL2 + NetUrl.getCompanyData;
         params.clear();
-        params.put("pageSize",6);
+        params.put("pageSize",pageSize);
         params.put("pageNo", pageNo);
         params.put("companyClass", companycategroy);
         params.put("topIndex", -1);
@@ -125,20 +138,19 @@ public class CompanyListActivity extends AppCompatActivity {
 
                     @Override
                     public void onResponse(CompanyList response, int id) {
-                        refreshLayout.finishLoadMore(2000);
                         if (response != null) {
                             data = response.getData();
+                            dataCount = response.getDataCount();
                             if (data.size() == 0 && pageNo == 1){
                                 ToastUtil.shortToast(getApplicationContext(),"没有入驻");
                             }else {
                                 allData.addAll(data);
                                 if (pageNo == 1) {
-                                    facilityCategroyAdapter = new FacilityCategroyAdapter(allData, CompanyListActivity.this);
+                                    facilityCategroyAdapter = new FacilityCategroyAdapter(data, CompanyListActivity.this);
                                     companylistRv.setAdapter(facilityCategroyAdapter);
                                     LayoutInflater inflater = CompanyListActivity.this.getLayoutInflater();
                                     View headView = inflater.inflate(R.layout.pop_tv, companylistRv, false);
                                     facilityCategroyAdapter.addHeaderView(headView);
-
 
                                 }else {
                                     facilityCategroyAdapter.addData(data);
@@ -150,7 +162,7 @@ public class CompanyListActivity extends AppCompatActivity {
                                         Intent intent = new Intent(CompanyListActivity.this, MemberCompanyShowActivity.class);
                                         //传递Id；
                                         intent.putExtra("companyName", allData.get(position).getCompanyName());
-                                        intent.putExtra("companyDetail", allData.get(position));
+//                                        intent.putExtra("companyDetail", allData.get(position));
                                         intent.putExtra("companyID", allData.get(position).getID());
                                         startActivity(intent);
                                     }

@@ -125,7 +125,6 @@
         <activity android:name="com.xytsz.xytaj.activity.CheckRoadActivity" />
         <activity android:name="com.xytsz.xytaj.activity.PostRoadActivity" />
         <activity
-
             android:name="com.xytsz.xytaj.activity.SendRoadActivity"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
@@ -179,6 +178,9 @@
         <activity android:name="com.xytsz.xytaj.activity.CompanyListActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ProduceDetailActivity" />
         <activity android:name="com.xytsz.xytaj.activity.ProduceListActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.RandomReportActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.CheckStandardActivity" />
+        <activity android:name="com.xytsz.xytaj.activity.CheckStandardDetailActivity" />
 
 
 

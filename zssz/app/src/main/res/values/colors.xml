@@ -17,6 +17,7 @@
     <color name="cc_orage_enable">#ffcfcfcf</color><!-- 浅白fff0a75b -->
     <!-- 不透明#fff0e6dc -->
     <color name="cc_orage_red">#fff86851</color>
+    <color name="cc_red1">#fb0000</color>
     <color name="cc_supervise">#ff762c</color>
 
     <color name="cc_light_dark">#d38c8888</color>

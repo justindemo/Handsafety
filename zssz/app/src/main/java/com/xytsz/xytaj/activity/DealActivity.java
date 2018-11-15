@@ -15,6 +15,10 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.xytsz.xytaj.MyApplication;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.DealAdapter;
@@ -59,18 +63,25 @@ public class DealActivity extends AppCompatActivity {
                     break;
                 case FAIL:
                     mProgressBar.setVisibility(View.GONE);
-                    ToastUtil.shortToast(getApplicationContext(), "未获取数据,请稍后");
+                    mtvfail.setText("数据未获取");
+                    mtvfail.setVisibility(View.VISIBLE);
                     break;
             }
         }
     };
     private ProgressBar mProgressBar;
     private List<Review> reviews;
+    private List<Review> allDatas = new ArrayList<>();
     private TextView mtvfail;
     private String nodata;
     private DealAdapter adapter;
     private List<List<ImageUrl>> imageUrlLists = new ArrayList<>();
     private List<AudioUrl> audioUrls = new ArrayList<>();
+    private int pageIndex;
+    private int pageSize = 10;
+    private boolean islastPage;
+    private SmartRefreshLayout dealRefersh;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,14 +92,54 @@ public class DealActivity extends AppCompatActivity {
         nodata = getString(R.string.deal_nodata);
         initAcitionbar();
         initView();
-
+        pageIndex = 1;
         initData();
+
+        dealRefersh.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                if (!islastPage) {
+                    refreshLayout.finishLoadMore(2000);
+                    ++pageIndex;
+                    initData();
+                } else {
+                    refreshLayout.finishLoadMore();
+                    ToastUtil.shortToast(getApplicationContext(), "没有更多了");
+                }
+
+
+            }
+        });
+
+        dealRefersh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                pageIndex = 1;
+                refreshLayout.finishRefresh(2000);
+                initData();
+            }
+        });
+        mLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(DealActivity.this, SendRoadDetailActivity.class);
+                intent.putExtra("position", position);
+                intent.putExtra("tag", GlobalContanstant.NOTIFY);
+                intent.putExtra("detail", allDatas.get(position));
+                intent.putExtra("audioUrl", audioUrls.get(position));
+                intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position));
+                startActivityForResult(intent, 400);
+            }
+        });
     }
 
     private void initView() {
         mLv = (ListView) findViewById(R.id.Lv_deal);
         mProgressBar = (ProgressBar) findViewById(R.id.review_progressbar);
         mtvfail = (TextView) findViewById(R.id.tv_deal_fail);
+
+        dealRefersh = (SmartRefreshLayout) findViewById(R.id.deal_refersh);
+
     }
 
     private void initData() {
@@ -104,18 +155,25 @@ public class DealActivity extends AppCompatActivity {
 
                     String dealData = getServiceData(NetUrl.getdealtask,personID);
                     if (dealData != null) {
+                        if (dealData.equals("[]")) {
+                            islastPage = true;
+                            if (pageIndex == 1){
+                                Message message = Message.obtain();
+                                message.what = NODEAL;
+                                handler.sendMessage(message);
+                            }
 
+                        } else {
                         reviews = JsonUtil.jsonToBean(dealData, new TypeToken<List<Review>>() {
                         }.getType());
 
-                        if (reviews.size() == 0) {
+                        if (reviews.size() != 0) {
 
-                            Message message = Message.obtain();
-                            message.what = NODEAL;
-                            handler.sendMessage(message);
+                            if (pageIndex == 1){
+                                audioUrls.clear();
+                                imageUrlLists.clear();
 
-                        } else {
-                            audioUrls.clear();
+                            }
                             //遍历list
                             for (Review detail : reviews) {
 
@@ -123,7 +181,7 @@ public class DealActivity extends AppCompatActivity {
                                 /**
                                  * 获取到图片的URl
                                  */
-                                String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW,headerList);
+                                String json = RoadActivity.getAllImagUrl(taskNumber, GlobalContanstant.GETREVIEW, headerList);
                                 if (json != null) {
 
                                     //String list = new JSONObject(json).getJSONArray("").toString();
@@ -134,38 +192,41 @@ public class DealActivity extends AppCompatActivity {
                                 }
 
 
-                                String audioUrljson = RoadActivity.getAudio(taskNumber,headerList);
+                                String audioUrljson = RoadActivity.getAudio(taskNumber, headerList);
 
-                                if (audioUrljson != null){
+                                if (audioUrljson != null) {
                                     AudioUrl audioUrl = JsonUtil.jsonToBean(audioUrljson, AudioUrl.class);
                                     audioUrls.add(audioUrl);
                                 }
 
 
-
                             }
 
-                            adapter = new DealAdapter(reviews, imageUrlLists, audioUrls);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mLv.setAdapter(adapter);
-                                    mProgressBar.setVisibility(View.GONE);
-                                    mLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                            Intent intent = new Intent(DealActivity.this,SendRoadDetailActivity.class);
-                                            intent.putExtra("position",position);
-                                            intent.putExtra("tag",GlobalContanstant.NOTIFY);
-                                            intent.putExtra("detail", reviews.get(position));
-                                            intent.putExtra("audioUrl", audioUrls.get(position));
-                                            intent.putExtra("imageUrls", (Serializable) imageUrlLists.get(position));
-                                            startActivityForResult(intent,400);
-                                        }
-                                    });
-                                }
-                            });
+                            if (pageIndex == 1) {
 
+                                allDatas.clear();
+                                allDatas.addAll(reviews);
+                                adapter = new DealAdapter(allDatas, imageUrlLists, audioUrls);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mLv.setAdapter(adapter);
+                                        mProgressBar.setVisibility(View.GONE);
+
+                                    }
+                                });
+                            } else {
+                                allDatas.addAll(reviews);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyDataSetChanged();
+                                        mProgressBar.setVisibility(View.GONE);
+
+                                    }
+                                });
+                            }
+                        }
 
                         }
                     }
@@ -180,14 +241,15 @@ public class DealActivity extends AppCompatActivity {
 
 
     }
-    public static List<HeaderProperty> headerList = new ArrayList<>();
-    public static HeaderProperty headerPropertyObj;
+    public List<HeaderProperty> headerList = new ArrayList<>();
+    public HeaderProperty headerPropertyObj;
 
-    public static String getServiceData(String method,int personID) throws Exception {
-
+    public  String getServiceData(String method,int personID) throws Exception {
 
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace,method);
         soapObject.addProperty("personId",personID);
+        soapObject.addProperty("pageIndex", pageIndex);
+        soapObject.addProperty("pageSize", pageSize);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER12);
         envelope.bodyOut = soapObject;//由于是发送请求，所以是设置bodyOut
@@ -232,6 +294,10 @@ public class DealActivity extends AppCompatActivity {
                 imageUrlLists.remove(backedPosition);
                 audioUrls.remove(backedPosition);
                 adapter.notifyDataSetChanged();
+                if (reviews.size() == 0){
+                    mtvfail.setText(nodata);
+                    mtvfail.setVisibility(View.VISIBLE);
+                }
             }
         }
     }

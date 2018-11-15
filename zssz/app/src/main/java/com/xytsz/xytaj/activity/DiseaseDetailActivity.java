@@ -71,6 +71,12 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
     LinearLayout llRoadIdea;
     @Bind(R.id.tv_detail_sendadvice)
     TextView tvDetailSendadvice;
+    @Bind(R.id.ll_post_facility)
+    LinearLayout llPostFacility;
+    @Bind(R.id.ll_post_department)
+    LinearLayout llPostDepartment;
+    @Bind(R.id.tv_detail_facility_way)
+    TextView tvDetailFacilityWay;
     private ImageView mivPhoto1;
     private ImageView mivPhoto2;
     private ImageView mivPhoto3;
@@ -163,117 +169,129 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         mtvProblemAudio = (TextView) findViewById(R.id.tv_detail_problem_audio);
 
 
-
     }
-
 
 
     private void initData() {
         //赋值
-        tvDetailFacility.setText(detail.getDeviceName());
-        tvDetailFacilityPerson.setText(detail.getCheckPersonName());
-        tvDetailFacilityTeam.setText(detail.getDeptName());
 
-        tvDetailSendadvice.setText(detail.getZZCSSHInfo());
-        tvDetailFacilityLoca.setText(detail.getAddressInfo());
-        StringBuilder stringBuilder = new StringBuilder();
-        List<String> errorInfo = detail.getErrorInfo();
-        for (String s : errorInfo) {
-            stringBuilder.append(s).append(";");
-        }
-        String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-        tvDetailFacilityProblem.setText(problem);
+        if (detail != null) {
 
-        tvDetailReportetime.setText(detail.getCheckTime());
-        tvDetailRequestname.setText(detail.getRequirementsComplete_Person_Name());
-        tvDetailRequesttime.setText(detail.getRequirementsCompleteTime());
-        tvDetailPlan.setText(detail.getZZCSInfo());
-        tvDetailPlaner.setText(detail.getZZCSPersonName());
+            if (detail.getCheckType() == 2) {
+                llPostDepartment.setVisibility(View.GONE);
+                llPostFacility.setVisibility(View.VISIBLE);
+                tvDetailFacilityWay.setText(getResources().getString(R.string.randomreprote));
+            } else {
+                llPostDepartment.setVisibility(View.VISIBLE);
+                llPostFacility.setVisibility(View.VISIBLE);
+                tvDetailFacilityWay.setText(getResources().getString(R.string.standardreprote));
+            }
 
-        mtvProblemLoca.setText(detail.getRemarks());
+            tvDetailFacility.setText(detail.getDeviceName());
+            tvDetailFacilityPerson.setText(detail.getCheckPersonName());
+            tvDetailFacilityTeam.setText(detail.getDeptName());
+
+            tvDetailSendadvice.setText(detail.getZZCSSHInfo());
+            tvDetailFacilityLoca.setText(detail.getAddressInfo());
+            StringBuilder stringBuilder = new StringBuilder();
+            List<String> errorInfo = detail.getErrorInfo();
+            for (String s : errorInfo) {
+                stringBuilder.append(s).append(";");
+            }
+            String problem = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+            tvDetailFacilityProblem.setText(problem);
+
+            tvDetailReportetime.setText(detail.getCheckTime());
+            tvDetailRequestname.setText(detail.getRequirementsComplete_Person_Name());
+            tvDetailRequesttime.setText(detail.getRequirementsCompleteTime());
+            tvDetailPlan.setText(detail.getZZCSInfo());
+            tvDetailPlaner.setText(detail.getZZCSPersonName());
+
+            mtvProblemLoca.setText(detail.getRemarks());
 
 
-        if (imageUrls.size() != 0) {
-            if (imageUrls.size() == 1) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
+            if (imageUrls.size() != 0) {
+                if (imageUrls.size() == 1) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
+                    mivPhoto2.setVisibility(View.INVISIBLE);
+                    mivPhoto3.setVisibility(View.INVISIBLE);
+                } else if (imageUrls.size() == 2) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(mivPhoto2);
+                    mivPhoto3.setVisibility(View.INVISIBLE);
+                } else if (imageUrls.size() == 3) {
+                    Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(mivPhoto2);
+                    Glide.with(getApplicationContext()).load(imageUrls.get(2).getImgurl()).into(mivPhoto3);
+                }
+            } else {
+
+                mivPhoto1.setVisibility(View.VISIBLE);
                 mivPhoto2.setVisibility(View.INVISIBLE);
                 mivPhoto3.setVisibility(View.INVISIBLE);
-            } else if (imageUrls.size() == 2) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
-                Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(mivPhoto2);
-                mivPhoto3.setVisibility(View.INVISIBLE);
-            } else if (imageUrls.size() == 3) {
-                Glide.with(getApplicationContext()).load(imageUrls.get(0).getImgurl()).into(mivPhoto1);
-                Glide.with(getApplicationContext()).load(imageUrls.get(1).getImgurl()).into(mivPhoto2);
-                Glide.with(getApplicationContext()).load(imageUrls.get(2).getImgurl()).into(mivPhoto3);
+                Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivPhoto1);
+
             }
-        } else {
-
-            mivPhoto1.setVisibility(View.VISIBLE);
-            mivPhoto2.setVisibility(View.INVISIBLE);
-            mivPhoto3.setVisibility(View.INVISIBLE);
-            Glide.with(getApplicationContext()).load(R.mipmap.prepost).into(mivPhoto1);
-
-        }
-        mivPhoto1.setOnClickListener(this);
-        mivPhoto2.setOnClickListener(this);
-        mivPhoto3.setOnClickListener(this);
+            mivPhoto1.setOnClickListener(this);
+            mivPhoto2.setOnClickListener(this);
+            mivPhoto3.setOnClickListener(this);
 
 
-        if (detail.getRemarks().isEmpty()) {
-            if (audioUrl != null) {
-                if (audioUrl.getAudioUrl() != null) {
-                    if (!audioUrl.getAudioUrl().equals("false")) {
-                        if (!audioUrl.getTime().isEmpty()) {
-                            mtvProblemLoca.setVisibility(View.GONE);
-                            mtvProblemAudio.setVisibility(View.VISIBLE);
-                            soundUtil = new SoundUtil();
-                            mtvProblemAudio.setText(audioUrl.getTime());
+            if (detail.getRemarks().isEmpty()) {
+                if (audioUrl != null) {
+                    if (audioUrl.getAudioUrl() != null) {
+                        if (!audioUrl.getAudioUrl().equals("false")) {
+                            if (!audioUrl.getTime().isEmpty()) {
+                                mtvProblemLoca.setVisibility(View.GONE);
+                                mtvProblemAudio.setVisibility(View.VISIBLE);
+                                soundUtil = new SoundUtil();
+                                mtvProblemAudio.setText(audioUrl.getTime());
 
-                            mtvProblemAudio.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                                mtvProblemAudio.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
 
-                                    Drawable drawable = getResources().getDrawable(R.mipmap.pause);
-                                    final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
+                                        Drawable drawable = getResources().getDrawable(R.mipmap.pause);
+                                        final Drawable drawableRight = getResources().getDrawable(R.mipmap.play);
 
-                                    mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
-                                    //soundUtil.play(audioUrl);
+                                        mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+                                        //soundUtil.play(audioUrl);
 
-                                    soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
-                                        @Override
-                                        public void onFinish() {
-                                            mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
-                                        }
+                                        soundUtil.setOnFinishListener(new SoundUtil.OnFinishListener() {
+                                            @Override
+                                            public void onFinish() {
+                                                mtvProblemAudio.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
+                                            }
 
-                                        @Override
-                                        public void onError() {
+                                            @Override
+                                            public void onError() {
 
-                                        }
-                                    });
+                                            }
+                                        });
 
 
-                                    soundUtil.play(audioUrl.getAudioUrl());
-                                }
-                            });
+                                        soundUtil.play(audioUrl.getAudioUrl());
+                                    }
+                                });
+                            }
+                        } else {
+                            mtvProblemLoca.setVisibility(View.VISIBLE);
+
+                            mtvProblemAudio.setVisibility(View.GONE);
                         }
-                    } else {
-                        mtvProblemLoca.setVisibility(View.VISIBLE);
-
-                        mtvProblemAudio.setVisibility(View.GONE);
                     }
+                } else {
+                    mtvProblemLoca.setVisibility(View.VISIBLE);
+
+                    mtvProblemAudio.setVisibility(View.GONE);
                 }
             } else {
                 mtvProblemLoca.setVisibility(View.VISIBLE);
-
                 mtvProblemAudio.setVisibility(View.GONE);
             }
         } else {
-            mtvProblemLoca.setVisibility(View.VISIBLE);
-            mtvProblemAudio.setVisibility(View.GONE);
+            ToastUtil.shortToast(getApplicationContext(), "数据未获取");
         }
-
-
 
     }
 
@@ -338,6 +356,7 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private List<HeaderProperty> headerList = new ArrayList<>();
+
     private String toNet() throws Exception {
         //发通知节点//哪个单子，状态，通知人是谁，意见是什么,时间是否需要。
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.reviewmethodName);
@@ -356,7 +375,7 @@ public class DiseaseDetailActivity extends AppCompatActivity implements View.OnC
         //添加cookie
 //        private List<HeaderProperty> headerList = new ArrayList<>();
         headerList.clear();
-        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+        HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie, SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
         httpTransportSE.call(null, envelope/*,headerList*/);

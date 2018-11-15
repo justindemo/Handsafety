@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -60,8 +61,7 @@ import java.util.List;
  * Created by admin on 2017/1/4.
  * 首页
  */
-public class HomeFragment extends BaseFragment implements ActivityCompat.OnRequestPermissionsResultCallback {
-
+public class HomeFragment extends BaseFragment {
 
     private static final int FAIL = 404;
     private static final int MANAGER = 111120;
@@ -110,7 +110,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
     private TextView mActionbartext;
     private TextView mtvPatrolNumber;
-    private List<String> patrolNumbers = new ArrayList<>();
+    private ProgressBar testProgress;
 
 
     @Override
@@ -132,6 +132,8 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
         mtvuncheckNumber = (TextView) view.findViewById(R.id.tv_home_unchecek_number);
         mtvcheckNumber = (TextView) view.findViewById(R.id.tv_home_check_number);
         mtvPatrolNumber = (TextView) view.findViewById(R.id.tv_home_patrol_number);
+        testProgress = (ProgressBar) view.findViewById(R.id.testprogress);
+
         return view;
     }
 
@@ -171,6 +173,8 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
     private void getData() {
 
+        testProgress.setVisibility(View.VISIBLE);
+
         headerList.clear();
         if (HomeFragment.this.getActivity() != null) {
             HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
@@ -179,7 +183,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
             headerList.add(headerPropertyObj);
         }
 
-        patrolNumbers.clear();
+
         new Thread() {
             @Override
             public void run() {
@@ -199,17 +203,16 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
                     String postcount = getManageData(NetUrl.getpostcountmethod, personId);
                     String checkcount = getManageData(NetUrl.getcheckcountmethod, personId);
 
-                    patrolNumbers.add(patrolcount);
-                    patrolNumbers.add(examinecount);
-                    patrolNumbers.add(dealcount);
-                    patrolNumbers.add(reviewcount);
-                    patrolNumbers.add(postcount);
-                    patrolNumbers.add(checkcount);
-
-
                     Message message = Message.obtain();
                     message.what = MANAGER;
-                    message.obj = patrolNumbers;
+                    Bundle bundle = new Bundle();
+                    bundle.putString("patrolcount", patrolcount);
+                    bundle.putString("examinecount", examinecount);
+                    bundle.putString("dealcount", dealcount);
+                    bundle.putString("reviewcount", reviewcount);
+                    bundle.putString("postcount", postcount);
+                    bundle.putString("checkcount", checkcount);
+                    message.setData(bundle);
                     handler.sendMessage(message);
 
                 } catch (Exception e) {
@@ -276,7 +279,7 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtils.requestPermissionsResult(getActivity(), requestCode, permissions, grantResults, mPermissionGrant);
     }
 
@@ -287,20 +290,21 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
             locationClient.start();
         }
         role = SpUtils.getInt(getContext(), GlobalContanstant.ROLE);
-
+        getData();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        mapview.onResume();
+        if (mapview != null) {
+            mapview.onResume();
+        }
+//        getData();
 
-        getData();
-
-        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_READ_EXTERNAL_STORAGE, mPermissionGrant);
+//        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_READ_EXTERNAL_STORAGE, mPermissionGrant);
         PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
-        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
+//        PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
         PermissionUtils.requestPermission(this.getActivity(), PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
 
     }
@@ -308,7 +312,9 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     @Override
     public void onPause() {
         super.onPause();
-        mapview.onPause();
+        if (mapview != null) {
+            mapview.onPause();
+        }
         if (locationClient != null) {
             locationClient.stop();
             locationClient.unRegisterLocationListener(myListener);
@@ -319,81 +325,73 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mapview.onDestroy();
+        if (mapview != null) {
+            mapview.onDestroy();
+        }
         if (locationClient != null) {
             locationClient.stop();
             locationClient.unRegisterLocationListener(myListener);
         }
     }
 
-    private static final int ISLOAD = 33301;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
                 case MANAGER:
-                    mtvPatrolNumber.setVisibility(View.VISIBLE);
-                    mtvreviewNumber.setVisibility(View.VISIBLE);
-                    mtvsendNumber.setVisibility(View.VISIBLE);
-                    mtvcheckNumber.setVisibility(View.VISIBLE);
-                    mtvuncheckNumber.setVisibility(View.VISIBLE);
-                    mtvdealNumber.setVisibility(View.VISIBLE);
+                    testProgress.setVisibility(View.GONE);
+                    Bundle data = msg.getData();
 
-                    List<String> list = (List<String>) msg.obj;
+                    String patrolcount = data.getString("patrolcount");
+                    String examinecount = data.getString("examinecount");
+                    String dealcount = data.getString("dealcount");
+                    String reviewcount = data.getString("reviewcount");
+                    String postcount = data.getString("postcount");
+                    String checkcount = data.getString("checkcount");
 
-                    for (String str : list) {
-                        if (TextUtils.equals(str, GlobalContanstant.NoLogin)) {
-                            ToastUtil.shortToast(getContext(),"请先登录");
-                            return;
+                    if (patrolcount!= null && examinecount != null && dealcount != null
+                            && reviewcount != null && postcount != null&& checkcount != null ){
+                        mtvPatrolNumber.setVisibility(View.VISIBLE);
+                        mtvreviewNumber.setVisibility(View.VISIBLE);
+                        mtvsendNumber.setVisibility(View.VISIBLE);
+                        mtvcheckNumber.setVisibility(View.VISIBLE);
+                        mtvuncheckNumber.setVisibility(View.VISIBLE);
+                        mtvdealNumber.setVisibility(View.VISIBLE);
+
+                        mtvPatrolNumber.setText(patrolcount);
+                        mtvreviewNumber.setText(examinecount);
+                        mtvdealNumber.setText(dealcount);
+                        mtvsendNumber.setText(reviewcount);
+                        mtvuncheckNumber.setText(postcount);
+                        mtvcheckNumber.setText(checkcount);
+                        if (patrolcount.equals("0")){
+                            mtvPatrolNumber.setVisibility(View.GONE);
                         }
-                    }
-
-                    for (int i = 0; i < list.size(); i++) {
-                        if (list.get(i).equals("0")) {
-                            switch (i) {
-                                case 0:
-                                    mtvPatrolNumber.setVisibility(View.GONE);
-                                    break;
-                                case 1:
-                                    mtvreviewNumber.setVisibility(View.GONE);
-                                    break;
-                                case 2:
-                                    mtvdealNumber.setVisibility(View.GONE);
-                                    break;
-                                case 3:
-                                    mtvsendNumber.setVisibility(View.GONE);
-                                    break;
-                                case 4:
-                                    mtvuncheckNumber.setVisibility(View.GONE);
-                                    break;
-                                case 5:
-                                    mtvcheckNumber.setVisibility(View.GONE);
-                                    break;
-                            }
-                        } else {
-                            mtvPatrolNumber.setText(list.get(0));
-                            mtvreviewNumber.setText(list.get(1));
-                            mtvdealNumber.setText(list.get(2));
-                            mtvsendNumber.setText(list.get(3));
-                            mtvuncheckNumber.setText(list.get(4));
-                            mtvcheckNumber.setText(list.get(5));
+                        if (examinecount.equals("0")){
+                            mtvreviewNumber.setVisibility(View.GONE);
                         }
-                    }
+                        if (dealcount.equals("0")){
+                            mtvdealNumber.setVisibility(View.GONE);
+                        }
+                        if (reviewcount.equals("0")){
+                            mtvsendNumber.setVisibility(View.GONE);
+                        }
+                        if (postcount.equals("0")){
+                            mtvuncheckNumber.setVisibility(View.GONE);
+                        }
+                        if (checkcount.equals("0")){
+                            mtvcheckNumber.setVisibility(View.GONE);
+                        }
 
+                    }
 
                     break;
                 case FAIL:
-                    if (HomeFragment.this.getActivity() != null) {
-//                        ToastUtil.shortToast(HomeFragment.this.getActivity(), "");
-                    }
+                    testProgress.setVisibility(View.GONE);
                     break;
-                case ISLOAD:
-                    String isload = (String) msg.obj;
-                    if (!isload.equals("true")) {
-//                        ToastUtil.shortToast(getContext(), "上报位置信息失败，请检查网络");
-                    }
-                    break;
+
             }
         }
     };
@@ -463,9 +461,6 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-
-        super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == RESULT_OK) { //RESULT_OK = -1
             Bundle bundle = data.getExtras();
             ToastUtil.shortToast(getActivity(), "扫描成功");
@@ -476,5 +471,6 @@ public class HomeFragment extends BaseFragment implements ActivityCompat.OnReque
             startActivity(intent);
 
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

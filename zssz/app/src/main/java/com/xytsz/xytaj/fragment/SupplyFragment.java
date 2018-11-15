@@ -109,7 +109,7 @@ public class SupplyFragment extends BaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtils.requestPermissionsResult(getActivity(), requestCode, permissions, grantResults, mPermissionGrant);
     }
 
@@ -221,7 +221,7 @@ public class SupplyFragment extends BaseFragment {
                                         Intent intent = new Intent(getContext(), MemberCompanyShowActivity.class);
                                         //传递Id；
                                         intent.putExtra("companyName", thirdDatas.get(position).getCompanyName());
-                                        intent.putExtra("companyDetail", thirdDatas.get(position));
+//                                        intent.putExtra("companyDetail", thirdDatas.get(position));
                                         intent.putExtra("companyID", thirdDatas.get(position).getID());
                                         startActivity(intent);
                                     }
@@ -403,7 +403,8 @@ public class SupplyFragment extends BaseFragment {
                     break;
                 case R.id.iv_sup_phone:
                     //打电话
-                    PermissionUtils.requestPermission(SupplyFragment.this.getActivity(), PermissionUtils.CODE_CALL_PHONE, mPermissionGrant);
+                    PermissionUtils.requestPermission(SupplyFragment.this.getActivity(),
+                            PermissionUtils.CODE_CALL_PHONE, mPermissionGrant);
 
                     break;
                 case R.id.iv_sup_wechat:

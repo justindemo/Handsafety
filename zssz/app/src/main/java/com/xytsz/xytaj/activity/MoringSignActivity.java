@@ -1,7 +1,6 @@
 package com.xytsz.xytaj.activity;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,13 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,14 +31,11 @@ import com.baidu.location.LocationClientOption;
 import com.google.gson.reflect.TypeToken;
 import com.xytsz.xytaj.R;
 import com.xytsz.xytaj.adapter.MoringCheckAdapter;
-import com.xytsz.xytaj.adapter.SearchAdapter;
-import com.xytsz.xytaj.adapter.SendRoadAdapter;
 import com.xytsz.xytaj.bean.CheckItem;
 import com.xytsz.xytaj.bean.DiseaseInformation;
 import com.xytsz.xytaj.bean.Person;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
-import com.xytsz.xytaj.ui.SearchView;
 import com.xytsz.xytaj.util.BitmapUtil;
 import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.JsonUtil;
@@ -76,8 +68,7 @@ import butterknife.OnClick;
  * Created by admin on 2018/3/2.
  * 早会签到
  */
-public class MoringSignActivity extends AppCompatActivity
-{
+public class MoringSignActivity extends AppCompatActivity {
 
     @Bind(R.id.tv_sign_team)
     TextView tvSignTeam;
@@ -93,6 +84,7 @@ public class MoringSignActivity extends AppCompatActivity
     Button reportSign;
     @Bind(R.id.morning_progressbar)
     LinearLayout morningProgressbar;
+
     private String tag;
     private String method;
     public Handler handler = new Handler() {
@@ -124,19 +116,19 @@ public class MoringSignActivity extends AppCompatActivity
                     llSign.setVisibility(View.VISIBLE);
                     reportSign.setVisibility(View.VISIBLE);
                     Bundle bundle = msg.getData();
-                    String personJson = bundle.getString("person");
+//                    String personJson = bundle.getString("person");
                     String checkJson = bundle.getString("check");
 
-                    persons = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
-                    }.getType());
+                    /*persons = JsonUtil.jsonToBean(personJson, new TypeToken<List<Person>>() {
+                    }.getType());*/
                     checkItemLists = JsonUtil.jsonToBean(checkJson, new TypeToken<List<CheckItem>>() {
                     }.getType());
 
-
+/*
                     personlist = new String[persons.size()];
                     for (int i = 0; i < personlist.length; i++) {
                         personlist[i] = persons.get(i).getName();
-                    }
+                    }*/
 
                     checkItems.clear();
                     checkItems.add("正常");
@@ -212,7 +204,7 @@ public class MoringSignActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             fileResult = savedInstanceState.getString("file_path");
         }
         super.onCreate(savedInstanceState);
@@ -244,13 +236,12 @@ public class MoringSignActivity extends AppCompatActivity
         }
         initActionbar(title);
         PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_COARSE_LOCATION, mPermissionGrant);
-        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
+//        PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_ACCESS_FINE_LOCATION, mPermissionGrant);
         initData();
         diseaseInformation = new DiseaseInformation();
 
 
     }
-
 
 
     private void locat() {
@@ -297,7 +288,7 @@ public class MoringSignActivity extends AppCompatActivity
 
         headerList.clear();
         HeaderProperty headerPropertyObj = new HeaderProperty(GlobalContanstant.Cookie,
-                SpUtils.getString(getApplicationContext(),GlobalContanstant.CookieHeader));
+                SpUtils.getString(getApplicationContext(), GlobalContanstant.CookieHeader));
 
         headerList.add(headerPropertyObj);
 
@@ -305,14 +296,14 @@ public class MoringSignActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    String personData = getData("person");
+//                    String personData = getData("person");
                     String checkData = getData("check");
 
 
-                    if (personData != null && checkData != null) {
+                    if ( checkData != null) {
                         Message message = Message.obtain();
                         Bundle bundle = new Bundle();
-                        bundle.putString("person", personData);
+//                        bundle.putString("person", personData);
                         bundle.putString("check", checkData);
                         message.setData(bundle);
                         message.what = GlobalContanstant.PERSONSIGNSUCCESS;
@@ -344,7 +335,7 @@ public class MoringSignActivity extends AppCompatActivity
                 soapObject = new SoapObject(NetUrl.nameSpace, NetUrl.getSignCheck);
                 if (this.tag.equals("trainsign")) {
                     soapObject.addProperty("Type", 2);
-                } else if (this.tag.equals("moringsign")){
+                } else if (this.tag.equals("moringsign")) {
                     soapObject.addProperty("Type", 1);
                 }
 
@@ -361,7 +352,7 @@ public class MoringSignActivity extends AppCompatActivity
 
         //添加cookie
 //
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
 
         SoapObject object = (SoapObject) envelope.bodyIn;
 
@@ -416,14 +407,14 @@ public class MoringSignActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionUtils.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        if (Build.VERSION.SDK_INT >= 24){
-            outState.putString("file_path",fileResult);
-        }else {
+        if (Build.VERSION.SDK_INT >= 24) {
+            outState.putString("file_path", fileResult);
+        } else {
             outState.putString("file_path", fileResult);
 
         }
@@ -437,27 +428,28 @@ public class MoringSignActivity extends AppCompatActivity
         switch (requestCode) {
             case Take_Photo:
                 if (resultCode == RESULT_OK) {
-                    if (data != null){
+                    if (data != null) {
                         bitmap = (Bitmap) data.getExtras().get("data");
-                    }else {
+                    } else {
                         bitmap = BitmapUtil.getScaleBitmap(fileResult);
 
-
                     }
-                    if (bitmap ==null){
+                    if (bitmap == null) {
                         return;
+                    } else {
+                        ivSignPicture.setImageBitmap(bitmap);
+
+                        diseaseInformation.fileName = saveToSDCard(bitmap);
+                        //将选择的图片设置到控件上
+                        diseaseInformation.encode = ReportActivity.photo2Base64(path);
                     }
-                    ivSignPicture.setImageBitmap(bitmap);
-                    diseaseInformation.fileName = saveToSDCard(bitmap);
-                    //将选择的图片设置到控件上
-                    diseaseInformation.encode = ReportActivity.photo2Base64(path);
 
                 }
 
                 break;
         }
 
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -501,12 +493,11 @@ public class MoringSignActivity extends AppCompatActivity
         return fileName;
     }
 
+
     @OnClick({R.id.tv_sign_person, R.id.iv_sign_picture, R.id.report_sign})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_sign_person:
 
-                break;
             case R.id.iv_sign_picture:
                 //添加照片
                 PermissionUtils.requestPermission(MoringSignActivity.this, PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
@@ -517,47 +508,38 @@ public class MoringSignActivity extends AppCompatActivity
                 //没有图片不能上报
                 //没有选择检查项不能上报
                 //选择正常和不正常的同时的时候 不能上报。
-                    String personName = tvSignPerson.getText().toString();
-                    //获取人员ID
-                    for (Person pe : persons) {
-                        if (TextUtils.equals(personName, pe.getName())) {
-                            selectPersonID = pe.getId();
-                        }
-                    }
-                    List<DiseaseInformation.CheckItem> checkItemList = moringCheckAdapter.getDiseaseInformation();
 
-                    StringBuilder stringBuilder = new StringBuilder();
+                List<DiseaseInformation.CheckItem> checkItemList = moringCheckAdapter.getDiseaseInformation();
 
-                    if (checkItemList.get(0).isCheck()) {
-                        for (int i = 1; i < checkItemList.size(); i++) {
-                            if (checkItemList.get(i).isCheck()) {
-                                ToastUtil.shortToast(getApplicationContext(), "检查项选择错误");
-                                return;
-                            }
-                        }
+                StringBuilder stringBuilder = new StringBuilder();
 
-                        problemTag = "正常";
-                    } else {
-                        problemTag = "不正常";
-                    }
-
-
+                if (checkItemList.get(0).isCheck()) {
                     for (int i = 1; i < checkItemList.size(); i++) {
-
-                        int position = checkItemList.get(i).getPosition();
-                        stringBuilder.append(position).append(",");
-
+                        if (checkItemList.get(i).isCheck()) {
+                            ToastUtil.shortToast(getApplicationContext(), "检查项选择错误");
+                            return;
+                        }
                     }
-                    problemtext = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
 
-                    upData();
+                    problemTag = "正常";
+                } else {
+                    problemTag = "不正常";
+                }
+
+
+                for (int i = 1; i < checkItemList.size(); i++) {
+
+                    int position = checkItemList.get(i).getPosition();
+                    stringBuilder.append(position).append(",");
+
+                }
+                problemtext = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+
+                upData();
 
                 break;
         }
     }
-
-
-
 
 
     private void upData() {
@@ -591,14 +573,14 @@ public class MoringSignActivity extends AppCompatActivity
         SoapObject soapObject = new SoapObject(NetUrl.nameSpace, method);
         if (tag.equals("trainsign")) {
             soapObject.addProperty("TrainId", trainId);
-        } else if (tag.equals("moringsign")){
+        } else if (tag.equals("moringsign")) {
             soapObject.addProperty("SignID", signId);
             soapObject.addProperty("latitude", diseaseInformation.latitude);
             soapObject.addProperty("longitude", diseaseInformation.longitude);
-        }else {
+        } else {
             soapObject.addProperty("MeetingID", trainId);
         }
-        soapObject.addProperty("SignPersonId", selectPersonID);
+        soapObject.addProperty("SignPersonId", personID);
         soapObject.addProperty("CheckInfo", problemTag);
         soapObject.addProperty("Info", problemtext);
         soapObject.addProperty("FileName", diseaseInformation.fileName);  //文件类型
@@ -608,11 +590,9 @@ public class MoringSignActivity extends AppCompatActivity
         envelope.setOutputSoapObject(soapObject);
         envelope.dotNet = true;
         envelope.bodyOut = soapObject;
-
-
         HttpTransportSE httpTransportSE = new HttpTransportSE(NetUrl.SERVERURL);
 
-        httpTransportSE.call(null, envelope,headerList);
+        httpTransportSE.call(null, envelope, headerList);
         SoapObject object = (SoapObject) envelope.bodyIn;
         String result = object.getProperty(0).toString();
         return result;
@@ -620,13 +600,14 @@ public class MoringSignActivity extends AppCompatActivity
 
 
 
+
     private class MyListener extends BDAbstractLocationListener {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            if (diseaseInformation != null){
-                diseaseInformation.longitude = bdLocation.getLongitude() +"";
-                diseaseInformation.latitude = bdLocation.getLatitude() +"";
+            if (diseaseInformation != null) {
+                diseaseInformation.longitude = bdLocation.getLongitude() + "";
+                diseaseInformation.latitude = bdLocation.getLatitude() + "";
             }
         }
     }
@@ -635,7 +616,7 @@ public class MoringSignActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (locationClient != null){
+        if (locationClient != null) {
             locationClient.start();
         }
     }
@@ -643,7 +624,7 @@ public class MoringSignActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if (locationClient != null){
+        if (locationClient != null) {
             locationClient.stop();
         }
     }
@@ -651,7 +632,7 @@ public class MoringSignActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (locationClient !=null){
+        if (locationClient != null) {
             locationClient.stop();
             locationClient.unRegisterLocationListener(myListener);
         }

@@ -27,6 +27,15 @@ public class ReportData implements Serializable{
     private String DeviceName;
     private String DeviceNum;
     private int ID;
+    public String getIsShow() {
+        return IsShow;
+    }
+
+    public void setIsShow(String isShow) {
+        IsShow = isShow;
+    }
+
+    private String IsShow;
     private java.util.List<Problem> List;
 
     public String getChargeperson2() {

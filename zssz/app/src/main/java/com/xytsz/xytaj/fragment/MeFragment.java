@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -33,6 +34,7 @@ import com.xytsz.xytaj.bean.UpdateStatus;
 import com.xytsz.xytaj.bean.VersionInfo;
 import com.xytsz.xytaj.global.GlobalContanstant;
 import com.xytsz.xytaj.net.NetUrl;
+import com.xytsz.xytaj.util.FileUtils;
 import com.xytsz.xytaj.util.IntentUtil;
 import com.xytsz.xytaj.util.PermissionUtils;
 import com.xytsz.xytaj.util.SpUtils;
@@ -112,6 +114,7 @@ public class MeFragment extends BaseFragment {
     private TextView mActionbartext;
     private TextView tvReviewNum;
     private static boolean isClick;
+    private TextView tvCleanCache;
 
 
     @Override
@@ -129,6 +132,7 @@ public class MeFragment extends BaseFragment {
 
         mine_tv_sign = (TextView) view.findViewById(R.id.mine_tv_sign);
         tvReviewNum = (TextView) view.findViewById(R.id.tv_review_nume);
+        tvCleanCache = (TextView) view.findViewById(R.id.me_clean_cache);
 
         return view;
     }
@@ -182,7 +186,7 @@ public class MeFragment extends BaseFragment {
         mLLReview.setOnClickListener(listener);
         //mTvData.setOnClickListener(listener);
         forUs.setOnClickListener(listener);
-
+        tvCleanCache.setOnClickListener(listener);
 
         headerList.clear();
         if (MeFragment.this.getActivity() != null) {
@@ -218,8 +222,6 @@ public class MeFragment extends BaseFragment {
                 case R.id.iv_my_icon:
                     //
 
-
-
                     Intent intent1 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(intent1, 200);
                     break;
@@ -240,6 +242,27 @@ public class MeFragment extends BaseFragment {
 
                 case R.id.for_us:
                     IntentUtil.startActivity(getContext(), ForUsActivity.class);
+                    break;
+                case R.id.me_clean_cache:
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                        String cleanPath = Environment.getExternalStorageDirectory().getAbsolutePath()+
+                                "/Zsaj/";
+                        //判断这个文件夹是否存在
+
+                        FileUtils.cleanCustomCache(cleanPath);
+
+
+                        if (Build.VERSION.SDK_INT >=24){
+                            FileUtils.cleanExternalCache(getContext());
+                        }
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastUtil.shortToast(getContext(),"清理完成");
+                            }
+                        },1500);
+                    }
                     break;
 
             }
@@ -494,7 +517,7 @@ public class MeFragment extends BaseFragment {
                     String info = (String) msg.obj;
                     if (info != null) {
                         //检查更新
-                        UpdateVersionUtil.localCheckedVersion(MeFragment.this.getActivity().getApplicationContext(),
+                        UpdateVersionUtil.localCheckedVersion(MeFragment.this.getContext(),
                                 new UpdateVersionUtil.UpdateListener() {
 
                             @Override
@@ -507,7 +530,7 @@ public class MeFragment extends BaseFragment {
                                         break;
                                     case UpdateStatus.NO:
                                         //没有新版本
-                                        ToastUtil.shortToast(MeFragment.this.getActivity().getApplicationContext(), "已经是最新版本了!");
+                                        ToastUtil.shortToast(MeFragment.this.getContext(), "已经是最新版本了!");
                                         break;
                                     case UpdateStatus.NOWIFI:
                                         //当前是非wifi网络
@@ -518,11 +541,11 @@ public class MeFragment extends BaseFragment {
                                         break;
                                     case UpdateStatus.ERROR:
                                         //检测失败
-                                        ToastUtil.shortToast(MeFragment.this.getActivity().getApplicationContext(), "检测失败，请稍后重试！");
+                                        ToastUtil.shortToast(MeFragment.this.getContext(), "检测失败，请稍后重试！");
                                         break;
                                     case UpdateStatus.TIMEOUT:
                                         //链接超时
-                                        ToastUtil.shortToast(MeFragment.this.getActivity().getApplicationContext(), "链接超时，请检查网络设置!");
+                                        ToastUtil.shortToast(MeFragment.this.getContext(), "链接超时，请检查网络设置!");
                                         break;
                                 }
                             }
@@ -595,11 +618,13 @@ public class MeFragment extends BaseFragment {
                 //退出
                 userExit();
                 Intent intent1 = new Intent(MeFragment.this.getActivity(), MainActivity.class);
-                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent1);
+                getActivity().finish();
                 break;
             //软件评价
             case R.id.me_appraise:
+
 
                 IntentUtil.startActivity(MeFragment.this.getActivity(), AppraiseActivity.class);
                 break;
@@ -653,7 +678,7 @@ public class MeFragment extends BaseFragment {
         // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
         oks.setTitleUrl("http://www.xytgps.com");
         // text是分享文本，所有平台都需要这个字段
-        oks.setText("掌上市政是一款助力中国智慧城市的发展，为中国城市里的市政养护行业提供“规划设计+软件开发+系统集成+行内专业术语规范+运营维护+定期培训考核”的一体化解决方案的App。");
+        oks.setText("掌上安监是针对工贸企业运营过程中的粉尘防爆、消防安全、环境保护、职业卫生的管理，以及员工的安全培训管理的一套完整的工贸企业生产安全现场执行系统。");
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         oks.setImagePath(testPath);//确保SDcard下面存在此张图片
         // url仅在微信（包括好友和朋友圈）中使用
@@ -711,7 +736,7 @@ public class MeFragment extends BaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtils.requestPermissionsResult(MeFragment.this.getActivity(), requestCode, permissions, grantResults, mPermission);
     }
 

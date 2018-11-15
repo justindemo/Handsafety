@@ -10,6 +10,8 @@
     <dimen name="supply_height">175dp</dimen>
     <dimen name="supply_bg_height">230dp</dimen>
     <dimen name="facility_bg_height">200dp</dimen>
+    <dimen name="report_img">100dp</dimen>
+    <dimen name="moring_img_height">144dp</dimen>
 
 
 </resources>

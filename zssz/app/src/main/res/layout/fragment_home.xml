@@ -18,10 +18,18 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/map_height" />
 
+        <ProgressBar
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateDrawable="@drawable/progress_loading"
+            android:id="@+id/testprogress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </FrameLayout>
 
     <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -39,7 +47,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                >
 
                 <ImageView
                     android:id="@+id/home_report"
@@ -51,8 +60,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_report"
-                    android:layout_marginTop="4dp"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="8dp"
                     android:text="@string/reprote"
                     android:textSize="15sp" />
                 <TextView
@@ -84,11 +93,11 @@
                     android:src="@mipmap/home_deal" />
 
                 <TextView
+                    android:layout_marginLeft="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_deal"
-                    android:layout_marginTop="4dp"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
                     android:text="@string/deal"
                     android:textSize="15sp" />
 
@@ -124,11 +133,11 @@
 
 
                 <TextView
+                    android:layout_marginLeft="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_post"
-                    android:layout_marginTop="4dp"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
                     android:text="@string/post"
                     android:textSize="15sp" />
 
@@ -173,8 +182,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_review"
-                    android:layout_marginTop="4dp"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="8dp"
                     android:text="@string/review"
                     android:textSize="15sp" />
 
@@ -211,8 +220,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_send"
-                    android:layout_marginTop="4dp"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="8dp"
                     android:text="@string/send"
                     android:textSize="15sp" />
 
@@ -241,7 +250,6 @@
                 android:orientation="vertical">
 
                 <ImageView
-
                     android:id="@+id/home_check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -251,7 +259,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/home_check"
-                    android:padding="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="8dp"
                     android:text="@string/check"
                     android:textSize="15sp" />
 

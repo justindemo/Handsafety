@@ -95,11 +95,11 @@ public class HomeActivity extends AppCompatActivity {
         SDKInitializer.initialize(getApplicationContext());
 
         setContentView(R.layout.activity_home);
-        String loginId = SpUtils.getString(getApplicationContext(), GlobalContanstant.LOGINID);
+
 
         role = SpUtils.getInt(getApplicationContext(), GlobalContanstant.ROLE);
 
-        if (loginId == null || TextUtils.isEmpty(loginId)) {
+        /*if (loginId == null || TextUtils.isEmpty(loginId)) {
             isFirst = false;
             Intent intent = new Intent(HomeActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -107,7 +107,7 @@ public class HomeActivity extends AppCompatActivity {
             HomeActivity.this.finish();
         }else {
             isFirst = true;
-        }
+        }*/
 
         /**
          *
@@ -247,7 +247,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        if (isFirst){
+
             //添加cookie
 //        private List<HeaderProperty> headerList = new ArrayList<>();
             headerList.clear();
@@ -275,7 +275,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 }.start();
             }
-        }
+
 
 
 

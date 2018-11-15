@@ -52,14 +52,18 @@ public class ProduceListActivity extends AppCompatActivity {
     private String tag;
 
 
-    private List<CompanyProduce.Produce> data1 = new ArrayList<>();
     private ProduceListAdapter produceListAdapter;
     private List<CompanyProduce.Produce> data;
     private int companyId;
     private String url;
     private List<CompanyCase.DataBean> casedata;
-    private List<CompanyCase.DataBean> data2 = new ArrayList<>();
+
+    private List<CompanyProduce.Produce> data1= new ArrayList<>();
+    private List<CompanyCase.DataBean> data2= new ArrayList<>();
     private int personId;
+    private int datacount;
+    private int pageSize = 8;
+    private int caseCount;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,8 +95,23 @@ public class ProduceListActivity extends AppCompatActivity {
                 producelistRefreshlayout.setOnLoadMoreListener(new OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(RefreshLayout refreshLayout) {
-                        ++pageNo;
-                        getproduceList(1);
+                        producelistRefreshlayout.finishLoadMore(2000);
+                        if (datacount != 0){
+                            int pagecount = datacount / pageSize;
+                            int max = datacount % pageSize;
+                            if (max >0) {
+                                ++pagecount;
+                            }
+                            if (pageNo < pagecount) {
+                                ++pageNo;
+                                getproduceList(1);
+                            }else {
+                                ToastUtil.shortToast(getApplicationContext(),"没有更多了");
+                            }
+                        }
+
+
+
                     }
                 });
 
@@ -103,8 +122,23 @@ public class ProduceListActivity extends AppCompatActivity {
                 producelistRefreshlayout.setOnLoadMoreListener(new OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(RefreshLayout refreshLayout) {
-                        ++pageNo;
-                        getproduceList(2);
+                        producelistRefreshlayout.finishLoadMore(2000);
+                        if (caseCount != 0){
+                            int pagecount = caseCount / pageSize;
+                            int max = caseCount % pageSize;
+                            if (max >0) {
+                                ++pagecount;
+                            }
+                            if (pageNo < pagecount) {
+                                ++pageNo;
+                                getproduceList(2);
+                            }else {
+                                ToastUtil.shortToast(getApplicationContext(),"没有更多了");
+                            }
+                        }
+
+
+
                     }
                 });
 
@@ -118,10 +152,10 @@ public class ProduceListActivity extends AppCompatActivity {
     private int pageNo = 1;
     private Map<String, Integer> params = new HashMap<>();
     private  CaseListAdapter caseListAdapter;
-    private void getproduceList(int categroy) {
+    private void getproduceList(final int categroy) {
 
         params.clear();
-        params.put("pageSize", 6);
+        params.put("pageSize",pageSize);
         params.put("pageNo", pageNo);
         params.put("companyID", companyId);
         params.put("AJPersonID", personId);
@@ -143,9 +177,10 @@ public class ProduceListActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(CompanyProduce response, int id) {
-                            producelistRefreshlayout.finishLoadMore(2000);
+
                             if (response != null) {
                                 data = response.getData();
+                                datacount = response.getDataCount();
                                 if (data.size() == 0) {
                                     if (pageNo == 1) {
                                         ToastUtil.shortToast(getApplicationContext(), "noting");
@@ -153,7 +188,7 @@ public class ProduceListActivity extends AppCompatActivity {
                                 } else {
                                     data1.addAll(data);
                                     if (pageNo == 1) {
-                                        produceListAdapter = new ProduceListAdapter(data1, ProduceListActivity.this);
+                                        produceListAdapter = new ProduceListAdapter(data, ProduceListActivity.this);
                                         producelistRv.setAdapter(produceListAdapter);
                                     } else {
                                         produceListAdapter.addData(data);
@@ -192,17 +227,19 @@ public class ProduceListActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(CompanyCase response, int id) {
-                            producelistRefreshlayout.finishLoadMore(2000);
+
                             if (response != null) {
                                 casedata = response.getData();
+                                caseCount = response.getDataCount();
                                 if (casedata.size() == 0) {
                                     if (pageNo == 1) {
                                         ToastUtil.shortToast(getApplicationContext(), "noting");
                                     }
                                 } else {
+
                                     data2.addAll(casedata);
                                     if (pageNo == 1) {
-                                        caseListAdapter = new CaseListAdapter(data2, ProduceListActivity.this);
+                                        caseListAdapter = new CaseListAdapter(casedata, ProduceListActivity.this);
                                         producelistRv.setAdapter(caseListAdapter);
 
                                     } else {
